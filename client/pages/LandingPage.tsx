@@ -28,17 +28,17 @@ export default function LandingPage() {
   return (
     <div className="min-h-screen bg-bg-soft relative overflow-hidden">
       {/* Decorative background circles */}
-      <div className="absolute -left-20 top-[834px] w-[459px] h-[459px] rounded-full opacity-40 bg-gradient-to-b from-primary-blue to-[#B3D8FF] pointer-events-none" />
+      <div className="absolute -left-20 top-[834px] w-[459px] h-[459px] rounded-full opacity-40 bg-gradient-to-b from-primary-blue to-[#B3D8FF] pointer-events-none float-slow-1" />
       <div
-        className="absolute left-[633px] top-[81px] w-[279px] h-[279px] rounded-full opacity-40 pointer-events-none"
+        className="absolute left-[633px] top-[81px] w-[279px] h-[279px] rounded-full opacity-40 pointer-events-none float-slow-2"
         style={{
           background:
             "linear-gradient(180deg, rgba(49, 133, 252, 0.20) 0%, rgba(179, 216, 255, 0.20) 100%)",
         }}
       />
-      <div className="absolute right-[24px] top-[657px] w-[150px] h-[150px] rounded-full bg-[#B3D8FF] opacity-40 pointer-events-none" />
+      <div className="absolute right-[24px] top-[657px] w-[150px] h-[150px] rounded-full bg-[#B3D8FF] opacity-40 pointer-events-none float-slow-3" />
       <div
-        className="absolute right-0 bottom-[133px] w-[200px] h-[200px] rounded-full opacity-40 pointer-events-none"
+        className="absolute right-0 bottom-[133px] w-[200px] h-[200px] rounded-full opacity-40 pointer-events-none float-slow-1"
         style={{ background: "linear-gradient(315deg, #B3D8FF 0.3%, #3185FC 99.7%)" }}
       />
 
