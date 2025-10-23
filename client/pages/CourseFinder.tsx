@@ -1,4 +1,4 @@
-import { useState, useMemo } from "react";
+import { useMemo, useState } from "react";
 import { Search, ChevronDown } from "lucide-react";
 import Navigation from "@/components/Navigation";
 import type { Course } from "@/types/course";
@@ -6,8 +6,13 @@ import { courseId } from "@/types/course";
 import { useWishlist } from "@/context/WishlistContext";
 
 export default function CourseFinder() {
-  const [fieldFilter, setFieldFilter] = useState("All Fields");
-  const [universityFilter, setUniversityFilter] = useState("All Universities");
+  // Filters & sort
+  const [search, setSearch] = useState<string>("");
+  const [fieldFilter, setFieldFilter] = useState<string>("All Fields");
+  const [universityFilter, setUniversityFilter] = useState<string>("All Universities");
+  const [atarMin, setAtarMin] = useState<number>(30);
+  const [atarMax, setAtarMax] = useState<number>(99.95);
+  const [sortBy, setSortBy] = useState<"none" | "uni" | "course">("none");
 
   const universities = [
     { name: "University of Wollongong", location: "Wollongong, NSW", abbr: "UOW" },
@@ -25,40 +30,41 @@ export default function CourseFinder() {
   ];
 
   const degrees = [
-    { title: "Bachelor of Computer Science", abbr: "CS" },
-    { title: "Bachelor of Information Technology", abbr: "IT" },
-    { title: "Bachelor of Data Science", abbr: "DS" },
-    { title: "Bachelor of Software Engineering", abbr: "SE" },
-    { title: "Bachelor of Electrical Engineering", abbr: "EE" },
-    { title: "Bachelor of Mechanical Engineering", abbr: "ME" },
-    { title: "Bachelor of Civil Engineering", abbr: "CE" },
-    { title: "Bachelor of Business", abbr: "BUS" },
-    { title: "Bachelor of Commerce", abbr: "BCOM" },
-    { title: "Bachelor of Accounting", abbr: "ACC" },
-    { title: "Bachelor of Finance", abbr: "FIN" },
-    { title: "Bachelor of Law", abbr: "LLB" },
-    { title: "Bachelor of Arts", abbr: "BA" },
-    { title: "Bachelor of Design", abbr: "DES" },
-    { title: "Bachelor of Architecture", abbr: "ARCH" },
-    { title: "Bachelor of Education", abbr: "EDU" },
-    { title: "Bachelor of Nursing", abbr: "NURS" },
-    { title: "Bachelor of Psychology", abbr: "PSY" },
-    { title: "Bachelor of Biomedical Science", abbr: "BIOM" },
-    { title: "Bachelor of Pharmacy", abbr: "PHAR" },
-    { title: "Bachelor of Environmental Science", abbr: "ENV" },
-    { title: "Bachelor of Communication", abbr: "COMM" },
+    { title: "Bachelor of Computer Science", abbr: "CS", field: "Computing & IT" },
+    { title: "Bachelor of Information Technology", abbr: "IT", field: "Computing & IT" },
+    { title: "Bachelor of Data Science", abbr: "DS", field: "Computing & IT" },
+    { title: "Bachelor of Software Engineering", abbr: "SE", field: "Computing & IT" },
+    { title: "Bachelor of Electrical Engineering", abbr: "EE", field: "Engineering" },
+    { title: "Bachelor of Mechanical Engineering", abbr: "ME", field: "Engineering" },
+    { title: "Bachelor of Civil Engineering", abbr: "CE", field: "Engineering" },
+    { title: "Bachelor of Business", abbr: "BUS", field: "Business" },
+    { title: "Bachelor of Commerce", abbr: "BCOM", field: "Business" },
+    { title: "Bachelor of Accounting", abbr: "ACC", field: "Business" },
+    { title: "Bachelor of Finance", abbr: "FIN", field: "Business" },
+    { title: "Bachelor of Law", abbr: "LLB", field: "Law" },
+    { title: "Bachelor of Arts", abbr: "BA", field: "Arts & Design" },
+    { title: "Bachelor of Design", abbr: "DES", field: "Arts & Design" },
+    { title: "Bachelor of Architecture", abbr: "ARCH", field: "Arts & Design" },
+    { title: "Bachelor of Education", abbr: "EDU", field: "Education & Health" },
+    { title: "Bachelor of Nursing", abbr: "NURS", field: "Education & Health" },
+    { title: "Bachelor of Psychology", abbr: "PSY", field: "Education & Health" },
+    { title: "Bachelor of Biomedical Science", abbr: "BIOM", field: "Science" },
+    { title: "Bachelor of Pharmacy", abbr: "PHAR", field: "Science" },
+    { title: "Bachelor of Environmental Science", abbr: "ENV", field: "Science" },
+    { title: "Bachelor of Communication", abbr: "COMM", field: "Arts & Design" },
   ];
 
   const sem1 = { start: "26-FEB-2026", close: "31-JAN-2026" };
   const sem2 = { start: "22-JUL-2026", close: "30-JUN-2026" };
 
-  // Generate ~144 varied entries (12 universities x 12 selected degrees)
+  // Generate varied entries (12 universities x 12 degrees = 144)
   const courses: Course[] = useMemo(() => {
-    const chosenDegrees = degrees.slice(0, 12); // pick 12 diverse degrees
+    const chosenDegrees = degrees.slice(0, 12);
     const out: Course[] = [];
     universities.forEach((uni, ui) => {
       chosenDegrees.forEach((deg, di) => {
         const sem = (ui + di) % 2 === 0 ? sem1 : sem2;
+        const atar = 50 + ((ui * 13 + di * 7) % 50); // ~50–99
         out.push({
           university: uni.name,
           location: uni.location,
@@ -66,13 +72,41 @@ export default function CourseFinder() {
           code: `${uni.abbr}-${deg.abbr}-${String(di + 1).padStart(2, "0")}`,
           startDate: sem.start,
           closingDate: sem.close,
+          atar,
+          field: deg.field,
         });
       });
     });
-    return out; // 12*12 = 144 entries
+    return out;
   }, []);
 
+  const universityNames = useMemo(() => universities.map((u) => u.name), []);
+  const fieldOptions = useMemo(() => ["All Fields", ...Array.from(new Set(degrees.map((d) => d.field)))], []);
+
   const { add, has } = useWishlist();
+
+  // Filtering + sorting pipeline
+  const filteredCourses = useMemo(() => {
+    const q = search.trim().toLowerCase();
+    let list = courses.filter((c) => c.atar === undefined || (c.atar >= atarMin && c.atar <= atarMax));
+
+    if (q) {
+      list = list.filter(
+        (c) =>
+          c.university.toLowerCase().includes(q) ||
+          c.degree.toLowerCase().includes(q) ||
+          c.code.toLowerCase().includes(q)
+      );
+    }
+
+    if (fieldFilter !== "All Fields") list = list.filter((c) => c.field === fieldFilter);
+    if (universityFilter !== "All Universities") list = list.filter((c) => c.university === universityFilter);
+
+    if (sortBy === "uni") list = [...list].sort((a, b) => a.university.localeCompare(b.university));
+    if (sortBy === "course") list = [...list].sort((a, b) => a.degree.localeCompare(b.degree));
+
+    return list;
+  }, [courses, search, fieldFilter, universityFilter, atarMin, atarMax, sortBy]);
 
   return (
     <div className="min-h-screen bg-bg-soft">
@@ -81,12 +115,8 @@ export default function CourseFinder() {
       {/* Header */}
       <div className="w-full h-[140px] bg-primary-blue flex items-center justify-start px-6 lg:px-36">
         <div>
-          <h1 className="text-white text-3xl font-bold mb-2">
-            Find Your Perfect Course
-          </h1>
-          <p className="text-white text-sm">
-            Explore thousands of University courses across NSW
-          </p>
+          <h1 className="text-white text-3xl font-bold mb-2">Find Your Perfect Course</h1>
+          <p className="text-white text-sm">Explore thousands of University courses across NSW</p>
         </div>
       </div>
 
@@ -97,18 +127,8 @@ export default function CourseFinder() {
           <div className="bg-white border border-[#B3D8FF] rounded-lg p-4 shadow-[0_0_14px_0_rgba(49,133,252,0.15)] space-y-6">
             {/* Filter Header */}
             <div className="flex items-center gap-4">
-              <svg
-                width="32"
-                height="32"
-                viewBox="0 0 32 32"
-                fill="none"
-                xmlns="http://www.w3.org/2000/svg"
-              >
-                <path
-                  d="M23.5 7H8.5C8.22386 7 8 7.22386 8 7.5V9.78005C8 9.9202 8.05882 10.0539 8.16214 10.1486L13.8379 15.3514C13.9412 15.4461 14 15.5798 14 15.72V25.0979C14 25.4906 14.432 25.73 14.765 25.5219L17.765 23.6469C17.9112 23.5555 18 23.3953 18 23.2229V15.72C18 15.5798 18.0588 15.4461 18.1621 15.3514L23.8379 10.1486C23.9412 10.0539 24 9.9202 24 9.78005V7.5C24 7.22386 23.7761 7 23.5 7Z"
-                  stroke="#6E7491"
-                  strokeWidth="2"
-                />
+              <svg width="32" height="32" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M23.5 7H8.5C8.22386 7 8 7.22386 8 7.5V9.78005C8 9.9202 8.05882 10.0539 8.16214 10.1486L13.8379 15.3514C13.9412 15.4461 14 15.5798 14 15.72V25.0979C14 25.4906 14.432 25.73 14.765 25.5219L17.765 23.6469C17.9112 23.5555 18 23.3953 18 23.2229V15.72C18 15.5798 18.0588 15.4461 18.1621 15.3514L23.8379 10.1486C23.9412 10.0539 24 9.9202 24 9.78005V7.5C24 7.22386 23.7761 7 23.5 7Z" stroke="#6E7491" strokeWidth="2" />
               </svg>
               <h2 className="text-2xl font-bold text-[#1A1A1A]">Filters</h2>
             </div>
@@ -118,26 +138,25 @@ export default function CourseFinder() {
               <Search className="w-5 h-5 text-grey-400" />
               <input
                 type="text"
-                placeholder="Find Your Perfect Course"
+                value={search}
+                onChange={(e) => setSearch(e.target.value)}
+                placeholder="Filter by course, institution, or code"
                 className="flex-1 bg-transparent text-sm text-primary-blue placeholder:text-primary-blue outline-none"
               />
             </div>
 
             {/* Field of Study */}
             <div className="space-y-2">
-              <label className="block text-sm font-medium text-black">
-                Field of Study
-              </label>
+              <label className="block text-sm font-medium text-black">Field of Study</label>
               <div className="relative">
                 <select
                   value={fieldFilter}
                   onChange={(e) => setFieldFilter(e.target.value)}
                   className="w-full px-3 py-2.5 border border-[#777] rounded bg-bg-soft text-sm text-[#5D5D5D] appearance-none cursor-pointer"
                 >
-                  <option>All Fields</option>
-                  <option>Computer Science</option>
-                  <option>Engineering</option>
-                  <option>Medicine</option>
+                  {fieldOptions.map((opt) => (
+                    <option key={opt}>{opt}</option>
+                  ))}
                 </select>
                 <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-grey-400 pointer-events-none" />
               </div>
@@ -145,9 +164,7 @@ export default function CourseFinder() {
 
             {/* University */}
             <div className="space-y-2">
-              <label className="block text-sm font-medium text-black">
-                University
-              </label>
+              <label className="block text-sm font-medium text-black">University</label>
               <div className="relative">
                 <select
                   value={universityFilter}
@@ -155,9 +172,9 @@ export default function CourseFinder() {
                   className="w-full px-3 py-2.5 border border-[#777] rounded bg-bg-soft text-sm text-[#5D5D5D] appearance-none cursor-pointer"
                 >
                   <option>All Universities</option>
-                  <option>University of Wollongong</option>
-                  <option>Australian National University</option>
-                  <option>University of New South Wales</option>
+                  {universityNames.map((u) => (
+                    <option key={u}>{u}</option>
+                  ))}
                 </select>
                 <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-grey-400 pointer-events-none" />
               </div>
@@ -165,16 +182,30 @@ export default function CourseFinder() {
 
             {/* ATAR Slider */}
             <div className="space-y-3">
-              <label className="block text-base text-[#1E1E1E]">
-                ATAR Requirement: Up to 99.95
-              </label>
-              <div className="relative h-2 bg-[#E6E6E6] rounded-full">
-                <div className="absolute left-0 top-1/2 -translate-y-1/2 w-4 h-4 bg-[#2C2C2C] rounded-full" />
-                <div className="absolute right-0 top-1/2 -translate-y-1/2 w-4 h-4 bg-[#2C2C2C] rounded-full" />
+              <label className="block text-base text-[#1E1E1E]">ATAR Requirement: {atarMin.toFixed(2)} – {atarMax.toFixed(2)}</label>
+              <div className="relative">
+                <input
+                  type="range"
+                  min={30}
+                  max={99.95}
+                  step={0.05}
+                  value={atarMin}
+                  onChange={(e) => setAtarMin(Math.min(Number(e.target.value), atarMax))}
+                  className="w-full h-2 bg-[#E6E6E6] rounded-full appearance-none"
+                />
+                <input
+                  type="range"
+                  min={30}
+                  max={99.95}
+                  step={0.05}
+                  value={atarMax}
+                  onChange={(e) => setAtarMax(Math.max(Number(e.target.value), atarMin))}
+                  className="w-full h-2 bg-transparent -mt-2 appearance-none"
+                />
               </div>
               <div className="flex justify-between text-sm text-[#777]">
-                <span>30</span>
-                <span>99.95</span>
+                <span>{atarMin.toFixed(2)}</span>
+                <span>{atarMax.toFixed(2)}</span>
               </div>
             </div>
           </div>
@@ -183,12 +214,26 @@ export default function CourseFinder() {
         {/* Course Table */}
         <div className="flex-1 overflow-hidden">
           <div className="bg-white border border-[#E9E8FC] rounded-2xl overflow-hidden">
+            {/* Toolbar */}
+            <div className="flex items-center justify-end gap-3 p-3 border-b border-[#E9E8FC]">
+              <label className="text-sm text-grey-400">Sort by</label>
+              <select
+                value={sortBy}
+                onChange={(e) => setSortBy(e.target.value as any)}
+                className="px-2 py-1 border border-[#E1E8F0] rounded text-sm"
+              >
+                <option value="none">None</option>
+                <option value="uni">University (A–Z)</option>
+                <option value="course">Course (A–Z)</option>
+              </select>
+            </div>
+
             {/* Scrollable vertical list */}
             <div className="h-[632px] overflow-x-auto overflow-y-auto">
               <table className="w-full">
                 <tbody className="divide-y divide-[#E9E8FC]">
-                  {courses.map((course, index) => (
-                    <tr key={index} className="hover:bg-gray-50 transition-colors">
+                  {filteredCourses.map((course, index) => (
+                    <tr key={courseId(course) + index} className="hover:bg-gray-50 transition-colors">
                       <td className="p-4">
                         <div className="flex items-center gap-4">
                           <div className="w-12 h-12 rounded-full bg-primary-blue flex-shrink-0" />
@@ -215,10 +260,7 @@ export default function CourseFinder() {
                                   Added
                                 </button>
                               ) : (
-                                <button
-                                  onClick={() => add(course)}
-                                  className="px-3 py-2 text-sm border border-primary-blue text-primary-blue rounded-md hover:bg-blue-50"
-                                >
+                                <button onClick={() => add(course)} className="px-3 py-2 text-sm border border-primary-blue text-primary-blue rounded-md hover:bg-blue-50">
                                   Add to Wishlist
                                 </button>
                               )}
