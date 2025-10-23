@@ -9,63 +9,67 @@ export default function CourseFinder() {
   const [fieldFilter, setFieldFilter] = useState("All Fields");
   const [universityFilter, setUniversityFilter] = useState("All Universities");
 
-  const baseCourses: Course[] = [
-    {
-      university: "University of Wollongong",
-      location: "Wollongong, NSW",
-      degree: "Bachelor of Computer Science",
-      code: "7C8DB0",
-      startDate: "02-MAR-2026",
-      closingDate: "13-JAN-2026",
-    },
-    {
-      university: "Australian National University",
-      location: "Acton, CBR",
-      degree: "Bachelor of Computing",
-      code: "ANU-COMP",
-      startDate: "23-FEB-2026",
-      closingDate: "06-FEB-2026",
-    },
-    {
-      university: "University of New South Wales",
-      location: "Kensington, NSW",
-      degree: "Bachelor of Science (Computer Science)",
-      code: "UNSW-CS",
-      startDate: "16-FEB-2026",
-      closingDate: "22-JAN-2026",
-    },
-    {
-      university: "University of Wollongong",
-      location: "Liverpool, NSW",
-      degree: "Bachelor of Computer Science Bachelor of Laws",
-      code: "UOW-CS-LLB",
-      startDate: "02-MAR-2026",
-      closingDate: "29-JAN-2026",
-    },
-    {
-      university: "University of Western Sydney",
-      location: "Parramatta",
-      degree: "Bachelor of Computer Science",
-      code: "UWS-CS",
-      startDate: "02-MAR-2026",
-      closingDate: "06-FEB-2026",
-    },
+  const universities = [
+    { name: "University of Wollongong", location: "Wollongong, NSW", abbr: "UOW" },
+    { name: "Australian National University", location: "Acton, CBR", abbr: "ANU" },
+    { name: "University of New South Wales", location: "Kensington, NSW", abbr: "UNSW" },
+    { name: "University of Sydney", location: "Camperdown, NSW", abbr: "USYD" },
+    { name: "University of Technology Sydney", location: "Ultimo, NSW", abbr: "UTS" },
+    { name: "Macquarie University", location: "Macquarie Park, NSW", abbr: "MQ" },
+    { name: "Western Sydney University", location: "Parramatta, NSW", abbr: "WSU" },
+    { name: "University of Newcastle", location: "Callaghan, NSW", abbr: "UON" },
+    { name: "University of Canberra", location: "Bruce, ACT", abbr: "UC" },
+    { name: "Charles Sturt University", location: "Wagga Wagga, NSW", abbr: "CSU" },
+    { name: "Australian Catholic University", location: "North Sydney, NSW", abbr: "ACU" },
+    { name: "University of New England", location: "Armidale, NSW", abbr: "UNE" },
   ];
 
-  // Expand to many entries for scroll demo
+  const degrees = [
+    { title: "Bachelor of Computer Science", abbr: "CS" },
+    { title: "Bachelor of Information Technology", abbr: "IT" },
+    { title: "Bachelor of Data Science", abbr: "DS" },
+    { title: "Bachelor of Software Engineering", abbr: "SE" },
+    { title: "Bachelor of Electrical Engineering", abbr: "EE" },
+    { title: "Bachelor of Mechanical Engineering", abbr: "ME" },
+    { title: "Bachelor of Civil Engineering", abbr: "CE" },
+    { title: "Bachelor of Business", abbr: "BUS" },
+    { title: "Bachelor of Commerce", abbr: "BCOM" },
+    { title: "Bachelor of Accounting", abbr: "ACC" },
+    { title: "Bachelor of Finance", abbr: "FIN" },
+    { title: "Bachelor of Law", abbr: "LLB" },
+    { title: "Bachelor of Arts", abbr: "BA" },
+    { title: "Bachelor of Design", abbr: "DES" },
+    { title: "Bachelor of Architecture", abbr: "ARCH" },
+    { title: "Bachelor of Education", abbr: "EDU" },
+    { title: "Bachelor of Nursing", abbr: "NURS" },
+    { title: "Bachelor of Psychology", abbr: "PSY" },
+    { title: "Bachelor of Biomedical Science", abbr: "BIOM" },
+    { title: "Bachelor of Pharmacy", abbr: "PHAR" },
+    { title: "Bachelor of Environmental Science", abbr: "ENV" },
+    { title: "Bachelor of Communication", abbr: "COMM" },
+  ];
+
+  const sem1 = { start: "26-FEB-2026", close: "31-JAN-2026" };
+  const sem2 = { start: "22-JUL-2026", close: "30-JUN-2026" };
+
+  // Generate ~144 varied entries (12 universities x 12 selected degrees)
   const courses: Course[] = useMemo(() => {
+    const chosenDegrees = degrees.slice(0, 12); // pick 12 diverse degrees
     const out: Course[] = [];
-    for (let i = 0; i < 12; i++) {
-      for (const c of baseCourses) {
+    universities.forEach((uni, ui) => {
+      chosenDegrees.forEach((deg, di) => {
+        const sem = (ui + di) % 2 === 0 ? sem1 : sem2;
         out.push({
-          ...c,
-          code: `${c.code}-${i + 1}`,
-          startDate: c.startDate,
-          closingDate: c.closingDate,
+          university: uni.name,
+          location: uni.location,
+          degree: deg.title,
+          code: `${uni.abbr}-${deg.abbr}-${String(di + 1).padStart(2, "0")}`,
+          startDate: sem.start,
+          closingDate: sem.close,
         });
-      }
-    }
-    return out;
+      });
+    });
+    return out; // 12*12 = 144 entries
   }, []);
 
   const { add, has } = useWishlist();
