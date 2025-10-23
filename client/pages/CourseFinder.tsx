@@ -179,49 +179,45 @@ export default function CourseFinder() {
         {/* Course Table */}
         <div className="flex-1 overflow-hidden">
           <div className="bg-white border border-[#E9E8FC] rounded-2xl shadow-[0_11.963px_47.851px_0_rgba(49,133,252,0.20)] overflow-hidden">
-            <div className="overflow-x-auto">
+            {/* Scrollable vertical list */}
+            <div className="h-[632px] overflow-y-auto">
               <table className="w-full">
                 <tbody className="divide-y divide-[#E9E8FC]">
                   {courses.map((course, index) => (
-                    <tr
-                      key={index}
-                      className="hover:bg-gray-50 transition-colors"
-                    >
+                    <tr key={index} className="hover:bg-gray-50 transition-colors">
                       <td className="p-4">
                         <div className="flex items-center gap-4">
                           <div className="w-12 h-12 rounded-full bg-primary-blue flex-shrink-0" />
-                          <div className="min-w-0 flex-1 grid grid-cols-1 md:grid-cols-4 gap-4">
+                          <div className="min-w-0 flex-1 grid grid-cols-1 md:grid-cols-5 gap-4 items-center">
                             <div className="space-y-1">
-                              <div className="font-normal text-[#27273F] text-base">
-                                {course.university}
-                              </div>
-                              <div className="text-grey-400 text-base">
-                                {course.location}
-                              </div>
+                              <div className="font-normal text-[#27273F] text-base">{course.university}</div>
+                              <div className="text-grey-400 text-base">{course.location}</div>
                             </div>
                             <div className="space-y-1">
-                              <div className="font-normal text-[#27273F] text-base">
-                                {course.degree}
-                              </div>
-                              <div className="text-grey-400 text-base">
-                                {course.code}
-                              </div>
+                              <div className="font-normal text-[#27273F] text-base">{course.degree}</div>
+                              <div className="text-grey-400 text-base">{course.code}</div>
                             </div>
                             <div className="space-y-1 text-right">
-                              <div className="font-normal text-[#27273F] text-base">
-                                Course Starts
-                              </div>
-                              <div className="text-grey-400 text-base">
-                                {course.startDate}
-                              </div>
+                              <div className="font-normal text-[#27273F] text-base">Course Starts</div>
+                              <div className="text-grey-400 text-base">{course.startDate}</div>
                             </div>
                             <div className="space-y-1 text-right">
-                              <div className="font-normal text-[#27273F] text-base">
-                                Final Closing
-                              </div>
-                              <div className="text-grey-400 text-base">
-                                {course.closingDate}
-                              </div>
+                              <div className="font-normal text-[#27273F] text-base">Final Closing</div>
+                              <div className="text-grey-400 text-base">{course.closingDate}</div>
+                            </div>
+                            <div className="text-right">
+                              {has(courseId(course)) ? (
+                                <button className="px-3 py-2 text-sm border border-gray-300 text-gray-400 rounded-md cursor-default" disabled>
+                                  Added
+                                </button>
+                              ) : (
+                                <button
+                                  onClick={() => add(course)}
+                                  className="px-3 py-2 text-sm border border-primary-blue text-primary-blue rounded-md hover:bg-blue-50"
+                                >
+                                  Add to Wishlist
+                                </button>
+                              )}
                             </div>
                           </div>
                         </div>
