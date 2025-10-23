@@ -1,12 +1,32 @@
 import { Search } from "lucide-react";
 import { Link } from "react-router-dom";
+import { useMemo } from "react";
 import Navigation from "@/components/Navigation";
 import Footer from "@/components/Footer";
 import { useWishlist } from "@/context/WishlistContext";
 
 export default function Home() {
   const { wishlist } = useWishlist();
-  
+
+  const MONTHS: Record<string, number> = { JAN:0, FEB:1, MAR:2, APR:3, MAY:4, JUN:5, JUL:6, AUG:7, SEP:8, OCT:9, NOV:10, DEC:11 };
+  function parseDMY(s?: string | null): Date | null {
+    if (!s) return null;
+    const [dd, mmm, yyyy] = s.split("-");
+    const d = parseInt(dd || "", 10);
+    const m = MONTHS[(mmm || "").toUpperCase()] ?? 0;
+    const y = parseInt(yyyy || "", 10);
+    const date = new Date(y, m, d);
+    return isNaN(date.getTime()) ? null : date;
+  }
+  const upcomingDeadlines = useMemo(() => {
+    const today = new Date();
+    const todayStart = new Date(today.getFullYear(), today.getMonth(), today.getDate());
+    return wishlist.reduce((acc, c) => {
+      const d = parseDMY((c as any).closingDate);
+      return d && d >= todayStart ? acc + 1 : acc;
+    }, 0);
+  }, [wishlist]);
+
   const actionCards = [
     {
       title: "Course Finder",
@@ -125,7 +145,7 @@ export default function Home() {
           <div className="flex items-start gap-3 p-4 bg-bg-soft border-2 border-[#B3D8FF] rounded-xl shadow-[0_0_14px_0_rgba(49,133,252,0.15)]">
             <div className="w-8 h-8 rounded-full bg-[#F04438] flex-shrink-0 mt-3" />
             <div>
-              <div className="text-2xl font-bold text-[#1A1A1A]">0</div>
+              <div className="text-2xl font-bold text-[#1A1A1A]">{upcomingDeadlines}</div>
               <div className="text-base text-[#1A1A1A]">Upcoming Deadlines</div>
             </div>
           </div>
