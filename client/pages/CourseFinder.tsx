@@ -57,6 +57,29 @@ export default function CourseFinder() {
   const sem1 = { start: "26-FEB-2026", close: "31-JAN-2026" };
   const sem2 = { start: "22-JUL-2026", close: "30-JUN-2026" };
 
+  // Date helpers for D-MMM-YYYY strings
+  const MONTHS: Record<string, number> = { JAN: 0, FEB: 1, MAR: 2, APR: 3, MAY: 4, JUN: 5, JUL: 6, AUG: 7, SEP: 8, OCT: 9, NOV: 10, DEC: 11 };
+  function parseDMY(s: string): Date {
+    // expects like 26-FEB-2026
+    const [dd, mmm, yyyy] = s.split("-");
+    const d = parseInt(dd, 10);
+    const m = MONTHS[mmm as keyof typeof MONTHS] ?? 0;
+    const y = parseInt(yyyy, 10);
+    return new Date(y, m, d);
+  }
+  function fmtDMY(d: Date): string {
+    const inv: string[] = ["JAN","FEB","MAR","APR","MAY","JUN","JUL","AUG","SEP","OCT","NOV","DEC"];
+    const dd = String(d.getDate()).padStart(2, "0");
+    const mmm = inv[d.getMonth()];
+    const yyyy = d.getFullYear();
+    return `${dd}-${mmm}-${yyyy}`;
+  }
+  function addDays(base: Date, days: number): Date {
+    const d = new Date(base);
+    d.setDate(d.getDate() + days);
+    return d;
+  }
+
   // Generate varied entries (12 universities x 12 degrees = 144)
   const courses: Course[] = useMemo(() => {
     const chosenDegrees = degrees.slice(0, 12);
@@ -65,6 +88,12 @@ export default function CourseFinder() {
       chosenDegrees.forEach((deg, di) => {
         const sem = (ui + di) % 2 === 0 ? sem1 : sem2;
         const atar = 50 + ((ui * 13 + di * 7) % 50); // ~50–99
+        const startD = parseDMY(sem.start);
+        const closeD = parseDMY(sem.close);
+        const appOpenD = addDays(closeD, -90 - ((ui * 3 + di) % 15));
+        const openDayD = addDays(startD, -45 + ((ui + di) % 10));
+        const offerRelD = addDays(startD, -10 + ((ui * 2 + di) % 5));
+        const expoD = addDays(closeD, -60 + ((ui * 5 + di) % 7));
         out.push({
           university: uni.name,
           location: uni.location,
@@ -72,6 +101,10 @@ export default function CourseFinder() {
           code: `${uni.abbr}-${deg.abbr}-${String(di + 1).padStart(2, "0")}`,
           startDate: sem.start,
           closingDate: sem.close,
+          applicationOpenDate: fmtDMY(appOpenD),
+          openDayDate: fmtDMY(openDayD),
+          offerReleaseDate: fmtDMY(offerRelD),
+          expoDate: fmtDMY(expoD),
           atar,
           field: deg.field,
         });
