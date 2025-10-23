@@ -10,6 +10,7 @@ import Index from "./pages/Index";
 import Calendar from "./pages/Calendar";
 import CourseFinder from "./pages/CourseFinder";
 import Profile from "./pages/Profile";
+import LandingPage from "./pages/LandingPage";
 import Placeholder from "./pages/Placeholder";
 import NotFound from "./pages/NotFound";
 
