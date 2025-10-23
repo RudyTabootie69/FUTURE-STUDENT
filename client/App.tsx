@@ -26,6 +26,7 @@ const App = () => (
           <Route path="/" element={<Index />} />
           <Route path="/calendar" element={<Calendar />} />
           <Route path="/course-finder" element={<CourseFinder />} />
+          <Route path="/Landing-Page" element={<LandingPage />} />
           <Route path="/wishlist" element={<Placeholder pageName="My Wishlist" />} />
           <Route path="/profile" element={<Profile />} />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
