@@ -37,4 +37,11 @@ const App = () => (
   </QueryClientProvider>
 );
 
-createRoot(document.getElementById("root")!).render(<App />);
+const container = document.getElementById("root")!;
+// Reuse existing root across HMR to avoid duplicate createRoot warnings
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+const existingRoot = (window as any).__fusion_app_root;
+const root = existingRoot ?? createRoot(container);
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+;(window as any).__fusion_app_root = root;
+root.render(<App />);
