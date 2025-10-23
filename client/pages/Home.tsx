@@ -1,4 +1,5 @@
 import { Play } from "lucide-react";
+import Navigation from "@/components/Navigation";
 
 export default function Home() {
   const features = [
@@ -45,23 +46,7 @@ export default function Home() {
       />
 
       {/* Navigation */}
-      <nav className="w-full bg-bg-soft shadow-[0_2px_10px_0_rgba(49,133,252,0.10)] relative z-10">
-        <div className="w-full flex items-center justify-between px-6 py-2">
-          <img
-            src="https://api.builder.io/api/v1/image/assets/TEMP/4ce197ac521043188bace792d233ddbb851baa51?width=240"
-            alt="Logo"
-            className="h-[74px] w-[120px] rounded-2xl object-cover"
-          />
-          <div className="flex items-center gap-4">
-            <button className="px-4 py-2 text-sm font-medium text-primary-blue border-2 border-primary-blue bg-white rounded-lg hover:bg-gray-50 transition-colors">
-              Sign In
-            </button>
-            <button className="px-4 py-2 text-sm font-medium text-white bg-primary-blue rounded-lg hover:bg-blue-600 transition-colors">
-              Create Account
-            </button>
-          </div>
-        </div>
-      </nav>
+      <Navigation />
 
       {/* Hero Section */}
       <section className="relative z-10 max-w-[1200px] mx-auto px-6 pt-12 pb-20">
