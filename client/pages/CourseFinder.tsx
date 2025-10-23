@@ -184,7 +184,7 @@ export default function CourseFinder() {
         <div className="flex-1 overflow-hidden">
           <div className="bg-white border border-[#E9E8FC] rounded-2xl shadow-[1px_1px_3px_0_rgba(0,0,0,1)] overflow-hidden">
             {/* Scrollable vertical list */}
-            <div className="h-[632px] overflow-y-auto">
+            <div className="h-[632px] overflow-x-auto overflow-y-auto shadow-[1px_1px_40px_2px_rgba(74,144,226,1)]">
               <table className="w-full">
                 <tbody className="divide-y divide-[#E9E8FC]">
                   {courses.map((course, index) => (
