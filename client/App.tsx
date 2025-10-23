@@ -16,6 +16,7 @@ import Placeholder from "./pages/Placeholder";
 import Wishlist from "./pages/Wishlist";
 import NotFound from "./pages/NotFound";
 import Home from "./pages/Home";
+import Onboarding from "./pages/Onboarding";
 
 const queryClient = new QueryClient();
 
@@ -29,6 +30,7 @@ const App = () => (
           <WishlistProvider>
             <Routes>
               <Route path="/" element={<LandingPage />} />
+              <Route path="/onboarding" element={<Onboarding />} />
               <Route path="/home" element={<Home />} />
               <Route path="/calendar" element={<Calendar />} />
               <Route path="/course-finder" element={<CourseFinder />} />
