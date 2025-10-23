@@ -1,4 +1,3 @@
-/** @import must precede all other statements */
 @import url("https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&family=Nunito+Sans:wght@400;600;700;800&display=swap");
 
 @tailwind base;
@@ -105,9 +104,7 @@
 }
 
 @layer base {
-  * {
-    @apply border-border;
-  }
+  * { @apply border-border; }
 
   body {
     @apply bg-background text-foreground;
@@ -124,4 +121,31 @@
     overflow-x: auto;
     white-space: pre;
   }
+}
+
+@layer utilities {
+  @keyframes fs-float-1 {
+    0% { transform: translate(0,0) scale(1); }
+    25% { transform: translate(16px,-10px) scale(1.05); }
+    50% { transform: translate(-12px,14px) scale(0.98); }
+    75% { transform: translate(10px,8px) scale(1.07); }
+    100% { transform: translate(0,0) scale(1); }
+  }
+  @keyframes fs-float-2 {
+    0% { transform: translate(0,0) scale(1); }
+    20% { transform: translate(-14px,12px) scale(1.03); }
+    50% { transform: translate(10px,-8px) scale(1.06); }
+    80% { transform: translate(-8px,6px) scale(0.99); }
+    100% { transform: translate(0,0) scale(1); }
+  }
+  @keyframes fs-float-3 {
+    0% { transform: translate(0,0) scale(1); }
+    33% { transform: translate(12px,8px) scale(1.02); }
+    66% { transform: translate(-10px,-12px) scale(1.07); }
+    100% { transform: translate(0,0) scale(1); }
+  }
+
+  .float-slow-1 { animation: fs-float-1 22s ease-in-out infinite; will-change: transform; }
+  .float-slow-2 { animation: fs-float-2 26s ease-in-out infinite; will-change: transform; }
+  .float-slow-3 { animation: fs-float-3 30s ease-in-out infinite; will-change: transform; }
 }
