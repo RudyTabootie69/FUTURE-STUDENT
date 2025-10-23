@@ -70,11 +70,12 @@ export default function Calendar() {
   const eventsMap = useMemo(() => {
     const map: Record<string, { label: string; color: string; bgColor: string; order: number }[]> = {};
 
-    const add = (dateStr: string | undefined, category: keyof typeof categoryMeta, label: string, abbr: string) => {
+    type Category = "Deadlines" | "Events" | "Start Dates" | "Important Dates";
+    const add = (dateStr: string | undefined, category: Category, label: string, abbr: string) => {
       const d = parseDMY(dateStr);
       if (!d) return;
       const key = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
-      const meta = categoryMeta[category as unknown as string];
+      const meta = categoryMeta[category];
       const entry = { label: `${abbr} ${label}`, color: meta.color, bgColor: meta.bgColor, order: meta.order };
       if (!map[key]) map[key] = [entry]; else map[key].push(entry);
     };
