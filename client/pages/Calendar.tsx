@@ -1,6 +1,7 @@
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import Navigation from "@/components/Navigation";
+import { useWishlist } from "@/context/WishlistContext";
 
 function monthLabel(date: Date) {
   return date.toLocaleString("en-US", { month: "long", year: "numeric" });
@@ -39,16 +40,72 @@ export default function Calendar() {
 
   const weeks = useMemo(() => buildMonthMatrix(viewDate), [viewDate]);
 
-  const eventMarkers: Record<string, { color: string }> = {
-    ["2025-10-24"]: { color: "#3185FC" },
-  };
-
   const legendItems = [
     { label: "Deadlines", color: "#FF4757", bgColor: "#FFE8EA" },
     { label: "Events", color: "#3185FC", bgColor: "#E8F4FF" },
     { label: "Start Dates", color: "#2ED573", bgColor: "#E8FFE8" },
     { label: "Important Dates", color: "#FFA726", bgColor: "#FFF3E0" },
-  ];
+  ] as const;
+
+  const categoryMeta = legendItems.reduce<Record<string, { color: string; bgColor: string; order: number }>>((acc, item, idx) => {
+    acc[item.label] = { color: item.color, bgColor: item.bgColor, order: idx };
+    return acc;
+  }, {});
+
+  const { wishlist } = useWishlist();
+
+  function parseDMY(s?: string | null): Date | null {
+    if (!s) return null;
+    const parts = s.split("-");
+    if (parts.length !== 3) return null;
+    const [dd, mmm, yyyy] = parts;
+    const MONTHS: Record<string, number> = { JAN: 0, FEB: 1, MAR: 2, APR: 3, MAY: 4, JUN: 5, JUL: 6, AUG: 7, SEP: 8, OCT: 9, NOV: 10, DEC: 11 };
+    const day = parseInt(dd, 10);
+    const month = MONTHS[(mmm || "").toUpperCase()] ?? 0;
+    const year = parseInt(yyyy, 10);
+    const d = new Date(year, month, day);
+    return isNaN(d.getTime()) ? null : d;
+  }
+
+  const eventsMap = useMemo(() => {
+    const map: Record<string, { label: string; color: string; bgColor: string; order: number }[]> = {};
+
+    const add = (dateStr: string | undefined, category: keyof typeof categoryMeta, label: string, abbr: string) => {
+      const d = parseDMY(dateStr);
+      if (!d) return;
+      const key = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
+      const meta = categoryMeta[category as unknown as string];
+      const entry = { label: `${abbr} ${label}`, color: meta.color, bgColor: meta.bgColor, order: meta.order };
+      if (!map[key]) map[key] = [entry]; else map[key].push(entry);
+    };
+
+    for (const c of wishlist) {
+      const abbr = (c.code?.split("-")?.[0]) || c.university;
+      add(c.closingDate, "Deadlines", "Applications Close", abbr);
+      add(c.openDayDate, "Events", "Open Day", abbr);
+      add(c.expoDate, "Events", "Expo", abbr);
+      add(c.startDate, "Start Dates", "Term Starts", abbr);
+      add(c.applicationOpenDate, "Important Dates", "Applications Open", abbr);
+      add(c.offerReleaseDate, "Important Dates", "Offer Release", abbr);
+    }
+
+    for (const key of Object.keys(map)) {
+      map[key].sort((a, b) => a.order - b.order || a.label.localeCompare(b.label));
+    }
+
+    return map;
+  }, [wishlist]);
+
+  useEffect(() => {
+    const keys = Object.keys(eventsMap);
+    if (keys.length === 0) return;
+    const today = new Date();
+    const todayYMD = new Date(today.getFullYear(), today.getMonth(), today.getDate());
+    const allDates = keys.map((k) => new Date(k + "T00:00:00"));
+    const future = allDates.filter((d) => d >= todayYMD).sort((a, b) => a.getTime() - b.getTime());
+    const target = (future[0] ?? allDates.sort((a, b) => a.getTime() - b.getTime())[0]);
+    if (target) setViewDate(new Date(target.getFullYear(), target.getMonth(), 1));
+  }, [eventsMap]);
 
   const goPrev = () => setViewDate(new Date(viewDate.getFullYear(), viewDate.getMonth() - 1, 1));
   const goNext = () => setViewDate(new Date(viewDate.getFullYear(), viewDate.getMonth() + 1, 1));
@@ -125,7 +182,7 @@ export default function Calendar() {
                 <div key={wIdx} className="grid grid-cols-7">
                   {week.map((day, dIdx) => {
                     const dateKey = day ? isoKey(viewDate, day) : "";
-                    const marker = day ? eventMarkers[dateKey] : undefined;
+                    const dayEvents = day ? (eventsMap[dateKey] || []) : [];
                     return (
                       <div
                         key={dIdx}
@@ -133,11 +190,15 @@ export default function Calendar() {
                       >
                         {day && (
                           <>
-                            <span className={`text-[13px] font-bold ${marker ? "text-primary-blue" : "text-[#1A1A1A]"}`}>
-                              {day}
-                            </span>
-                            {marker && (
-                              <div className="absolute top-6 left-2 w-1.5 h-1.5 rounded-full" style={{ backgroundColor: marker.color }} />
+                            <span className="text-[13px] font-bold text-[#1A1A1A]">{day}</span>
+                            {dayEvents.length > 0 && (
+                              <div className="mt-1 space-y-1 pr-1 overflow-hidden">
+                                {dayEvents.map((ev, i) => (
+                                  <div key={i} className="text-[10px] leading-tight px-1.5 py-0.5 rounded truncate" style={{ backgroundColor: ev.bgColor, color: ev.color }}>
+                                    {ev.label}
+                                  </div>
+                                ))}
+                              </div>
                             )}
                           </>
                         )}
