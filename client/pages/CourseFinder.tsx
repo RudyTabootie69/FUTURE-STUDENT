@@ -182,7 +182,7 @@ export default function CourseFinder() {
 
         {/* Course Table */}
         <div className="flex-1 overflow-hidden">
-          <div className="bg-white border border-[#E9E8FC] rounded-2xl shadow-[0_11.963px_47.851px_0_rgba(49,133,252,0.20)] overflow-hidden">
+          <div className="bg-white border border-[#E9E8FC] rounded-2xl shadow-[1px_1px_3px_0_rgba(0,0,0,1)] overflow-hidden">
             {/* Scrollable vertical list */}
             <div className="h-[632px] overflow-y-auto">
               <table className="w-full">
