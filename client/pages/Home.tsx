@@ -75,9 +75,9 @@ export default function Home() {
               <h2 className="text-[33px] font-bold text-black mb-1">Your Application Journey</h2>
               <p className="text-[18px] text-[#777]">Track your progress through each step</p>
             </div>
-            <div className="mt-4 lg:mt-0">
-              <div className="text-[33px] font-bold text-primary-blue">17%</div>
-              <div className="text-[18px] text-[#777]">Complete</div>
+            <div className="mt-4 lg:mt-0 text-right">
+              <div className="text-[33px] font-bold text-primary-blue">{wishlist.length}</div>
+              <div className="text-[18px] text-[#777]">Courses Saved</div>
             </div>
           </div>
 
