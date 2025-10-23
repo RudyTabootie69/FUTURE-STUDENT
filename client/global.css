@@ -1,5 +1,5 @@
 /** @import must precede all other statements */
-@import url("https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap");
+@import url("https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&family=Nunito+Sans:wght@400;600;700;800&display=swap");
 
 @tailwind base;
 @tailwind components;
@@ -12,7 +12,7 @@
    * A different format will require also updating the theme in tailwind.config.ts.
   */
   :root {
-    --background: 0 0% 100%;
+    --background: 216 100% 97.3%;
     --foreground: 222.2 84% 4.9%;
 
     --card: 0 0% 100%;
@@ -21,7 +21,7 @@
     --popover: 0 0% 100%;
     --popover-foreground: 222.2 84% 4.9%;
 
-    --primary: 222.2 47.4% 11.2%;
+    --primary: 211 98% 61%;
     --primary-foreground: 210 40% 98%;
 
     --secondary: 210 40% 96.1%;
@@ -43,20 +43,26 @@
     --radius: 0.5rem;
 
     --sidebar-background: 0 0% 98%;
-
     --sidebar-foreground: 240 5.3% 26.1%;
-
     --sidebar-primary: 240 5.9% 10%;
-
     --sidebar-primary-foreground: 0 0% 98%;
-
     --sidebar-accent: 240 4.8% 95.9%;
-
     --sidebar-accent-foreground: 240 5.9% 10%;
-
     --sidebar-border: 220 13% 91%;
-
     --sidebar-ring: 217.2 91.2% 59.8%;
+
+    /* Custom calendar colors */
+    --bg-soft: 216 100% 97.3%;
+    --primary-blue: 211 98% 61%;
+    --grey-400: 220 24% 58%;
+    --deadline-red: 354 100% 64%;
+    --deadline-bg: 354 100% 96%;
+    --event-blue: 211 98% 61%;
+    --event-bg: 211 100% 95%;
+    --start-green: 147 73% 52%;
+    --start-bg: 120 100% 95%;
+    --important-orange: 33 100% 60%;
+    --important-bg: 36 100% 94%;
   }
 
   .dark {
@@ -105,6 +111,7 @@
 
   body {
     @apply bg-background text-foreground;
+    font-family: 'Poppins', -apple-system, Roboto, Helvetica, sans-serif;
   }
 
   :where(p, span, li, h1, h2, h3, h4, h5, h6, a, button, label, td, th) {
