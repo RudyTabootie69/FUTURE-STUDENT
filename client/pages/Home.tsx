@@ -67,34 +67,7 @@ export default function Home() {
       </div>
 
       {/* Main Content */}
-      <div className="max-w-[1440px] mx-auto px-6 lg:px-[134px] -mt-16 relative z-10">
-        {/* Stat Cards */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12">
-          <div className="flex items-start gap-3 p-4 bg-bg-soft border-2 border-[#B3D8FF] rounded-xl shadow-[0_0_14px_0_rgba(49,133,252,0.15)]">
-            <div className="w-8 h-8 rounded-full bg-[#28C76F] flex-shrink-0 mt-3" />
-            <div>
-              <div className="text-2xl font-bold text-[#1A1A1A]">{wishlist.length}</div>
-              <div className="text-base text-[#1A1A1A]">Courses Saved</div>
-            </div>
-          </div>
-
-          <div className="flex items-start gap-3 p-4 bg-bg-soft border-2 border-[#B3D8FF] rounded-xl shadow-[0_0_14px_0_rgba(49,133,252,0.15)]">
-            <div className="w-8 h-8 rounded-full bg-[#F04438] flex-shrink-0 mt-3" />
-            <div>
-              <div className="text-2xl font-bold text-[#1A1A1A]">0</div>
-              <div className="text-base text-[#1A1A1A]">Upcoming Deadlines</div>
-            </div>
-          </div>
-
-          <div className="flex items-start gap-3 p-4 bg-bg-soft border-2 border-[#B3D8FF] rounded-xl shadow-[0_0_14px_0_rgba(49,133,252,0.15)]">
-            <div className="w-8 h-8 rounded-full bg-[#FFE55C] flex-shrink-0 mt-3" />
-            <div>
-              <div className="text-2xl font-bold text-[#1A1A1A]">1/6</div>
-              <div className="text-base text-[#1A1A1A]">Steps Completed</div>
-            </div>
-          </div>
-        </div>
-
+      <div className="max-w-[1440px] mx-auto px-6 lg:px-[134px] mt-8 relative">
         {/* Application Journey */}
         <div className="bg-bg-soft border border-[#B3D8FF] rounded-2xl p-6 mb-12 shadow-[0_0_15px_0_rgba(49,133,252,0.15)]">
           <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between mb-4">
@@ -136,6 +109,31 @@ export default function Home() {
                   )}
                 </div>
               ))}
+            </div>
+          </div>
+        </div>
+
+        {/* Key Stats */}
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12">
+          <div className="flex items-start gap-3 p-4 bg-bg-soft border-2 border-[#B3D8FF] rounded-xl shadow-[0_0_14px_0_rgba(49,133,252,0.15)]">
+            <div className="w-8 h-8 rounded-full bg-[#28C76F] flex-shrink-0 mt-3" />
+            <div>
+              <div className="text-2xl font-bold text-[#1A1A1A]">{wishlist.length}</div>
+              <div className="text-base text-[#1A1A1A]">Courses Saved</div>
+            </div>
+          </div>
+          <div className="flex items-start gap-3 p-4 bg-bg-soft border-2 border-[#B3D8FF] rounded-xl shadow-[0_0_14px_0_rgba(49,133,252,0.15)]">
+            <div className="w-8 h-8 rounded-full bg-[#F04438] flex-shrink-0 mt-3" />
+            <div>
+              <div className="text-2xl font-bold text-[#1A1A1A]">0</div>
+              <div className="text-base text-[#1A1A1A]">Upcoming Deadlines</div>
+            </div>
+          </div>
+          <div className="flex items-start gap-3 p-4 bg-bg-soft border-2 border-[#B3D8FF] rounded-xl shadow-[0_0_14px_0_rgba(49,133,252,0.15)]">
+            <div className="w-8 h-8 rounded-full bg-[#FFE55C] flex-shrink-0 mt-3" />
+            <div>
+              <div className="text-2xl font-bold text-[#1A1A1A]">1/6</div>
+              <div className="text-base text-[#1A1A1A]">Steps Completed</div>
             </div>
           </div>
         </div>
