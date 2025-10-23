@@ -145,8 +145,8 @@ export default function ContactUs() {
                   <div>
                     <h3 className="text-lg font-bold text-black mb-1">Address</h3>
                     <p className="text-[#777]">
-                      Level 5, 123 Education Street<br />
-                      Sydney NSW 2000<br />
+                      Level 5, 123 Keira Street<br />
+                      Wollongong NSW 2500<br />
                       Australia
                     </p>
                   </div>
@@ -154,14 +154,6 @@ export default function ContactUs() {
               </div>
             </div>
 
-            <div className="bg-white rounded-xl shadow-[0_10px_40px_0_rgba(49,133,252,0.20)] p-8">
-              <h3 className="text-xl font-bold text-black mb-4">Office Hours</h3>
-              <div className="space-y-2 text-[#777]">
-                <p><strong className="text-black">Monday - Friday:</strong> 9:00 AM - 5:00 PM</p>
-                <p><strong className="text-black">Saturday:</strong> 10:00 AM - 2:00 PM</p>
-                <p><strong className="text-black">Sunday:</strong> Closed</p>
-              </div>
-            </div>
           </div>
         </div>
       </div>
