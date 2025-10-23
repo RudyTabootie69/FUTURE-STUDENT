@@ -13,6 +13,7 @@ import CourseFinder from "./pages/CourseFinder";
 import Profile from "./pages/Profile";
 import LandingPage from "./pages/LandingPage";
 import Placeholder from "./pages/Placeholder";
+import Wishlist from "./pages/Wishlist";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
