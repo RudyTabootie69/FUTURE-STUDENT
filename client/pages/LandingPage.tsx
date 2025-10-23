@@ -1,5 +1,7 @@
 import { useState } from "react";
 import { Play } from "lucide-react";
+import { useNavigate } from "react-router-dom";
+import { useAuth } from "@/context/AuthContext";
 import {
   Dialog,
   DialogContent,
@@ -11,6 +13,8 @@ import {
 export default function LandingPage() {
   const [openSignIn, setOpenSignIn] = useState(false);
   const [openSignUp, setOpenSignUp] = useState(false);
+  const navigate = useNavigate();
+  const { login } = useAuth();
 
   const features = [
     { title: "Streamlined Applications", description: "Description of action" },
@@ -156,7 +160,7 @@ export default function LandingPage() {
             <DialogTitle>Sign In</DialogTitle>
             <DialogDescription>Welcome back. Enter your details to continue.</DialogDescription>
           </DialogHeader>
-          <form className="space-y-3">
+          <form className="space-y-3" onSubmit={(e) => { e.preventDefault(); login(); setOpenSignIn(false); navigate("/home", { replace: true }); }}>
             <div className="space-y-1">
               <label className="text-sm font-medium">Email</label>
               <input type="email" className="w-full px-3 py-2 border rounded-md bg-white" placeholder="you@example.com" />
@@ -177,7 +181,7 @@ export default function LandingPage() {
             <DialogTitle>Create Account</DialogTitle>
             <DialogDescription>Join Future Student. It only takes a minute.</DialogDescription>
           </DialogHeader>
-          <form className="space-y-3">
+          <form className="space-y-3" onSubmit={(e) => { e.preventDefault(); login(); setOpenSignUp(false); navigate("/home", { replace: true }); }}>
             <div className="space-y-1">
               <label className="text-sm font-medium">Name</label>
               <input type="text" className="w-full px-3 py-2 border rounded-md bg-white" placeholder="Your name" />

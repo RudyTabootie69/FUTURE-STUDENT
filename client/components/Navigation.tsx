@@ -1,10 +1,13 @@
-import { Link, useLocation } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
+import { useAuth } from "@/context/AuthContext";
 
 export default function Navigation() {
   const location = useLocation();
+  const navigate = useNavigate();
+  const { logout } = useAuth();
 
   const navItems = [
-    { label: "Home", path: "/" },
+    { label: "Home", path: "/home" },
     { label: "Course Finder", path: "/course-finder" },
     { label: "My Wishlist", path: "/wishlist" },
     { label: "Calendar", path: "/calendar" },
@@ -36,6 +39,15 @@ export default function Navigation() {
               </Link>
             );
           })}
+          <button
+            onClick={() => {
+              logout();
+              navigate("/", { replace: true });
+            }}
+            className="ml-2 px-3 py-2 text-sm font-medium text-primary-blue border-2 border-primary-blue bg-white rounded-lg hover:bg-gray-50 transition-colors"
+          >
+            Log Out
+          </button>
         </div>
       </div>
     </nav>
