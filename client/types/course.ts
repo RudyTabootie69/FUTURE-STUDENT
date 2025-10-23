@@ -6,6 +6,8 @@ export interface Course {
   startDate: string;
   closingDate: string;
   logoUrl?: string | null;
+  atar?: number; // approximate ATAR requirement
+  field?: string; // category of study
 }
 
 export function courseId(c: Course): string {
