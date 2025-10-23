@@ -5,9 +5,9 @@ import { createRoot } from "react-dom/client";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
+import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { WishlistProvider } from "@/context/WishlistContext";
-import { AuthProvider, useAuth } from "@/context/AuthContext";
+import { AuthProvider } from "@/context/AuthContext";
 import Calendar from "./pages/Calendar";
 import CourseFinder from "./pages/CourseFinder";
 import Profile from "./pages/Profile";
@@ -19,12 +19,6 @@ import Home from "./pages/Home";
 
 const queryClient = new QueryClient();
 
-function RequireAuth({ children }: { children: JSX.Element }) {
-  const { isAuthenticated } = useAuth();
-  if (!isAuthenticated) return <Navigate to="/" replace />;
-  return children;
-}
-
 const App = () => (
   <QueryClientProvider client={queryClient}>
     <TooltipProvider>
@@ -35,11 +29,11 @@ const App = () => (
           <WishlistProvider>
             <Routes>
               <Route path="/" element={<LandingPage />} />
-              <Route path="/home" element={<RequireAuth><Home /></RequireAuth>} />
-              <Route path="/calendar" element={<RequireAuth><Calendar /></RequireAuth>} />
-              <Route path="/course-finder" element={<RequireAuth><CourseFinder /></RequireAuth>} />
-              <Route path="/wishlist" element={<RequireAuth><Wishlist /></RequireAuth>} />
-              <Route path="/profile" element={<RequireAuth><Profile /></RequireAuth>} />
+              <Route path="/home" element={<Home />} />
+              <Route path="/calendar" element={<Calendar />} />
+              <Route path="/course-finder" element={<CourseFinder />} />
+              <Route path="/wishlist" element={<Wishlist />} />
+              <Route path="/profile" element={<Profile />} />
               {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
               <Route path="*" element={<NotFound />} />
             </Routes>
