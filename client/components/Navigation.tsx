@@ -4,11 +4,11 @@ export default function Navigation() {
   const location = useLocation();
 
   const navItems = [
-    { label: "Home", path: "/" },
-    { label: "Course Finder", path: "/course-finder" },
-    { label: "My Wishlist", path: "/wishlist" },
-    { label: "Calendar", path: "/calendar" },
-    { label: "Profile", path: "/profile" },
+    { label: "Home", path: "/", isCalendar: false },
+    { label: "Course Finder", path: "/course-finder", isCalendar: false },
+    { label: "My Wishlist", path: "/wishlist", isCalendar: false },
+    { label: "Calendar", path: "/calendar", isCalendar: true },
+    { label: "Profile", path: "/profile", isCalendar: false },
   ];
 
   return (
@@ -21,15 +21,15 @@ export default function Navigation() {
         />
         <div className="flex items-center gap-4 px-4">
           {navItems.map((item) => {
-            const isActive = location.pathname === item.path;
+            const isActive = item.isCalendar && (location.pathname === "/" || location.pathname === "/calendar");
             return (
               <Link
                 key={item.path}
                 to={item.path}
-                className={`px-2.5 py-2.5 text-sm font-normal transition-colors ${
+                className={`px-2.5 py-2.5 text-sm transition-colors ${
                   isActive
                     ? "text-primary-blue font-medium"
-                    : "text-grey-400 hover:text-primary-blue"
+                    : "text-grey-400 hover:text-primary-blue font-normal"
                 }`}
               >
                 {item.label}

@@ -36,22 +36,22 @@ export default function Calendar() {
       <div className="absolute right-[88px] top-[657px] w-[150px] h-[150px] rounded-full bg-[#B3D8FF] opacity-40 pointer-events-none" />
 
       {/* Main calendar container */}
-      <div className="relative z-10 max-w-[1153px] mx-auto mt-[107px] mb-20 px-4">
+      <div className="relative z-10 max-w-[1153px] w-full mx-auto mt-12 lg:mt-[107px] mb-20 px-4 sm:px-6 lg:px-8">
         <div className="shadow-[0_10px_40px_0_rgba(49,133,252,0.20)] rounded-2xl overflow-hidden">
           {/* Header section */}
-          <div className="bg-primary-blue px-8 pt-6 pb-8">
-            <h1 className="text-white text-[32px] font-bold leading-normal mb-2">
+          <div className="bg-primary-blue px-4 sm:px-8 pt-6 pb-8">
+            <h1 className="text-white text-2xl sm:text-[32px] font-bold leading-normal mb-2">
               My Calendar
             </h1>
-            <p className="text-[#B3D8FF] text-base font-normal">
+            <p className="text-[#B3D8FF] text-sm sm:text-base font-normal">
               Track your NSW university application deadlines and important dates
             </p>
           </div>
 
           {/* Calendar content */}
-          <div className="bg-white rounded-b-2xl px-8 py-6">
+          <div className="bg-white rounded-b-2xl px-4 sm:px-8 py-6">
             {/* Calendar controls and legend */}
-            <div className="flex flex-wrap items-center gap-4 mb-6">
+            <div className="flex flex-col lg:flex-row lg:items-center gap-4 mb-6">
               {/* Month navigation */}
               <div className="flex items-center gap-4">
                 <button className="w-10 h-10 rounded-lg border border-[#E1E8F0] bg-bg-soft flex items-center justify-center hover:bg-gray-100 transition-colors">
@@ -66,7 +66,7 @@ export default function Calendar() {
               </div>
 
               {/* Legend */}
-              <div className="flex flex-wrap items-center gap-3 ml-auto">
+              <div className="flex flex-wrap items-center gap-3 lg:ml-auto">
                 {legendItems.map((item) => (
                   <div
                     key={item.label}
@@ -108,7 +108,7 @@ export default function Calendar() {
                   {week.map((day, dayIndex) => (
                     <div
                       key={dayIndex}
-                      className="h-[120px] bg-white border-r border-b border-[#F1F5F9] last:border-r-0 p-2 hover:bg-gray-50 transition-colors relative"
+                      className="h-20 sm:h-24 lg:h-[120px] bg-white border-r border-b border-[#F1F5F9] last:border-r-0 p-2 hover:bg-gray-50 transition-colors relative"
                     >
                       {day && (
                         <>
