@@ -1,7 +1,6 @@
 import { useState } from "react";
 import Navigation from "@/components/Navigation";
 import { useProfile } from "@/context/ProfileContext";
-import { useState } from "react";
 
 export default function Profile() {
   const { profile, update } = useProfile();
