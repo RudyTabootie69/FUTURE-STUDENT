@@ -20,7 +20,7 @@ export default function Profile() {
       </div>
 
       {/* Profile Form */}
-      <div className="max-w-[900px] mx-auto px-4 -mt-8 pb-20 relative z-10 space-y-8">
+      <div className="max-w-[900px] mx-auto px-4 mt-8 pb-20 relative space-y-8">
         {/* Personal Details from Onboarding */}
         <div className="bg-white rounded-xl shadow-[0_10px_40px_0_rgba(49,133,252,0.20)] p-8 lg:p-12">
           <h2 className="text-2xl font-bold text-black mb-6">Personal Details</h2>
