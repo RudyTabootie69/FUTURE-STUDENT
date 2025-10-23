@@ -5,6 +5,10 @@ export interface Course {
   code: string;
   startDate: string;
   closingDate: string;
+  applicationOpenDate?: string;
+  openDayDate?: string;
+  offerReleaseDate?: string;
+  expoDate?: string;
   logoUrl?: string | null;
   atar?: number; // approximate ATAR requirement
   field?: string; // category of study
