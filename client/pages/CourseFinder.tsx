@@ -1,15 +1,9 @@
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import { Search, ChevronDown } from "lucide-react";
 import Navigation from "@/components/Navigation";
-
-interface Course {
-  university: string;
-  location: string;
-  degree: string;
-  code: string;
-  startDate: string;
-  closingDate: string;
-}
+import type { Course } from "@/types/course";
+import { courseId } from "@/types/course";
+import { useWishlist } from "@/context/WishlistContext";
 
 export default function CourseFinder() {
   const [fieldFilter, setFieldFilter] = useState("All Fields");
