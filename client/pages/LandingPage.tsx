@@ -181,7 +181,7 @@ export default function LandingPage() {
             <DialogTitle>Create Account</DialogTitle>
             <DialogDescription>Join Future Student. It only takes a minute.</DialogDescription>
           </DialogHeader>
-          <form className="space-y-3" onSubmit={(e) => { e.preventDefault(); login(); setOpenSignUp(false); navigate("/home", { replace: true }); }}>
+          <form className="space-y-3" onSubmit={(e) => { e.preventDefault(); login(); setOpenSignUp(false); navigate("/onboarding", { replace: true }); }}>
             <div className="space-y-1">
               <label className="text-sm font-medium">Name</label>
               <input type="text" className="w-full px-3 py-2 border rounded-md bg-white" placeholder="Your name" />
