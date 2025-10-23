@@ -9,7 +9,7 @@ export default function CourseFinder() {
   const [fieldFilter, setFieldFilter] = useState("All Fields");
   const [universityFilter, setUniversityFilter] = useState("All Universities");
 
-  const courses: Course[] = [
+  const baseCourses: Course[] = [
     {
       university: "University of Wollongong",
       location: "Wollongong, NSW",
@@ -22,7 +22,7 @@ export default function CourseFinder() {
       university: "Australian National University",
       location: "Acton, CBR",
       degree: "Bachelor of Computing",
-      code: "dsadw",
+      code: "ANU-COMP",
       startDate: "23-FEB-2026",
       closingDate: "06-FEB-2026",
     },
@@ -30,7 +30,7 @@ export default function CourseFinder() {
       university: "University of New South Wales",
       location: "Kensington, NSW",
       degree: "Bachelor of Science (Computer Science)",
-      code: "425800",
+      code: "UNSW-CS",
       startDate: "16-FEB-2026",
       closingDate: "22-JAN-2026",
     },
@@ -38,7 +38,7 @@ export default function CourseFinder() {
       university: "University of Wollongong",
       location: "Liverpool, NSW",
       degree: "Bachelor of Computer Science Bachelor of Laws",
-      code: "751203",
+      code: "UOW-CS-LLB",
       startDate: "02-MAR-2026",
       closingDate: "29-JAN-2026",
     },
@@ -46,11 +46,29 @@ export default function CourseFinder() {
       university: "University of Western Sydney",
       location: "Parramatta",
       degree: "Bachelor of Computer Science",
-      code: "723999",
+      code: "UWS-CS",
       startDate: "02-MAR-2026",
       closingDate: "06-FEB-2026",
     },
   ];
+
+  // Expand to many entries for scroll demo
+  const courses: Course[] = useMemo(() => {
+    const out: Course[] = [];
+    for (let i = 0; i < 12; i++) {
+      for (const c of baseCourses) {
+        out.push({
+          ...c,
+          code: `${c.code}-${i + 1}`,
+          startDate: c.startDate,
+          closingDate: c.closingDate,
+        });
+      }
+    }
+    return out;
+  }, []);
+
+  const { add, has } = useWishlist();
 
   return (
     <div className="min-h-screen bg-bg-soft">
