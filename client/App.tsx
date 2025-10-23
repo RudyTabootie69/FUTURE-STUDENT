@@ -28,8 +28,9 @@ const App = () => (
       <Sonner />
       <BrowserRouter>
         <AuthProvider>
-          <WishlistProvider>
-            <Routes>
+          <ProfileProvider>
+            <WishlistProvider>
+              <Routes>
               <Route path="/" element={<LandingPage />} />
               <Route path="/onboarding" element={<Onboarding />} />
               <Route path="/home" element={<Home />} />
@@ -39,8 +40,9 @@ const App = () => (
               <Route path="/profile" element={<Profile />} />
               {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
               <Route path="*" element={<NotFound />} />
-            </Routes>
-          </WishlistProvider>
+              </Routes>
+            </WishlistProvider>
+          </ProfileProvider>
         </AuthProvider>
       </BrowserRouter>
     </TooltipProvider>
