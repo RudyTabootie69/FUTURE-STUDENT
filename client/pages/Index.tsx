@@ -1,5 +1,5 @@
-import Calendar from "./Calendar";
+import Home from "./Home";
 
 export default function Index() {
-  return <Calendar />;
+  return <Home />;
 }
