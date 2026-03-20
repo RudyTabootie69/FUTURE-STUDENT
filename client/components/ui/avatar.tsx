@@ -1,7 +1,14 @@
 import * as React from "react";
 import * as AvatarPrimitive from "@radix-ui/react-avatar";
-
 import { cn } from "@/lib/utils";
+
+/* 
+UI element for profile pictures, so far the only one 
+that will be used is the individual user's own image.
+However if we expand into having NSW DoE staff as users interacting with students this will be further utilised.
+Also enables easy implementation of a default image.
+https://www.radix-ui.com/primitives/docs/components/avatar
+*/
 
 const Avatar = React.forwardRef<
   React.ElementRef<typeof AvatarPrimitive.Root>,
@@ -18,6 +25,7 @@ const Avatar = React.forwardRef<
 ));
 Avatar.displayName = AvatarPrimitive.Root.displayName;
 
+
 const AvatarImage = React.forwardRef<
   React.ElementRef<typeof AvatarPrimitive.Image>,
   React.ComponentPropsWithoutRef<typeof AvatarPrimitive.Image>
@@ -29,6 +37,7 @@ const AvatarImage = React.forwardRef<
   />
 ));
 AvatarImage.displayName = AvatarPrimitive.Image.displayName;
+
 
 const AvatarFallback = React.forwardRef<
   React.ElementRef<typeof AvatarPrimitive.Fallback>,
@@ -44,5 +53,6 @@ const AvatarFallback = React.forwardRef<
   />
 ));
 AvatarFallback.displayName = AvatarPrimitive.Fallback.displayName;
+
 
 export { Avatar, AvatarImage, AvatarFallback };

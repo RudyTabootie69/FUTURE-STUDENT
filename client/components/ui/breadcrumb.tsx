@@ -1,8 +1,14 @@
 import * as React from "react";
 import { Slot } from "@radix-ui/react-slot";
 import { ChevronRight, MoreHorizontal } from "lucide-react";
-
 import { cn } from "@/lib/utils";
+
+/* 
+Displays link path as part of the ui, 
+for example going from home page to log in page would make this element display 
+"Home > Log in"
+https://ui.shadcn.com/docs/components/radix/breadcrumb
+*/
 
 const Breadcrumb = React.forwardRef<
   HTMLElement,
@@ -27,6 +33,7 @@ const BreadcrumbList = React.forwardRef<
 ));
 BreadcrumbList.displayName = "BreadcrumbList";
 
+
 const BreadcrumbItem = React.forwardRef<
   HTMLLIElement,
   React.ComponentPropsWithoutRef<"li">
@@ -38,6 +45,7 @@ const BreadcrumbItem = React.forwardRef<
   />
 ));
 BreadcrumbItem.displayName = "BreadcrumbItem";
+
 
 const BreadcrumbLink = React.forwardRef<
   HTMLAnchorElement,
@@ -57,6 +65,7 @@ const BreadcrumbLink = React.forwardRef<
 });
 BreadcrumbLink.displayName = "BreadcrumbLink";
 
+
 const BreadcrumbPage = React.forwardRef<
   HTMLSpanElement,
   React.ComponentPropsWithoutRef<"span">
@@ -71,6 +80,7 @@ const BreadcrumbPage = React.forwardRef<
   />
 ));
 BreadcrumbPage.displayName = "BreadcrumbPage";
+
 
 const BreadcrumbSeparator = ({
   children,
@@ -88,6 +98,7 @@ const BreadcrumbSeparator = ({
 );
 BreadcrumbSeparator.displayName = "BreadcrumbSeparator";
 
+//This occurs only when the link length is too long i.e "home > ... > account > login"
 const BreadcrumbEllipsis = ({
   className,
   ...props
@@ -103,6 +114,7 @@ const BreadcrumbEllipsis = ({
   </span>
 );
 BreadcrumbEllipsis.displayName = "BreadcrumbElipssis";
+
 
 export {
   Breadcrumb,

@@ -1,14 +1,19 @@
 import * as React from "react";
 import * as AlertDialogPrimitive from "@radix-ui/react-alert-dialog";
-
 import { cn } from "@/lib/utils";
 import { buttonVariants } from "@/components/ui/button";
 
 const AlertDialog = AlertDialogPrimitive.Root;
-
 const AlertDialogTrigger = AlertDialogPrimitive.Trigger;
-
 const AlertDialogPortal = AlertDialogPrimitive.Portal;
+
+/*
+The alert dialog greys out the rest of the screen and brings up a dialog box with interactable buttons.
+Unlike other alert dialog options this can be set to be completely focused and the user cannot simply 
+click elsewhere on the screen to dismiss it, they must interact with it one way or another.
+This is important for extremely imperitive actions such as payment, account deletion, password changes etc
+https://www.radix-ui.com/primitives/docs/components/alert-dialog
+*/
 
 const AlertDialogOverlay = React.forwardRef<
   React.ElementRef<typeof AlertDialogPrimitive.Overlay>,
@@ -16,6 +21,7 @@ const AlertDialogOverlay = React.forwardRef<
 >(({ className, ...props }, ref) => (
   <AlertDialogPrimitive.Overlay
     className={cn(
+      /* This is the colour of the shaded overlay on the rest of the screen */
       "fixed inset-0 z-50 bg-black/80  data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0",
       className,
     )}
@@ -24,6 +30,7 @@ const AlertDialogOverlay = React.forwardRef<
   />
 ));
 AlertDialogOverlay.displayName = AlertDialogPrimitive.Overlay.displayName;
+
 
 const AlertDialogContent = React.forwardRef<
   React.ElementRef<typeof AlertDialogPrimitive.Content>,
@@ -43,6 +50,7 @@ const AlertDialogContent = React.forwardRef<
 ));
 AlertDialogContent.displayName = AlertDialogPrimitive.Content.displayName;
 
+
 const AlertDialogHeader = ({
   className,
   ...props
@@ -56,6 +64,7 @@ const AlertDialogHeader = ({
   />
 );
 AlertDialogHeader.displayName = "AlertDialogHeader";
+
 
 const AlertDialogFooter = ({
   className,
@@ -71,6 +80,7 @@ const AlertDialogFooter = ({
 );
 AlertDialogFooter.displayName = "AlertDialogFooter";
 
+
 const AlertDialogTitle = React.forwardRef<
   React.ElementRef<typeof AlertDialogPrimitive.Title>,
   React.ComponentPropsWithoutRef<typeof AlertDialogPrimitive.Title>
@@ -83,6 +93,7 @@ const AlertDialogTitle = React.forwardRef<
 ));
 AlertDialogTitle.displayName = AlertDialogPrimitive.Title.displayName;
 
+
 const AlertDialogDescription = React.forwardRef<
   React.ElementRef<typeof AlertDialogPrimitive.Description>,
   React.ComponentPropsWithoutRef<typeof AlertDialogPrimitive.Description>
@@ -93,8 +104,8 @@ const AlertDialogDescription = React.forwardRef<
     {...props}
   />
 ));
-AlertDialogDescription.displayName =
-  AlertDialogPrimitive.Description.displayName;
+AlertDialogDescription.displayName = AlertDialogPrimitive.Description.displayName;
+
 
 const AlertDialogAction = React.forwardRef<
   React.ElementRef<typeof AlertDialogPrimitive.Action>,
@@ -107,6 +118,7 @@ const AlertDialogAction = React.forwardRef<
   />
 ));
 AlertDialogAction.displayName = AlertDialogPrimitive.Action.displayName;
+
 
 const AlertDialogCancel = React.forwardRef<
   React.ElementRef<typeof AlertDialogPrimitive.Cancel>,
@@ -123,6 +135,7 @@ const AlertDialogCancel = React.forwardRef<
   />
 ));
 AlertDialogCancel.displayName = AlertDialogPrimitive.Cancel.displayName;
+
 
 export {
   AlertDialog,

@@ -1,9 +1,14 @@
 import * as React from "react";
 import * as AccordionPrimitive from "@radix-ui/react-accordion";
 import { ChevronDown } from "lucide-react";
-
 import { cn } from "@/lib/utils";
 
+/*
+This component is a header with an interactable arrow that 
+can expand into more text including buttons
+https://www.radix-ui.com/primitives/docs/components/accordion
+for reference
+*/
 const Accordion = AccordionPrimitive.Root;
 
 const AccordionItem = React.forwardRef<
@@ -15,9 +20,12 @@ const AccordionItem = React.forwardRef<
     className={cn("border-b", className)}
     {...props}
   />
-));
+  )
+);
 AccordionItem.displayName = "AccordionItem";
 
+
+//This collapses and uncollapses the accordion
 const AccordionTrigger = React.forwardRef<
   React.ElementRef<typeof AccordionPrimitive.Trigger>,
   React.ComponentPropsWithoutRef<typeof AccordionPrimitive.Trigger>
@@ -38,6 +46,8 @@ const AccordionTrigger = React.forwardRef<
 ));
 AccordionTrigger.displayName = AccordionPrimitive.Trigger.displayName;
 
+
+//The text of the accordion
 const AccordionContent = React.forwardRef<
   React.ElementRef<typeof AccordionPrimitive.Content>,
   React.ComponentPropsWithoutRef<typeof AccordionPrimitive.Content>
@@ -50,7 +60,7 @@ const AccordionContent = React.forwardRef<
     <div className={cn("pb-4 pt-0", className)}>{children}</div>
   </AccordionPrimitive.Content>
 ));
-
 AccordionContent.displayName = AccordionPrimitive.Content.displayName;
+
 
 export { Accordion, AccordionItem, AccordionTrigger, AccordionContent };

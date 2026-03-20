@@ -1,16 +1,20 @@
 import * as React from "react";
 import { cva, type VariantProps } from "class-variance-authority";
-
 import { cn } from "@/lib/utils";
+
+/*
+Alert ui element from base React.
+This is simply a small message that appears briefly on screen, no interactibility
+*/
 
 const alertVariants = cva(
   "relative w-full rounded-lg border p-4 [&>svg~*]:pl-7 [&>svg+div]:translate-y-[-3px] [&>svg]:absolute [&>svg]:left-4 [&>svg]:top-4 [&>svg]:text-foreground",
   {
     variants: {
       variant: {
+        //Add more variants here if you wish to change properties.
         default: "bg-background text-foreground",
-        destructive:
-          "border-destructive/50 text-destructive dark:border-destructive [&>svg]:text-destructive",
+        destructive: "border-destructive/50 text-destructive dark:border-destructive [&>svg]:text-destructive",
       },
     },
     defaultVariants: {
@@ -18,6 +22,7 @@ const alertVariants = cva(
     },
   },
 );
+
 
 const Alert = React.forwardRef<
   HTMLDivElement,
@@ -32,6 +37,7 @@ const Alert = React.forwardRef<
 ));
 Alert.displayName = "Alert";
 
+
 const AlertTitle = React.forwardRef<
   HTMLParagraphElement,
   React.HTMLAttributes<HTMLHeadingElement>
@@ -44,6 +50,7 @@ const AlertTitle = React.forwardRef<
 ));
 AlertTitle.displayName = "AlertTitle";
 
+
 const AlertDescription = React.forwardRef<
   HTMLParagraphElement,
   React.HTMLAttributes<HTMLParagraphElement>
@@ -55,5 +62,6 @@ const AlertDescription = React.forwardRef<
   />
 ));
 AlertDescription.displayName = "AlertDescription";
+
 
 export { Alert, AlertTitle, AlertDescription };

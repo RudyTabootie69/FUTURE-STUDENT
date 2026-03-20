@@ -1,20 +1,29 @@
 import * as React from "react";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import { DayPicker } from "react-day-picker";
-
 import { cn } from "@/lib/utils";
 import { buttonVariants } from "@/components/ui/button";
 
 export type CalendarProps = React.ComponentProps<typeof DayPicker>;
 
+/* 
+Using the unique package react-day-picker to build calendar
+
+https://www.npmjs.com/package/react-day-picker
+
+Most work done regarding sorting events will be done with the calendar, make sure you're read up
+https://daypicker.dev/
+*/
+
 function Calendar({
   className,
   classNames,
-  showOutsideDays = true,
+  showOutsideDays = false, //Set to true to have days falling outside the current month show up on current month calendar, defaulting to false for cleaner design.
   ...props
 }: CalendarProps) {
   return (
     <DayPicker
+      timeZone="UTC+11" //Explicitly choosing Sydney time under the assumption this app stays only with HSC NSW students
       showOutsideDays={showOutsideDays}
       className={cn("p-3", className)}
       classNames={{
@@ -36,7 +45,9 @@ function Calendar({
         row: "flex w-full mt-2",
         cell: "h-9 w-9 text-center text-sm p-0 relative [&:has([aria-selected].day-range-end)]:rounded-r-md [&:has([aria-selected].day-outside)]:bg-accent/50 [&:has([aria-selected])]:bg-accent first:[&:has([aria-selected])]:rounded-l-md last:[&:has([aria-selected])]:rounded-r-md focus-within:relative focus-within:z-20",
         day: cn(
-          buttonVariants({ variant: "ghost" }),
+          buttonVariants({
+             variant: "ghost" 
+          }),
           "h-9 w-9 p-0 font-normal aria-selected:opacity-100",
         ),
         day_range_end: "day-range-end",
@@ -64,5 +75,6 @@ function Calendar({
   );
 }
 Calendar.displayName = "Calendar";
+
 
 export { Calendar };
