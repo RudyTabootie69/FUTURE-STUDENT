@@ -22,7 +22,14 @@ export default function Home() {
     <div className="min-h-screen bg-bg-soft">
       <Navigation />
 
-      <Hero />
+      <Hero
+        title="Welcome back, Lachlan!"
+        description="Let’s continue planning your path to University. You’re doing great!"
+        cta={{
+          label: "Find Your Perfect Course",
+          href: "/course-finder",
+        }}
+      />
 
       <main>
         <ApplicationJourney

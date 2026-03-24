@@ -12,7 +12,7 @@ export function StatsGrid({
   stepsCompleted,
 }: StatsGridProps) {
   return (
-    <SectionWrapper padded={false} innerClassName="mt-12">
+    <SectionWrapper innerClassName="mt-12">
       <div className="grid grid-cols-1 gap-6 md:grid-cols-3">
         <StatCard
           value={savedCourses}

@@ -8,7 +8,7 @@ type QuickActionsProps = {
 
 export function QuickActions({ cards }: QuickActionsProps) {
   return (
-    <SectionWrapper padded={false} innerClassName="mt-12 mb-12">
+    <SectionWrapper innerClassName="mt-12 mb-12">
       <h2 className="mb-6 text-2xl font-bold text-black">Jump into it!</h2>
 
       <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">

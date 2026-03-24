@@ -11,7 +11,7 @@ export function ApplicationJourney({
   steps,
 }: ApplicationJourneyProps) {
   return (
-    <SectionWrapper padded={false} innerClassName="mt-8">
+    <SectionWrapper innerClassName="mt-8">
       <div className="rounded-2xl border border-[#B3D8FF] bg-bg-soft p-6 shadow-[0_0_15px_0_rgba(49,133,252,0.15)]">
         <div className="mb-4 flex flex-col lg:flex-row lg:items-center lg:justify-between">
           <div>
