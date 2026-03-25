@@ -1,22 +1,15 @@
 import { useEffect, useMemo, useState } from "react";
 import { ChevronLeft, ChevronRight } from "lucide-react";
-import Navigation from "@/components/Navigation";
 import { useWishlist } from "@/context/WishlistContext";
-import { buildMonthMatrix, isoKey, monthLabel } from "@/lib/utils";
+import { buildMonthMatrix, isoKey, monthLabel, parseDMY } from "@/lib/utils";
+import { LEGEND_ITEMS } from "@/pages/data/calendar-data";
 
-export default function Calendar() {
+export function Calendar() {
   const [viewDate, setViewDate] = useState(new Date(2025, 9, 1));
 
   const weeks = useMemo(() => buildMonthMatrix(viewDate), [viewDate]);
 
-  const legendItems = [
-    { label: "Deadlines", color: "#FF4757", bgColor: "#FFE8EA" },
-    { label: "Events", color: "#3185FC", bgColor: "#E8F4FF" },
-    { label: "Start Dates", color: "#2ED573", bgColor: "#E8FFE8" },
-    { label: "Important Dates", color: "#FFA726", bgColor: "#FFF3E0" },
-  ] as const;
-
-  const categoryMeta = legendItems.reduce<
+  const categoryMeta = LEGEND_ITEMS.reduce<
     Record<string, { color: string; bgColor: string; order: number }>
   >((acc, item, idx) => {
     acc[item.label] = { color: item.color, bgColor: item.bgColor, order: idx };
@@ -24,32 +17,6 @@ export default function Calendar() {
   }, {});
 
   const { wishlist } = useWishlist();
-
-  function parseDMY(s?: string | null): Date | null {
-    if (!s) return null;
-    const parts = s.split("-");
-    if (parts.length !== 3) return null;
-    const [dd, mmm, yyyy] = parts;
-    const MONTHS: Record<string, number> = {
-      JAN: 0,
-      FEB: 1,
-      MAR: 2,
-      APR: 3,
-      MAY: 4,
-      JUN: 5,
-      JUL: 6,
-      AUG: 7,
-      SEP: 8,
-      OCT: 9,
-      NOV: 10,
-      DEC: 11,
-    };
-    const day = parseInt(dd, 10);
-    const month = MONTHS[(mmm || "").toUpperCase()] ?? 0;
-    const year = parseInt(yyyy, 10);
-    const d = new Date(year, month, day);
-    return isNaN(d.getTime()) ? null : d;
-  }
 
   const eventsMap = useMemo(() => {
     const map: Record<
@@ -125,8 +92,6 @@ export default function Calendar() {
 
   return (
     <div className="min-h-screen bg-bg-soft relative overflow-hidden">
-      <Navigation />
-
       <div className="absolute left-6 top-[131px] w-[279px] h-[279px] rounded-full bg-[#B3D8FF] opacity-40 pointer-events-none" />
       <div className="absolute left-[42px] top-[835px] w-[662px] h-[662px] rounded-full bg-[#B3D8FF] opacity-40 pointer-events-none" />
       <div className="absolute right-[88px] top-[657px] w-[150px] h-[150px] rounded-full bg-[#B3D8FF] opacity-40 pointer-events-none" />
@@ -166,7 +131,7 @@ export default function Calendar() {
               </div>
 
               <div className="flex flex-wrap items-center gap-3 lg:ml-auto">
-                {legendItems.map((item) => (
+                {LEGEND_ITEMS.map((item) => (
                   <div
                     key={item.label}
                     className="flex items-center gap-2 px-3 py-1.5 rounded-[20px]"

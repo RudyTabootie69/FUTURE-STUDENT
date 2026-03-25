@@ -7,7 +7,7 @@ export function cn(...inputs: ClassValue[]) {
 
 // Home Utils
 
-const MONTHS: Record<string, number> = {
+export const MONTHS: Record<string, number> = {
   JAN: 0,
   FEB: 1,
   MAR: 2,
@@ -22,18 +22,6 @@ const MONTHS: Record<string, number> = {
   DEC: 11,
 };
 
-function parseDMY(dateString?: string | null): Date | null {
-  if (!dateString) return null;
-
-  const [dd, mmm, yyyy] = dateString.split("-");
-  const day = parseInt(dd || "", 10);
-  const month = MONTHS[(mmm || "").toUpperCase()] ?? 0;
-  const year = parseInt(yyyy || "", 10);
-
-  const date = new Date(year, month, day);
-  return Number.isNaN(date.getTime()) ? null : date;
-}
-
 export function getUpcomingDeadlines(wishlist: any[]) {
   const today = new Date();
   const todayStart = new Date(
@@ -46,4 +34,59 @@ export function getUpcomingDeadlines(wishlist: any[]) {
     const deadline = parseDMY(course?.closingDate);
     return deadline && deadline >= todayStart ? acc + 1 : acc;
   }, 0);
+}
+
+// Calendar utils
+
+export function monthLabel(date: Date) {
+  return date.toLocaleString("en-US", { month: "long", year: "numeric" });
+}
+
+export function buildMonthMatrix(viewDate: Date) {
+  const year = viewDate.getFullYear();
+  const month = viewDate.getMonth(); // 0-based
+
+  const firstDay = new Date(year, month, 1);
+  const startWeekday = firstDay.getDay(); // 0=Sun
+  const daysInMonth = new Date(year, month + 1, 0).getDate();
+
+  const cells: (number | null)[] = [];
+  for (let i = 0; i < startWeekday; i++) cells.push(null);
+  for (let d = 1; d <= daysInMonth; d++) cells.push(d);
+  while (cells.length % 7 !== 0) cells.push(null);
+  while (cells.length < 42) cells.push(null);
+
+  const weeks: (number | null)[][] = [];
+  for (let i = 0; i < cells.length; i += 7) {
+    weeks.push(cells.slice(i, i + 7));
+  }
+  return weeks;
+}
+
+export function isoKey(date: Date, day: number) {
+  const y = date.getFullYear();
+  const m = String(date.getMonth() + 1).padStart(2, "0");
+  const d = String(day).padStart(2, "0");
+  return `${y}-${m}-${d}`;
+}
+
+export function parseDMY(dateString?: string | null): Date | null {
+  if (!dateString) return null;
+
+  const parts = dateString.split("-");
+  if (parts.length !== 3) return null;
+
+  const [dd, mmm, yyyy] = parts;
+
+  const day = parseInt(dd, 10);
+  const month = MONTHS[(mmm || "").toUpperCase()];
+  const year = parseInt(yyyy, 10);
+
+  if (month === undefined || Number.isNaN(day) || Number.isNaN(year)) {
+    return null;
+  }
+
+  const date = new Date(year, month, day);
+
+  return Number.isNaN(date.getTime()) ? null : date;
 }
