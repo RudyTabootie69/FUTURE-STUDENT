@@ -31,20 +31,15 @@ export default function Home() {
         }}
       />
 
-      <main>
-        <ApplicationJourney
-          savedCourses={wishlist.length}
-          steps={journeySteps}
-        />
+      <ApplicationJourney savedCourses={wishlist.length} steps={journeySteps} />
 
-        <StatsGrid
-          savedCourses={wishlist.length}
-          upcomingDeadlines={upcomingDeadlines}
-          stepsCompleted="1/6"
-        />
+      <StatsGrid
+        savedCourses={wishlist.length}
+        upcomingDeadlines={upcomingDeadlines}
+        stepsCompleted="1/6"
+      />
 
-        <QuickActions cards={actionCards} />
-      </main>
+      <QuickActions cards={actionCards} />
 
       <Footer />
     </div>

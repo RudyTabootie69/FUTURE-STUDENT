@@ -12,8 +12,8 @@ export function ApplicationJourney({
 }: ApplicationJourneyProps) {
   return (
     <SectionWrapper innerClassName="mt-8">
-      <div className="rounded-2xl border border-[#B3D8FF] bg-bg-soft p-6 shadow-[0_0_15px_0_rgba(49,133,252,0.15)]">
-        <div className="mb-4 flex flex-col lg:flex-row lg:items-center lg:justify-between">
+      <div className="rounded-2xl border border-[#B3D8FF] bg-bg-soft p-6 ">
+        <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between">
           <div>
             <h2 className="mb-1 text-[33px] font-bold text-black">
               Your Application Journey
@@ -23,7 +23,7 @@ export function ApplicationJourney({
             </p>
           </div>
 
-          <div className="mt-4 text-right lg:mt-0">
+          <div className=" text-right lg:mt-0">
             <div className="text-[33px] font-bold text-primary-blue">
               {savedCourses}
             </div>

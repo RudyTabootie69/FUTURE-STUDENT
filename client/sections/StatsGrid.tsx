@@ -12,7 +12,7 @@ export function StatsGrid({
   stepsCompleted,
 }: StatsGridProps) {
   return (
-    <SectionWrapper innerClassName="mt-12">
+    <SectionWrapper>
       <div className="grid grid-cols-1 gap-6 md:grid-cols-3">
         <StatCard
           value={savedCourses}
@@ -42,7 +42,7 @@ type StatCardProps = {
 
 function StatCard({ value, label, dotClassName }: StatCardProps) {
   return (
-    <div className="flex items-start gap-3 rounded-xl border-2 border-[#B3D8FF] bg-bg-soft p-4 shadow-[0_0_14px_0_rgba(49,133,252,0.15)]">
+    <div className="flex items-start gap-3 rounded-xl border-2 border-[#B3D8FF] bg-bg-soft p-4">
       <div className={`mt-3 h-8 w-8 shrink-0 rounded-full ${dotClassName}`} />
       <div>
         <div className="text-2xl font-bold text-[#1A1A1A]">{value}</div>

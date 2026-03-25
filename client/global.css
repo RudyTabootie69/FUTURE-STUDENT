@@ -144,7 +144,7 @@
   }
 
   .layout-py {
-    @apply py-[72px] lg:pb-[108px];
+    @apply py-[48px] lg:pb-[72px];
   }
 
   .constrain {
