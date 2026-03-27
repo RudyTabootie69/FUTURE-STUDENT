@@ -5,7 +5,7 @@ import { buildMonthMatrix, isoKey, monthLabel, parseDMY } from "@/lib/utils";
 import { LEGEND_ITEMS } from "@/pages/data/calendar-data";
 
 export function Calendar() {
-  const [viewDate, setViewDate] = useState(new Date(2025, 9, 1));
+  const [viewDate, setViewDate] = useState(new Date(2026, 3, 26));
 
   const weeks = useMemo(() => buildMonthMatrix(viewDate), [viewDate]);
 

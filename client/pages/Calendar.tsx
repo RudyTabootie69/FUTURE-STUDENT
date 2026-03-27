@@ -5,7 +5,7 @@ import { useWishlist } from "@/context/WishlistContext";
 import { buildMonthMatrix, isoKey, monthLabel } from "@/lib/utils";
 
 export default function Calendar() {
-  const [viewDate, setViewDate] = useState(new Date(2025, 9, 1));
+  const [viewDate, setViewDate] = useState(new Date(2026, 3, 26));
 
   const weeks = useMemo(() => buildMonthMatrix(viewDate), [viewDate]);
 

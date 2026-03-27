@@ -9,34 +9,99 @@ export default function CourseFinder() {
   // Filters & sort
   const [search, setSearch] = useState<string>("");
   const [fieldFilter, setFieldFilter] = useState<string>("All Fields");
-  const [universityFilter, setUniversityFilter] = useState<string>("All Universities");
+  const [universityFilter, setUniversityFilter] =
+    useState<string>("All Universities");
   const [atarMin, setAtarMin] = useState<number>(30);
   const [atarMax, setAtarMax] = useState<number>(99.95);
   const [sortBy, setSortBy] = useState<"none" | "uni" | "course">("none");
 
   const universities = [
-    { name: "University of Wollongong", location: "Wollongong, NSW", abbr: "UOW" },
-    { name: "Australian National University", location: "Acton, CBR", abbr: "ANU" },
-    { name: "University of New South Wales", location: "Kensington, NSW", abbr: "UNSW" },
+    {
+      name: "University of Wollongong",
+      location: "Wollongong, NSW",
+      abbr: "UOW",
+    },
+    {
+      name: "Australian National University",
+      location: "Acton, CBR",
+      abbr: "ANU",
+    },
+    {
+      name: "University of New South Wales",
+      location: "Kensington, NSW",
+      abbr: "UNSW",
+    },
     { name: "University of Sydney", location: "Camperdown, NSW", abbr: "USYD" },
-    { name: "University of Technology Sydney", location: "Ultimo, NSW", abbr: "UTS" },
-    { name: "Macquarie University", location: "Macquarie Park, NSW", abbr: "MQ" },
-    { name: "Western Sydney University", location: "Parramatta, NSW", abbr: "WSU" },
-    { name: "University of Newcastle", location: "Callaghan, NSW", abbr: "UON" },
+    {
+      name: "University of Technology Sydney",
+      location: "Ultimo, NSW",
+      abbr: "UTS",
+    },
+    {
+      name: "Macquarie University",
+      location: "Macquarie Park, NSW",
+      abbr: "MQ",
+    },
+    {
+      name: "Western Sydney University",
+      location: "Parramatta, NSW",
+      abbr: "WSU",
+    },
+    {
+      name: "University of Newcastle",
+      location: "Callaghan, NSW",
+      abbr: "UON",
+    },
     { name: "University of Canberra", location: "Bruce, ACT", abbr: "UC" },
-    { name: "Charles Sturt University", location: "Wagga Wagga, NSW", abbr: "CSU" },
-    { name: "Australian Catholic University", location: "North Sydney, NSW", abbr: "ACU" },
-    { name: "University of New England", location: "Armidale, NSW", abbr: "UNE" },
+    {
+      name: "Charles Sturt University",
+      location: "Wagga Wagga, NSW",
+      abbr: "CSU",
+    },
+    {
+      name: "Australian Catholic University",
+      location: "North Sydney, NSW",
+      abbr: "ACU",
+    },
+    {
+      name: "University of New England",
+      location: "Armidale, NSW",
+      abbr: "UNE",
+    },
   ];
 
   const degrees = [
-    { title: "Bachelor of Computer Science", abbr: "CS", field: "Computing & IT" },
-    { title: "Bachelor of Information Technology", abbr: "IT", field: "Computing & IT" },
+    {
+      title: "Bachelor of Computer Science",
+      abbr: "CS",
+      field: "Computing & IT",
+    },
+    {
+      title: "Bachelor of Information Technology",
+      abbr: "IT",
+      field: "Computing & IT",
+    },
     { title: "Bachelor of Data Science", abbr: "DS", field: "Computing & IT" },
-    { title: "Bachelor of Software Engineering", abbr: "SE", field: "Computing & IT" },
-    { title: "Bachelor of Electrical Engineering", abbr: "EE", field: "Engineering" },
-    { title: "Bachelor of Mechanical Engineering", abbr: "ME", field: "Engineering" },
-    { title: "Bachelor of Civil Engineering", abbr: "CE", field: "Engineering" },
+    {
+      title: "Bachelor of Software Engineering",
+      abbr: "SE",
+      field: "Computing & IT",
+    },
+    {
+      title: "Bachelor of Electrical Engineering",
+      abbr: "EE",
+      field: "Engineering",
+    },
+    {
+      title: "Bachelor of Mechanical Engineering",
+      abbr: "ME",
+      field: "Engineering",
+    },
+    {
+      title: "Bachelor of Civil Engineering",
+      abbr: "CE",
+      field: "Engineering",
+    },
     { title: "Bachelor of Business", abbr: "BUS", field: "Business" },
     { title: "Bachelor of Commerce", abbr: "BCOM", field: "Business" },
     { title: "Bachelor of Accounting", abbr: "ACC", field: "Business" },
@@ -45,20 +110,49 @@ export default function CourseFinder() {
     { title: "Bachelor of Arts", abbr: "BA", field: "Arts & Design" },
     { title: "Bachelor of Design", abbr: "DES", field: "Arts & Design" },
     { title: "Bachelor of Architecture", abbr: "ARCH", field: "Arts & Design" },
-    { title: "Bachelor of Education", abbr: "EDU", field: "Education & Health" },
+    {
+      title: "Bachelor of Education",
+      abbr: "EDU",
+      field: "Education & Health",
+    },
     { title: "Bachelor of Nursing", abbr: "NURS", field: "Education & Health" },
-    { title: "Bachelor of Psychology", abbr: "PSY", field: "Education & Health" },
+    {
+      title: "Bachelor of Psychology",
+      abbr: "PSY",
+      field: "Education & Health",
+    },
     { title: "Bachelor of Biomedical Science", abbr: "BIOM", field: "Science" },
     { title: "Bachelor of Pharmacy", abbr: "PHAR", field: "Science" },
-    { title: "Bachelor of Environmental Science", abbr: "ENV", field: "Science" },
-    { title: "Bachelor of Communication", abbr: "COMM", field: "Arts & Design" },
+    {
+      title: "Bachelor of Environmental Science",
+      abbr: "ENV",
+      field: "Science",
+    },
+    {
+      title: "Bachelor of Communication",
+      abbr: "COMM",
+      field: "Arts & Design",
+    },
   ];
 
   const sem1 = { start: "26-FEB-2026", close: "31-JAN-2026" };
   const sem2 = { start: "22-JUL-2026", close: "30-JUN-2026" };
 
   // Date helpers for D-MMM-YYYY strings
-  const MONTHS: Record<string, number> = { JAN: 0, FEB: 1, MAR: 2, APR: 3, MAY: 4, JUN: 5, JUL: 6, AUG: 7, SEP: 8, OCT: 9, NOV: 10, DEC: 11 };
+  const MONTHS: Record<string, number> = {
+    JAN: 0,
+    FEB: 1,
+    MAR: 2,
+    APR: 3,
+    MAY: 4,
+    JUN: 5,
+    JUL: 6,
+    AUG: 7,
+    SEP: 8,
+    OCT: 9,
+    NOV: 10,
+    DEC: 11,
+  };
   function parseDMY(s: string): Date {
     // expects like 26-FEB-2026
     const [dd, mmm, yyyy] = s.split("-");
@@ -68,7 +162,20 @@ export default function CourseFinder() {
     return new Date(y, m, d);
   }
   function fmtDMY(d: Date): string {
-    const inv: string[] = ["JAN","FEB","MAR","APR","MAY","JUN","JUL","AUG","SEP","OCT","NOV","DEC"];
+    const inv: string[] = [
+      "JAN",
+      "FEB",
+      "MAR",
+      "APR",
+      "MAY",
+      "JUN",
+      "JUL",
+      "AUG",
+      "SEP",
+      "OCT",
+      "NOV",
+      "DEC",
+    ];
     const dd = String(d.getDate()).padStart(2, "0");
     const mmm = inv[d.getMonth()];
     const yyyy = d.getFullYear();
@@ -82,7 +189,7 @@ export default function CourseFinder() {
 
   // Generate varied entries (12 universities x 12 degrees = 144)
   const courses: Course[] = useMemo(() => {
-    const chosenDegrees = degrees.slice(0, 12);
+    const chosenDegrees = degrees;
     const out: Course[] = [];
     universities.forEach((uni, ui) => {
       chosenDegrees.forEach((deg, di) => {
@@ -114,32 +221,49 @@ export default function CourseFinder() {
   }, []);
 
   const universityNames = useMemo(() => universities.map((u) => u.name), []);
-  const fieldOptions = useMemo(() => ["All Fields", ...Array.from(new Set(degrees.map((d) => d.field)))], []);
+  const fieldOptions = useMemo(
+    () => ["All Fields", ...Array.from(new Set(degrees.map((d) => d.field)))],
+    [],
+  );
 
   const { add, has } = useWishlist();
 
   // Filtering + sorting pipeline
   const filteredCourses = useMemo(() => {
     const q = search.trim().toLowerCase();
-    let list = courses.filter((c) => c.atar === undefined || (c.atar >= atarMin && c.atar <= atarMax));
+    let list = courses.filter(
+      (c) => c.atar === undefined || (c.atar >= atarMin && c.atar <= atarMax),
+    );
 
     if (q) {
       list = list.filter(
         (c) =>
           c.university.toLowerCase().includes(q) ||
           c.degree.toLowerCase().includes(q) ||
-          c.code.toLowerCase().includes(q)
+          c.code.toLowerCase().includes(q),
       );
     }
 
-    if (fieldFilter !== "All Fields") list = list.filter((c) => c.field === fieldFilter);
-    if (universityFilter !== "All Universities") list = list.filter((c) => c.university === universityFilter);
+    if (fieldFilter !== "All Fields")
+      list = list.filter((c) => c.field === fieldFilter);
+    if (universityFilter !== "All Universities")
+      list = list.filter((c) => c.university === universityFilter);
 
-    if (sortBy === "uni") list = [...list].sort((a, b) => a.university.localeCompare(b.university));
-    if (sortBy === "course") list = [...list].sort((a, b) => a.degree.localeCompare(b.degree));
+    if (sortBy === "uni")
+      list = [...list].sort((a, b) => a.university.localeCompare(b.university));
+    if (sortBy === "course")
+      list = [...list].sort((a, b) => a.degree.localeCompare(b.degree));
 
     return list;
-  }, [courses, search, fieldFilter, universityFilter, atarMin, atarMax, sortBy]);
+  }, [
+    courses,
+    search,
+    fieldFilter,
+    universityFilter,
+    atarMin,
+    atarMax,
+    sortBy,
+  ]);
 
   return (
     <div className="min-h-screen bg-bg-soft">
@@ -148,8 +272,12 @@ export default function CourseFinder() {
       {/* Header */}
       <div className="w-full h-[140px] bg-primary-blue flex items-center justify-start px-6 lg:px-36">
         <div>
-          <h1 className="text-white text-3xl font-bold mb-2">Find Your Perfect Course</h1>
-          <p className="text-white text-sm">Explore thousands of University courses across NSW</p>
+          <h1 className="text-white text-3xl font-bold mb-2">
+            Find Your Perfect Course
+          </h1>
+          <p className="text-white text-sm">
+            Explore thousands of University courses across NSW
+          </p>
         </div>
       </div>
 
@@ -160,8 +288,18 @@ export default function CourseFinder() {
           <div className="bg-white border border-[#B3D8FF] rounded-lg p-4 shadow-[0_0_14px_0_rgba(49,133,252,0.15)] space-y-6">
             {/* Filter Header */}
             <div className="flex items-center gap-4">
-              <svg width="32" height="32" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
-                <path d="M23.5 7H8.5C8.22386 7 8 7.22386 8 7.5V9.78005C8 9.9202 8.05882 10.0539 8.16214 10.1486L13.8379 15.3514C13.9412 15.4461 14 15.5798 14 15.72V25.0979C14 25.4906 14.432 25.73 14.765 25.5219L17.765 23.6469C17.9112 23.5555 18 23.3953 18 23.2229V15.72C18 15.5798 18.0588 15.4461 18.1621 15.3514L23.8379 10.1486C23.9412 10.0539 24 9.9202 24 9.78005V7.5C24 7.22386 23.7761 7 23.5 7Z" stroke="#6E7491" strokeWidth="2" />
+              <svg
+                width="32"
+                height="32"
+                viewBox="0 0 32 32"
+                fill="none"
+                xmlns="http://www.w3.org/2000/svg"
+              >
+                <path
+                  d="M23.5 7H8.5C8.22386 7 8 7.22386 8 7.5V9.78005C8 9.9202 8.05882 10.0539 8.16214 10.1486L13.8379 15.3514C13.9412 15.4461 14 15.5798 14 15.72V25.0979C14 25.4906 14.432 25.73 14.765 25.5219L17.765 23.6469C17.9112 23.5555 18 23.3953 18 23.2229V15.72C18 15.5798 18.0588 15.4461 18.1621 15.3514L23.8379 10.1486C23.9412 10.0539 24 9.9202 24 9.78005V7.5C24 7.22386 23.7761 7 23.5 7Z"
+                  stroke="#6E7491"
+                  strokeWidth="2"
+                />
               </svg>
               <h2 className="text-2xl font-bold text-[#1A1A1A]">Filters</h2>
             </div>
@@ -180,7 +318,9 @@ export default function CourseFinder() {
 
             {/* Field of Study */}
             <div className="space-y-2">
-              <label className="block text-sm font-medium text-black">Field of Study</label>
+              <label className="block text-sm font-medium text-black">
+                Field of Study
+              </label>
               <div className="relative">
                 <select
                   value={fieldFilter}
@@ -197,7 +337,9 @@ export default function CourseFinder() {
 
             {/* University */}
             <div className="space-y-2">
-              <label className="block text-sm font-medium text-black">University</label>
+              <label className="block text-sm font-medium text-black">
+                University
+              </label>
               <div className="relative">
                 <select
                   value={universityFilter}
@@ -215,7 +357,9 @@ export default function CourseFinder() {
 
             {/* ATAR Slider */}
             <div className="space-y-3">
-              <label className="block text-base text-[#1E1E1E]">ATAR Requirement: {atarMin.toFixed(2)} – {atarMax.toFixed(2)}</label>
+              <label className="block text-base text-[#1E1E1E]">
+                ATAR Requirement: {atarMin.toFixed(2)} – {atarMax.toFixed(2)}
+              </label>
               <div className="relative">
                 <input
                   type="range"
@@ -223,7 +367,9 @@ export default function CourseFinder() {
                   max={99.95}
                   step={0.05}
                   value={atarMin}
-                  onChange={(e) => setAtarMin(Math.min(Number(e.target.value), atarMax))}
+                  onChange={(e) =>
+                    setAtarMin(Math.min(Number(e.target.value), atarMax))
+                  }
                   className="w-full h-2 bg-[#E6E6E6] rounded-full appearance-none"
                 />
                 <input
@@ -232,7 +378,9 @@ export default function CourseFinder() {
                   max={99.95}
                   step={0.05}
                   value={atarMax}
-                  onChange={(e) => setAtarMax(Math.max(Number(e.target.value), atarMin))}
+                  onChange={(e) =>
+                    setAtarMax(Math.max(Number(e.target.value), atarMin))
+                  }
                   className="w-full h-2 bg-transparent -mt-2 appearance-none"
                 />
               </div>
@@ -266,34 +414,59 @@ export default function CourseFinder() {
               <table className="w-full">
                 <tbody className="divide-y divide-[#E9E8FC]">
                   {filteredCourses.map((course, index) => (
-                    <tr key={courseId(course) + index} className="hover:bg-gray-50 transition-colors">
+                    <tr
+                      key={courseId(course) + index}
+                      className="hover:bg-gray-50 transition-colors"
+                    >
                       <td className="p-4">
                         <div className="flex items-center gap-4">
                           <div className="w-12 h-12 rounded-full bg-primary-blue flex-shrink-0" />
                           <div className="min-w-0 flex-1 grid grid-cols-1 md:grid-cols-5 gap-4 items-center">
                             <div className="space-y-1">
-                              <div className="font-normal text-[#27273F] text-base">{course.university}</div>
-                              <div className="text-grey-400 text-base">{course.location}</div>
+                              <div className="font-normal text-[#27273F] text-base">
+                                {course.university}
+                              </div>
+                              <div className="text-grey-400 text-base">
+                                {course.location}
+                              </div>
                             </div>
                             <div className="space-y-1">
-                              <div className="font-normal text-[#27273F] text-base">{course.degree}</div>
-                              <div className="text-grey-400 text-base">{course.code}</div>
+                              <div className="font-normal text-[#27273F] text-base">
+                                {course.degree}
+                              </div>
+                              <div className="text-grey-400 text-base">
+                                {course.code}
+                              </div>
                             </div>
                             <div className="space-y-1 text-right">
-                              <div className="font-normal text-[#27273F] text-base">Course Starts</div>
-                              <div className="text-grey-400 text-base">{course.startDate}</div>
+                              <div className="font-normal text-[#27273F] text-base">
+                                Course Starts
+                              </div>
+                              <div className="text-grey-400 text-base">
+                                {course.startDate}
+                              </div>
                             </div>
                             <div className="space-y-1 text-right">
-                              <div className="font-normal text-[#27273F] text-base">Final Closing</div>
-                              <div className="text-grey-400 text-base">{course.closingDate}</div>
+                              <div className="font-normal text-[#27273F] text-base">
+                                Final Closing
+                              </div>
+                              <div className="text-grey-400 text-base">
+                                {course.closingDate}
+                              </div>
                             </div>
                             <div className="text-right">
                               {has(courseId(course)) ? (
-                                <button className="px-3 py-2 text-sm border border-gray-300 text-gray-400 rounded-md cursor-default" disabled>
+                                <button
+                                  className="px-3 py-2 text-sm border border-gray-300 text-gray-400 rounded-md cursor-default"
+                                  disabled
+                                >
                                   Added
                                 </button>
                               ) : (
-                                <button onClick={() => add(course)} className="px-3 py-2 text-sm border border-primary-blue text-primary-blue rounded-md hover:bg-blue-50">
+                                <button
+                                  onClick={() => add(course)}
+                                  className="px-3 py-2 text-sm border border-primary-blue text-primary-blue rounded-md hover:bg-blue-50"
+                                >
                                   Add to Wishlist
                                 </button>
                               )}
