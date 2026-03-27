@@ -23,7 +23,7 @@ export default function Home() {
       <Navigation />
 
       <Hero
-        title="Welcome back, Lachlan!"
+        title="Welcome, Student!"
         description="Let’s continue planning your path to University. You’re doing great!"
         cta={{
           label: "Find Your Perfect Course",
