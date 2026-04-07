@@ -21,6 +21,8 @@ import Onboarding from "./pages/Onboarding";
 import AboutUs from "./pages/AboutUs";
 import ContactUs from "./pages/ContactUs";
 
+/* This is the starting page, initialise from here */
+
 const queryClient = new QueryClient();
 
 const App = () => (
@@ -58,6 +60,7 @@ const container = document.getElementById("root")!;
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 const existingRoot = (window as any).__fusion_app_root;
 const root = existingRoot ?? createRoot(container);
+
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
-;(window as any).__fusion_app_root = root;
+(window as any).__fusion_app_root = root;
 root.render(<App />);

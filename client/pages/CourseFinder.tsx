@@ -191,6 +191,7 @@ export default function CourseFinder() {
   const courses: Course[] = useMemo(() => {
     const chosenDegrees = degrees;
     const out: Course[] = [];
+    let i = 0;
     universities.forEach((uni, ui) => {
       chosenDegrees.forEach((deg, di) => {
         const sem = (ui + di) % 2 === 0 ? sem1 : sem2;
@@ -202,9 +203,10 @@ export default function CourseFinder() {
         const offerRelD = addDays(startD, -10 + ((ui * 2 + di) % 5));
         const expoD = addDays(closeD, -60 + ((ui * 5 + di) % 7));
         out.push({
+          uacID: i++,
           university: uni.name,
           location: uni.location,
-          degree: deg.title,
+          title: deg.title,
           code: `${uni.abbr}-${deg.abbr}-${String(di + 1).padStart(2, "0")}`,
           startDate: sem.start,
           closingDate: sem.close,
@@ -239,7 +241,7 @@ export default function CourseFinder() {
       list = list.filter(
         (c) =>
           c.university.toLowerCase().includes(q) ||
-          c.degree.toLowerCase().includes(q) ||
+          c.title.toLowerCase().includes(q) ||
           c.code.toLowerCase().includes(q),
       );
     }
@@ -252,7 +254,7 @@ export default function CourseFinder() {
     if (sortBy === "uni")
       list = [...list].sort((a, b) => a.university.localeCompare(b.university));
     if (sortBy === "course")
-      list = [...list].sort((a, b) => a.degree.localeCompare(b.degree));
+      list = [...list].sort((a, b) => a.title.localeCompare(b.title));
 
     return list;
   }, [
@@ -432,7 +434,7 @@ export default function CourseFinder() {
                             </div>
                             <div className="space-y-1">
                               <div className="font-normal text-[#27273F] text-base">
-                                {course.degree}
+                                {course.title}
                               </div>
                               <div className="text-grey-400 text-base">
                                 {course.code}

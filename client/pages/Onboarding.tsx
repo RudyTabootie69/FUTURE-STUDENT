@@ -1,7 +1,7 @@
 import { useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useProfile } from "@/context/ProfileContext";
-import type { StudentProfile } from "@/types/profile";
+import type { StudentProfile } from "@/types/user";
 
 export default function Onboarding() {
   const navigate = useNavigate();

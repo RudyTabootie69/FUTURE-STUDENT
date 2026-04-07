@@ -1,5 +1,5 @@
 import { createContext, useContext, useEffect, useMemo, useState } from "react";
-import type { StudentProfile } from "@/types/profile";
+import type { StudentProfile } from "@/types/user";
 
 interface ProfileContextValue {
   profile: StudentProfile | null;

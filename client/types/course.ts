@@ -1,7 +1,10 @@
-export interface Course {
+export class Course {
+  uacID: number;
+  uniID?: string; 
+  title: string;
+  description?: string;
   university: string;
   location: string;
-  degree: string;
   code: string;
   startDate: string;
   closingDate: string;
@@ -11,8 +14,10 @@ export interface Course {
   expoDate?: string;
   logoUrl?: string | null;
   atar?: number; // approximate ATAR requirement
+  duration?: number;
   field?: string; // category of study
 }
+
 
 export function courseId(c: Course): string {
   return `${c.university}__${c.code}`;

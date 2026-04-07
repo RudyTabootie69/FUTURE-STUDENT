@@ -5,10 +5,14 @@ export interface PaymentSummary {
   last4?: string | null;
 }
 
-export interface StudentProfile {
+export class User {
+  id: number;
   userType: string;
-  fullName: string;
+  firstName: string;
+  lastName: string;
   nesaNumber: string;
+  username: string;
+  email: string;
   uacId?: string;
   usi?: string;
   entryYear: number;
@@ -19,5 +23,13 @@ export interface StudentProfile {
   firstInFamily?: string; // Yes/No/Prefer not to say
   indigenous?: string; // Yes/No/Prefer not to say
   culturalBackground?: string;
+  passwordHash: string;
+  hashSalt: string;
   payment?: PaymentSummary | null;
+  
+  constructor(id: number, username: string, firstName: string, lastName: string,password: string, salt: string, address: string) {
+      this.id = id;  
+      this.firstName = firstName;
+        
+  }
 }

@@ -4,6 +4,11 @@ import Navigation from "@/components/Navigation";
 import { useWishlist } from "@/context/WishlistContext";
 import { buildMonthMatrix, isoKey, monthLabel } from "@/lib/utils";
 
+  //How to load into this
+  //On server start connect to local MySQL database
+  //Create function that returns events from MySQL server
+  //Call server side function on calendar open
+
 export default function Calendar() {
   const [viewDate, setViewDate] = useState(new Date(2026, 3, 26));
 
@@ -50,6 +55,7 @@ export default function Calendar() {
     const d = new Date(year, month, day);
     return isNaN(d.getTime()) ? null : d;
   }
+
 
   const eventsMap = useMemo(() => {
     const map: Record<

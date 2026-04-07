@@ -1,5 +1,8 @@
 // HOME TYPES
 
+/* Where all global class objects are defined */
+
+
 export type JourneyStep = {
   label: string;
   active: boolean;
@@ -12,11 +15,13 @@ export type ActionCard = {
 };
 
 // COURSE TYPES
-
-export interface Course {
+export class Course {
+  uacID: number;
+  uniID?: string; 
+  title: string;
+  description?: string;
   university: string;
   location: string;
-  degree: string;
   code: string;
   startDate: string;
   closingDate: string;
@@ -26,6 +31,7 @@ export interface Course {
   expoDate?: string;
   logoUrl?: string | null;
   atar?: number; // approximate ATAR requirement
+  duration?: number;
   field?: string; // category of study
 }
 
@@ -42,10 +48,13 @@ export interface PaymentSummary {
   last4?: string | null;
 }
 
-export interface StudentProfile {
+export class User {
   userType: string;
-  fullName: string;
+  firstName: string;
+  lastName: string;
   nesaNumber: string;
+  username: string;
+  email: string;
   uacId?: string;
   usi?: string;
   entryYear: number;
@@ -56,5 +65,7 @@ export interface StudentProfile {
   firstInFamily?: string; // Yes/No/Prefer not to say
   indigenous?: string; // Yes/No/Prefer not to say
   culturalBackground?: string;
+  passwordHash: string;
+  hashSalt: string;
   payment?: PaymentSummary | null;
 }
