@@ -70,31 +70,87 @@ server.post('/users', (req, res) => {
 In the request body there will be a third variable, 
 a boolean saying if the user would like to say like to stay logged in. 
 If checked yes a JWT Token will be generated.
+
+Parent and Staff user types are incomplete.
 */
 server.post('/users/:login', (req, res) => {
-  const { username, password} = req.body;
+  const { username, password, userType} = req.body;
 
-  let user = new User(id: -1, username: "Error User");
+  let user = new User(1, userType, "Error First Name", "Error Last Name", "Error Nesa Number", "Error Username", "Error Email", -1, "01/01/2000", "Error School Name", "Error Address", "Error Password Hash", "Error Hash Salt");
+  
+  switch(userType){
 
-  conn.query('select id, passwordHash, hashSalt from Users where username = ?', userId, (err, result) => {
-    if (err) throw err;
-    let salt = result.first[2];
-    let compareInput = bcrypt.hash(password, salt);
-    let compareDB = result.first[1];
-    console.log("Compareinput = " + compareInput);
-    console.log("CompareDB = " + compareDB);
-    if (compareInput != compareDB){
-        //Comment the next line to stop testing
-        user = new User(id: 999, username: "Test Account", password: "Test Password", salt: "Salt");
-        res.send('Log in Failure');
+    case "Student":
+      conn.query('select id, firstName, lastName, nesaNumber, userName, email, entryYear, dob, school, address, passwordHash, hashSalt from Users where username = ?', username, (err, result) => {
+        if (err) throw err;
+        let salt = result.first[11];
+        let compareInput = bcrypt.hash(password, salt);
+        let compareDB = result.first[10];
+        console.log("Compareinput = " + compareInput);
+        console.log("CompareDB = " + compareDB);
+        if (compareInput != compareDB){
+            //Comment the next line to stop testing
+            user = new User(999, "Test Account", "John", "Doe", "123456789", "TestAccount", "test@test.com",  2, "01/01/2000", "UOW", "Northfields Ave", "Password Hash", "Hash Salt");
+            res.send('Log in Failure (Student)');
+            return;
+        }
+
+        /* Edit to remove password later */
+        user = new User(result.first[0], "Student", result.first[1], result.first[2], result.first[3], result.first[4], result.first[5], result.first[6], result.first[7], result.first[8], result.first[9], result.first[10], result.first[11]);
+        res.send('Log in success (Student)');
         return;
-    }
+      });
+      break;
 
-    /* Edit to remove password later */
-    user = new User(id: result.first[0], username: username, password: password, salt: salt, address: "42 Wallaby Way Sydney",);
-    res.send('Log in success');
-    
-  });
+    case "Staff":
+      conn.query('select id, firstName, lastName, nesaNumber, userName, email, entryYear, dob, school, address, passwordHash, hashSalt from Users where username = ?', username, (err, result) => {
+        if (err) throw err;
+        let salt = result.first[11];
+        let compareInput = bcrypt.hash(password, salt);
+        let compareDB = result.first[10];
+        console.log("Compareinput = " + compareInput);
+        console.log("CompareDB = " + compareDB);
+        if (compareInput != compareDB){
+            //Comment the next line to stop testing
+            user = new User(999, "Test Account", "John", "Doe", "123456789", "TestAccount", "test@test.com",  2, "01/01/2000", "UOW", "Northfields Ave", "Password Hash", "Hash Salt");
+            res.send('Log in Failure (Student)');
+            return;
+        }
+
+        /* Edit to remove password later */
+        user = new User(result.first[0], "Student", result.first[1], result.first[2], result.first[3], result.first[4], result.first[5], result.first[6], result.first[7], result.first[8], result.first[9], result.first[10], result.first[11]);
+        res.send('Log in success (Parent)');
+        return;
+      });
+      break;
+
+    case "Parent":
+      conn.query('select id, firstName, lastName, nesaNumber, userName, email, entryYear, dob, school, address, passwordHash, hashSalt from Users where username = ?', username, (err, result) => {
+        if (err) throw err;
+        let salt = result.first[11];
+        let compareInput = bcrypt.hash(password, salt);
+        let compareDB = result.first[10];
+        console.log("Compareinput = " + compareInput);
+        console.log("CompareDB = " + compareDB);
+        if (compareInput != compareDB){
+            //Comment the next line to stop testing
+            user = new User(999, "Test Account", "John", "Doe", "123456789", "TestAccount", "test@test.com",  2, "01/01/2000", "UOW", "Northfields Ave", "Password Hash", "Hash Salt");
+            res.send('Log in Failure (Parent)');
+            return;
+        }
+
+        /* Edit to remove password later */
+        user = new User(result.first[0], "Parent", result.first[1], result.first[2], result.first[3], result.first[4], result.first[5], result.first[6], result.first[7], result.first[8], result.first[9], result.first[10], result.first[11]);
+        res.send('Log in success (Parent)');
+        return;
+      });
+      break;
+      
+    default:
+      console.log("Error in user type");
+      return;
+
+  }
 });
 
  // Get all users
