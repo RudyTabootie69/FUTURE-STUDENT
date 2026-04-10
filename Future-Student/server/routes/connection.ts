@@ -1,6 +1,6 @@
 import { json } from "stream/consumers";
 import { any } from "zod/v4";
-import { User } from "@/types/user";
+import { Student, Parent, Staff, User } from "@/types/user";
 
 const express = require('express');
 const mysql = require('mysql');
@@ -76,8 +76,6 @@ Parent and Staff user types are incomplete.
 server.post('/users/:login', (req, res) => {
   const { username, password, userType} = req.body;
 
-  let user = new User(1, userType, "Error First Name", "Error Last Name", "Error Nesa Number", "Error Username", "Error Email", -1, "01/01/2000", "Error School Name", "Error Address", "Error Password Hash", "Error Hash Salt");
-  
   switch(userType){
 
     case "Student":
@@ -90,14 +88,16 @@ server.post('/users/:login', (req, res) => {
         console.log("CompareDB = " + compareDB);
         if (compareInput != compareDB){
             //Comment the next line to stop testing
-            user = new User(999, "Test Account", "John", "Doe", "123456789", "TestAccount", "test@test.com",  2, "01/01/2000", "UOW", "Northfields Ave", "Password Hash", "Hash Salt");
-            res.send('Log in Failure (Student)');
+            let user = new Student(999, "John", "Doe", "123456789", "TestAccount", "test@test.com",  2, "01/01/2000", "UOW", "Northfields Ave", "Password Hash", "Hash Salt");
+            console.log('Log in Failure (Student)');
+            res.send(user);
             return;
         }
 
         /* Edit to remove password later */
-        user = new User(result.first[0], "Student", result.first[1], result.first[2], result.first[3], result.first[4], result.first[5], result.first[6], result.first[7], result.first[8], result.first[9], result.first[10], result.first[11]);
-        res.send('Log in success (Student)');
+        let user = new Student(result.first[0], result.first[1], result.first[2], result.first[3], result.first[4], result.first[5], result.first[6], result.first[7], result.first[8], result.first[9], result.first[10], result.first[11]);
+        console.log('Log in success (Student)');
+        res.send(user);
         return;
       });
       break;
@@ -112,14 +112,16 @@ server.post('/users/:login', (req, res) => {
         console.log("CompareDB = " + compareDB);
         if (compareInput != compareDB){
             //Comment the next line to stop testing
-            user = new User(999, "Test Account", "John", "Doe", "123456789", "TestAccount", "test@test.com",  2, "01/01/2000", "UOW", "Northfields Ave", "Password Hash", "Hash Salt");
-            res.send('Log in Failure (Student)');
+            let user = new Staff(999, "John", "Doe", "123456789", "TestAccount", "test@test.com",  2, "01/01/2000", "UOW", "Northfields Ave", "Password Hash", "Hash Salt");
+            console.log('Log in Failure (Staff)');
+            res.send(user);
             return;
         }
 
         /* Edit to remove password later */
-        user = new User(result.first[0], "Student", result.first[1], result.first[2], result.first[3], result.first[4], result.first[5], result.first[6], result.first[7], result.first[8], result.first[9], result.first[10], result.first[11]);
-        res.send('Log in success (Parent)');
+        let user = new Staff(result.first[0], result.first[1], result.first[2], result.first[3], result.first[4], result.first[5], result.first[6], result.first[7], result.first[8], result.first[9], result.first[10], result.first[11]);
+        console.log('Log in success (Staff)');
+        res.send(user);
         return;
       });
       break;
@@ -134,14 +136,16 @@ server.post('/users/:login', (req, res) => {
         console.log("CompareDB = " + compareDB);
         if (compareInput != compareDB){
             //Comment the next line to stop testing
-            user = new User(999, "Test Account", "John", "Doe", "123456789", "TestAccount", "test@test.com",  2, "01/01/2000", "UOW", "Northfields Ave", "Password Hash", "Hash Salt");
-            res.send('Log in Failure (Parent)');
+            let user = new Parent(999, "John", "Doe", "123456789", "TestAccount", "test@test.com",  2, "01/01/2000", "UOW", "Northfields Ave", "Password Hash", "Hash Salt");
+            console.log('Log in Failure (Parent)');
+            res.send(user);
             return;
         }
 
         /* Edit to remove password later */
-        user = new User(result.first[0], "Parent", result.first[1], result.first[2], result.first[3], result.first[4], result.first[5], result.first[6], result.first[7], result.first[8], result.first[9], result.first[10], result.first[11]);
-        res.send('Log in success (Parent)');
+        let user = new Parent(result.first[0], result.first[1], result.first[2], result.first[3], result.first[4], result.first[5], result.first[6], result.first[7], result.first[8], result.first[9], result.first[10], result.first[11]);
+        console.log('Log in success (Parent)');
+        res.send(user);
         return;
       });
       break;
