@@ -58,10 +58,8 @@ export default function Calendar() {
 
 
   const eventsMap = useMemo(() => {
-    const map: Record<
-      string,
-      { label: string; color: string; bgColor: string; order: number }[]
-    > = {};
+    const map: 
+    Record<string,{ label: string; color: string; bgColor: string; order: number }[]> = {};
 
     type Category = "Deadlines" | "Events" | "Start Dates" | "Important Dates";
     const add = (
@@ -72,7 +70,8 @@ export default function Calendar() {
     ) => {
       const d = parseDMY(dateStr);
       if (!d) return;
-      const key = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
+      const key = 
+      `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
       const meta = categoryMeta[category];
       const entry = {
         label: `${abbr} ${label}`,
@@ -84,6 +83,7 @@ export default function Calendar() {
       else map[key].push(entry);
     };
 
+    //test this
     for (const c of wishlist) {
       const abbr = c.code?.split("-")?.[0] || c.university;
       add(c.closingDate, "Deadlines", "Applications Close", abbr);
