@@ -1,6 +1,6 @@
 import Navigation from "@/components/Navigation";
 import { useWishlist } from "@/context/WishlistContext";
-import { courseId } from "@/types/course";
+import { toString } from "@/types/course";
 
 export default function Wishlist() {
   const { wishlist, remove } = useWishlist();
@@ -27,7 +27,7 @@ export default function Wishlist() {
               <table className="w-full">
                 <tbody className="divide-y divide-[#E9E8FC]">
                   {wishlist.map((course) => (
-                    <tr key={courseId(course)} className="hover:bg-gray-50 transition-colors">
+                    <tr key={toString(course)} className="hover:bg-gray-50 transition-colors">
                       <td className="p-4">
                         <div className="flex items-center gap-4">
                           <div className="w-12 h-12 rounded-full bg-primary-blue flex-shrink-0" />
@@ -37,7 +37,7 @@ export default function Wishlist() {
                               <div className="text-grey-400">{course.location}</div>
                             </div>
                             <div className="space-y-1">
-                              <div className="text-[#27273F]">{course.degree}</div>
+                              <div className="text-[#27273F]">{course.title}</div>
                               <div className="text-grey-400">{course.code}</div>
                             </div>
                             <div className="space-y-1 text-right">
@@ -50,7 +50,7 @@ export default function Wishlist() {
                             </div>
                             <div className="text-right">
                               <button
-                                onClick={() => remove(courseId(course))}
+                                onClick={() => remove(toString(course))}
                                 className="px-3 py-2 text-sm border border-primary-blue text-primary-blue rounded-md hover:bg-blue-50"
                               >
                                 Remove

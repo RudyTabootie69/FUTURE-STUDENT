@@ -14,7 +14,8 @@ const eventContext = createContext<eventContextValue | undefined>(undefined);
 
 const STORAGE_KEY = "eventEvents";
 
-export function eventProvider({ children }: { children: React.ReactNode }) {
+export function eventProvider({ children }: { children: React.ReactNode })
+ {
   const [event, setevent] = useState<Event[]>([]);
 
   // Load from localStorage
