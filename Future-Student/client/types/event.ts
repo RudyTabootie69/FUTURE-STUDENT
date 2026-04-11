@@ -6,3 +6,7 @@ export class Event {
   date: string;
   endDate?: string;
 }
+
+export function toString(e: Event): string {
+  return e.title;
+}

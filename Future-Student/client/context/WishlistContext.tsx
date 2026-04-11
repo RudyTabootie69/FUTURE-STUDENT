@@ -1,6 +1,6 @@
 import { createContext, useContext, useEffect, useMemo, useState } from "react";
 import type { Course } from "@/types/course";
-import { courseId } from "@/types/course";
+import { toString } from "@/types/course";
 
 interface WishlistContextValue {
   wishlist: Course[];
@@ -39,9 +39,9 @@ export function WishlistProvider({ children }: { children: React.ReactNode }) {
   const value = useMemo<WishlistContextValue>(() => ({
     wishlist,
     add: (c: Course) =>
-      setWishlist((prev) => (prev.find((p) => courseId(p) === courseId(c)) ? prev : [...prev, c])),
-    remove: (id: string) => setWishlist((prev) => prev.filter((p) => courseId(p) !== id)),
-    has: (id: string) => wishlist.some((p) => courseId(p) === id),
+      setWishlist((prev) => (prev.find((p) => toString(p) === toString(c)) ? prev : [...prev, c])),
+    remove: (id: string) => setWishlist((prev) => prev.filter((p) => toString(p) !== id)),
+    has: (id: string) => wishlist.some((p) => toString(p) === id),
     clear: () => setWishlist([]),
   }), [wishlist]);
 

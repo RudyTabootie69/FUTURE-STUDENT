@@ -19,6 +19,6 @@ export class Course {
 }
 
 
-export function courseId(c: Course): string {
-  return `${c.university}__${c.code}`;
+export function toString(c: Course): string {
+  return `${c.university}__${c.uacID}`;
 }

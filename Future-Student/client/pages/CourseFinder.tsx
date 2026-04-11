@@ -2,7 +2,7 @@ import { useMemo, useState } from "react";
 import { Search, ChevronDown } from "lucide-react";
 import Navigation from "@/components/Navigation";
 import type { Course } from "@/types/course";
-import { courseId } from "@/types/course";
+import { toString } from "@/types/course";
 import { useWishlist } from "@/context/WishlistContext";
 
 export default function CourseFinder() {
@@ -15,6 +15,7 @@ export default function CourseFinder() {
   const [atarMax, setAtarMax] = useState<number>(99.95);
   const [sortBy, setSortBy] = useState<"none" | "uni" | "course">("none");
 
+  //The functionality here needs to be replaced with searching and saving universities
   const universities = [
     {
       name: "University of Wollongong",
@@ -417,7 +418,7 @@ export default function CourseFinder() {
                 <tbody className="divide-y divide-[#E9E8FC]">
                   {filteredCourses.map((course, index) => (
                     <tr
-                      key={courseId(course) + index}
+                      key={toString(course) + index}
                       className="hover:bg-gray-50 transition-colors"
                     >
                       <td className="p-4">
@@ -457,7 +458,7 @@ export default function CourseFinder() {
                               </div>
                             </div>
                             <div className="text-right">
-                              {has(courseId(course)) ? (
+                              {has(toString(course)) ? (
                                 <button
                                   className="px-3 py-2 text-sm border border-gray-300 text-gray-400 rounded-md cursor-default"
                                   disabled
