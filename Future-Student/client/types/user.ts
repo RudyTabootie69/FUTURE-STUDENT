@@ -69,7 +69,7 @@ export class Staff extends User{
   culturalBackground?: string;
   
   public override getUserType(): string{
-    return "Student";
+    return "Staff";
   }
 
   constructor(id: number, firstName: string, lastName: string, nesaNumber: string, username: string, email: string, entryYear: number, dob: string, schoolName: string, address: string, passwordHash: string, hashSalt: string) {
@@ -91,7 +91,7 @@ export class Parent extends User{
   culturalBackground?: string;
   
   public override getUserType(): string{
-    return "Student";
+    return "Parent";
   }
 
   constructor(id: number, firstName: string, lastName: string, nesaNumber: string, username: string, email: string, entryYear: number, dob: string, schoolName: string, address: string, passwordHash: string, hashSalt: string) {
