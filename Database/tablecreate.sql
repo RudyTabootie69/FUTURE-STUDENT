@@ -2,8 +2,8 @@
 DROP DATABASE IF EXISTS futurestudentdb;
 CREATE DATABASE IF NOT EXISTS futurestudentdb;
 USE futurestudentdb;
-CREATE USER IF NOT EXISTS 'flutter'@'localhost';
-GRANT CREATE, ALTER, DROP, INSERT, UPDATE, DELETE, SELECT, REFERENCES, RELOAD on *.* TO 'flutter'@'localhost' WITH GRANT OPTION;
+CREATE USER IF NOT EXISTS 'FutureStudent'@'localhost';
+GRANT CREATE, ALTER, DROP, INSERT, UPDATE, DELETE, SELECT, REFERENCES, RELOAD on *.* TO 'FutureStudent'@'localhost' WITH GRANT OPTION;
 
 CREATE TABLE IF NOT EXISTS University(
     name varchar(255) PRIMARY KEY,
@@ -19,18 +19,17 @@ CREATE TABLE IF NOT EXISTS User(
     id INT AUTO_INCREMENT PRIMARY KEY,
     firstName varchar(255),
     lastName varchar(255),
+    address varchar(255),
     username varchar(255) NOT NULL,
     email varchar(255),
-    address varchar(255),
+    pfpPath varchar(255),
     passwordHash varchar(255) NOT NULL,
     hashSalt varchar(255) NOT NULL,
-    pfpPath varchar(255),
     CONSTRAINT U_User UNIQUE (id, username)
 );
 
 CREATE TABLE IF NOT EXISTS Student(
     id INT PRIMARY KEY,
-    nesaNumber varchar(255),
     school varchar(255),
     ecomStatus ENUM('low', 'medium', 'high'),
     indigenousStatus BOOL,
@@ -44,17 +43,6 @@ CREATE TABLE IF NOT EXISTS SchoolStaff(
     id INT PRIMARY KEY,
     school varchar(255),
     FOREIGN KEY (id) REFERENCES User(id),
-    FOREIGN KEY (school) REFERENCES School(name)
-);
-
-//This does not define a parent but rather a relationship between a parent user and a student user. 
-//This means there can be multiple entries for the same parent but for a different child.
-CREATE TABLE IF NOT EXISTS Parent(
-    parentID INT PRIMARY KEY,
-    childID INT,
-    school varchar(255),
-    FOREIGN KEY (parentID) REFERENCES User(id),
-    FOREIGN KEY (childID) REFERENCES Student(id),
     FOREIGN KEY (school) REFERENCES School(name)
 );
 
