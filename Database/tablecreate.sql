@@ -46,6 +46,13 @@ CREATE TABLE IF NOT EXISTS SchoolStaff(
     FOREIGN KEY (school) REFERENCES School(name)
 );
 
+CREATE TABLE IF NOT EXISTS Parent(
+    id INT PRIMARY KEY,
+    childID INT,
+    FOREIGN KEY (id) REFERENCES User(id),
+    FOREIGN KEY (childID) REFERENCES Student(id)
+);
+
 CREATE TABLE IF NOT EXISTS UniAdmin(
     id INT PRIMARY KEY,
     uni varchar(255),

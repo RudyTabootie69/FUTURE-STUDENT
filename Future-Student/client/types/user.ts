@@ -14,15 +14,13 @@ export class User {
   dob: string; // YYYY-MM-DD
   sex: Sex;
   address: string;
-  passwordHash: string;
-  hashSalt: string;
   payment?: PaymentSummary | null;
 
   public getUserType(): string{
     return "Undefined";
   }
 
-  constructor(id: number,  firstName: string, lastName: string, username: string, email: string, dob: string, address: string, passwordHash: string, hashSalt: string) {
+  constructor(id: number,  firstName: string, lastName: string, username: string, email: string, dob: string, address: string) {
       this.id = id;  
       this.firstName = firstName;
       this.lastName = lastName;
@@ -30,8 +28,6 @@ export class User {
       this.email = email;
       this.dob = dob;
       this.address = address;
-      this.passwordHash = passwordHash;
-      this.hashSalt = hashSalt;
         
   }
 }
@@ -50,8 +46,8 @@ export class Student extends User{
     return "Student";
   }
 
-  constructor(id: number, firstName: string, lastName: string, nesaNumber: string, username: string, email: string, entryYear: number, dob: string, schoolName: string, address: string, passwordHash: string, hashSalt: string) {
-      super(id, firstName, lastName, username, email, dob, address, passwordHash, hashSalt);
+  constructor(id: number, firstName: string, lastName: string,  username: string, email: string, dob: string, address: string, nesaNumber: string, entryYear: number, schoolName: string) {
+      super(id, firstName, lastName, username, email, dob, address);
       this.nesaNumber = nesaNumber;
       this.entryYear = entryYear;
       this.schoolName = schoolName; 
@@ -69,13 +65,11 @@ export class Staff extends User{
   culturalBackground?: string;
   
   public override getUserType(): string{
-    return "Student";
+    return "Staff";
   }
 
-  constructor(id: number, firstName: string, lastName: string, nesaNumber: string, username: string, email: string, entryYear: number, dob: string, schoolName: string, address: string, passwordHash: string, hashSalt: string) {
-      super(id, firstName, lastName, username, email, dob, address, passwordHash, hashSalt);
-      this.nesaNumber = nesaNumber;
-      this.entryYear = entryYear;
+  constructor(id: number, firstName: string, lastName: string,  username: string, email: string, dob: string, address: string, schoolName: string) {
+      super(id, firstName, lastName, username, email, dob, address);
       this.schoolName = schoolName; 
   }
 }
@@ -91,13 +85,11 @@ export class Parent extends User{
   culturalBackground?: string;
   
   public override getUserType(): string{
-    return "Student";
+    return "Parent";
   }
 
-  constructor(id: number, firstName: string, lastName: string, nesaNumber: string, username: string, email: string, entryYear: number, dob: string, schoolName: string, address: string, passwordHash: string, hashSalt: string) {
-      super(id, firstName, lastName, username, email, dob, address, passwordHash, hashSalt);
-      this.nesaNumber = nesaNumber;
-      this.entryYear = entryYear;
+  constructor(id: number, firstName: string, lastName: string,  username: string, email: string, dob: string, address: string, schoolName: string) {
+      super(id, firstName, lastName, username, email, dob, address);
       this.schoolName = schoolName; 
   }
 }
