@@ -5,9 +5,11 @@ import { Student, Parent, Staff, User } from "@/types/user";
 const express = require('express');
 const mysql = require('mysql');
 const bcrypt = require('bcrypt');
-
+const dotenv = require('dotenv');
+const jwt = require('jsonwebtoken');
 const server = express();
-const port = 3000;
+const port = process.env.PORT || 3000;
+const cookieParser = require('cookie-parser');
 
 server.use(express.json());
 server.use(express.urlencoded({ extended: true }));
@@ -16,17 +18,20 @@ server.listen(port, () => {
   console.log(`Server is running on port ${port}`);
 });
 
+server.use(cookieParser);
+
+
 /* If we're using Amazon EC2 these settings should not need to change */
 const conn= mysql.createPool({
   connectionLimit: 10,
-  host: 'localhost',
-  user: 'FutureStudent',
-  password: '',
-  database: 'FutureStudent'
+  host: process.env.DB_HOST,
+  user: process.env.DB_USER,
+  password: process.env.DB_PASSWORD,
+  database: process.env.DB_NAME
 });
 
 // Create a new user
-server.post('/users', (req, res) => {
+server.post('/users/:register', (req, res) => {
     const { username, password} = req.body;
 
     const saltRounds = 10;
@@ -65,96 +70,126 @@ server.post('/users', (req, res) => {
   },
 );
 
-// Check user for log in
-/* 
-In the request body there will be a third variable, 
-a boolean saying if the user would like to say like to stay logged in. 
-If checked yes a JWT Token will be generated.
 
-Parent and Staff user types are incomplete.
-*/
+// Check user for log in
 server.post('/users/:login', (req, res) => {
-  const { username, password, userType} = req.body;
+  const { username, password, userType, stayLogged} = req.body;
+
+  let user = new User(-1, "John", "Doe", "123456789", "TestAccount", "test@test.com", "Northfields Ave");
+
+  try {
+        conn.query('select hashSalt, passwordHash from Users where username = ?', username, (err, result) => {
+          if (err) throw err;
+          let salt = result.first[0];
+          let compareInput = bcrypt.hash(password, salt);
+          let compareDB = result.first[1];
+          console.log("Compareinput = " + compareInput);
+          console.log("CompareDB = " + compareDB);
+          if (compareInput != compareDB){
+
+              console.log('Log in Failure');
+              res.send(user);  //Comment out this line to stop testing
+              return;
+          }     
+      });
+      }catch (error) { 
+        res.status(500).send('Login failed');
+        return;
+      }
 
   switch(userType){
-
     case "Student":
-      conn.query('select id, firstName, lastName, nesaNumber, userName, email, entryYear, dob, school, address, passwordHash, hashSalt from Users where username = ?', username, (err, result) => {
-        if (err) throw err;
-        let salt = result.first[11];
-        let compareInput = bcrypt.hash(password, salt);
-        let compareDB = result.first[10];
-        console.log("Compareinput = " + compareInput);
-        console.log("CompareDB = " + compareDB);
-        if (compareInput != compareDB){
-            //Comment the next line to stop testing
-            let user = new Student(999, "John", "Doe", "123456789", "TestAccount", "test@test.com",  2, "01/01/2000", "UOW", "Northfields Ave", "Password Hash", "Hash Salt");
-            console.log('Log in Failure (Student)');
-            res.send(user);
-            return;
-        }
+      try {
+        conn.query('SELECT Users.id, Users.firstName, Users.lastName, Users.userName, Users.email, Users.dob, Users.address, Student.nesaNumber, Student.entryYear, Student.school, FROM Users INNER JOIN Users.id = Student.id AND Users.username = ?', username, (err, result) => {
+          if (err) throw err;
 
-        /* Edit to remove password later */
-        let user = new Student(result.first[0], result.first[1], result.first[2], result.first[3], result.first[4], result.first[5], result.first[6], result.first[7], result.first[8], result.first[9], result.first[10], result.first[11]);
-        console.log('Log in success (Student)');
-        res.send(user);
-        return;
+          /* Edit to remove password later */
+          user = new Student(result.first[0], result.first[1], result.first[2], result.first[3], result.first[4], result.first[5], result.first[6], result.first[7], result.first[8], result.first[9]);
+          
+          console.log('Log in success (Student)');
+          res.send(user);
       });
+      }catch (error) {
+        res.status(500).send('Login failed'); // Handle any unexpected errors
+      }
       break;
 
     case "Staff":
-      conn.query('select id, firstName, lastName, nesaNumber, userName, email, entryYear, dob, school, address, passwordHash, hashSalt from Users where username = ?', username, (err, result) => {
-        if (err) throw err;
-        let salt = result.first[11];
-        let compareInput = bcrypt.hash(password, salt);
-        let compareDB = result.first[10];
-        console.log("Compareinput = " + compareInput);
-        console.log("CompareDB = " + compareDB);
-        if (compareInput != compareDB){
-            //Comment the next line to stop testing
-            let user = new Staff(999, "John", "Doe", "123456789", "TestAccount", "test@test.com",  2, "01/01/2000", "UOW", "Northfields Ave", "Password Hash", "Hash Salt");
-            console.log('Log in Failure (Staff)');
-            res.send(user);
-            return;
-        }
+      try {
+        conn.query('SELECT Users.id, Users.firstName, Users.lastName, Users.userName, Users.email, Users.dob, Users.address, SchoolStaff.school, FROM Users INNER JOIN Users.id = SchoolStaff.id AND Users.username = ?', username, (err, result) => {
 
-        /* Edit to remove password later */
-        let user = new Staff(result.first[0], result.first[1], result.first[2], result.first[3], result.first[4], result.first[5], result.first[6], result.first[7], result.first[8], result.first[9], result.first[10], result.first[11]);
-        console.log('Log in success (Staff)');
-        res.send(user);
-        return;
-      });
-      break;
+
+          /* Edit to remove password later */
+          user = new Staff(result.first[0], result.first[1], result.first[2], result.first[3], result.first[4], result.first[5], result.first[6], result.first[7]);
+          console.log('Log in success (Staff)');
+          res.send(user);
+        });
+    }catch (error) {
+      res.status(500).send('Login failed'); // Handle any unexpected errors
+    }
+    break;
 
     case "Parent":
-      conn.query('select id, firstName, lastName, nesaNumber, userName, email, entryYear, dob, school, address, passwordHash, hashSalt from Users where username = ?', username, (err, result) => {
-        if (err) throw err;
-        let salt = result.first[11];
-        let compareInput = bcrypt.hash(password, salt);
-        let compareDB = result.first[10];
-        console.log("Compareinput = " + compareInput);
-        console.log("CompareDB = " + compareDB);
-        if (compareInput != compareDB){
-            //Comment the next line to stop testing
-            let user = new Parent(999, "John", "Doe", "123456789", "TestAccount", "test@test.com",  2, "01/01/2000", "UOW", "Northfields Ave", "Password Hash", "Hash Salt");
-            console.log('Log in Failure (Parent)');
-            res.send(user);
-            return;
-        }
-
-        /* Edit to remove password later */
-        let user = new Parent(result.first[0], result.first[1], result.first[2], result.first[3], result.first[4], result.first[5], result.first[6], result.first[7], result.first[8], result.first[9], result.first[10], result.first[11]);
-        console.log('Log in success (Parent)');
-        res.send(user);
-        return;
-      });
+      try {
+        conn.query('SELECT Users.id, Users.firstName, Users.lastName, Users.userName, Users.email, Users.dob, Users.address, SchoolStaff.school, FROM Users INNER JOIN Users.id = Parent.id AND Users.username = ?', username, (err, result) => {
+          /* Edit to remove password later */
+          user = new Parent(result.first[0], result.first[1], result.first[2], result.first[3], result.first[4], result.first[5], result.first[6], result.first[7]);
+          console.log('Log in success (Parent)');
+          res.send(user);
+          
+        });
+      }catch (error) {
+        res.status(500).send('Login failed'); // Handle any unexpected errors
+      }
       break;
-      
+  
+    
     default:
       console.log("Error in user type");
-      return;
-
+      break;
   }
+
+  if (stayLogged){
+    const token = jwt.sign(
+      { user: user },  // Payload (data inside the token)
+      process.env.JWT_SECRET,      // Secret key for signing the token
+      { expiresIn: "1h" }          // Token expiration time (1 hour)
+    );
+    res.cookie('token', token, {
+      httpOnly: true,   // Not accessible via JavaScript
+      secure: false,    // Set to true in production (HTTPS)
+    }).send({ success: true });
+  }
+});
+
+server.post('/users/:logout', (req, res) => {
+  res.clearCookie('token', {
+    httpOnly: true,
+    secure: false,
+  }).send({ success: true });
+});
+
+server.post('/users/:auth', (req, res, next) => {
+    const token = req.cookies.token;
+    if (!token) {
+      return res.status(401).send({ message: 'Unauthorized access' });
+    }
+
+    // If no token is provided, deny access
+    if (!token) {
+        return res.status(401).send('Access Denied');
+    }
+
+    // Verify the JWT using the secret key
+    jwt.verify(token, process.env.JWT_SECRET, (err, user) => {
+        if (err) return res.status(401).send('Invalid Token'); // Token verification failed
+
+        // If verification is successful, attach user data to request object
+        let authuser = req.user;
+
+        // Pass control to the next middleware or route handler
+        next();
+    });
 });
 
  // Get all users
