@@ -16,6 +16,7 @@ export default function LandingPage() {
   const [openSignIn, setOpenSignIn] = useState(false);
   const [openSignUp, setOpenSignUp] = useState(false);
   const navigate = useNavigate();
+  const { register } = useAuth();
   const { login } = useAuth();
 
   return (
@@ -67,7 +68,7 @@ export default function LandingPage() {
             className="space-y-3"
             onSubmit={(e) => {
               e.preventDefault();
-              login();
+              login(e);
               setOpenSignIn(false);
               navigate("/home", { replace: true });
             }}
@@ -111,7 +112,7 @@ export default function LandingPage() {
             className="space-y-3"
             onSubmit={(e) => {
               e.preventDefault();
-              login();
+              register(e);
               setOpenSignUp(false);
               navigate("/onboarding", { replace: true });
             }}

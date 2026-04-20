@@ -1,45 +1,84 @@
+import { bool } from "joi";
 import { createContext, useContext, useEffect, useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
+const express = require('express');
+const cookieParser = require('cookie-parser');
 
 interface AuthContextValue {
-  isAuthenticated: boolean;
-  login: () => void;
-  logout: () => void;
+  token: any
+  user: any
+  register: (any) => Promise<void>;
+  login: (any) => Promise<void>;
+  logout: () => Promise<void>;
 }
 
 const AuthContext = createContext<AuthContextValue | undefined>(undefined);
 
-const STORAGE_KEY = "auth.isAuthenticated";
 
-export function AuthProvider({ children }: { children: React.ReactNode }) {
+
+export const AuthProvider = ({ children }) => {
+  const [user, setUser] = useState(null);
+  const [token, setToken] = useState(localStorage.getItem("site") || "");
   const [isAuthenticated, setIsAuthenticated] = useState<boolean>(false);
   const navigate = useNavigate();
 
-  useEffect(() => {
+  const register = async (data) => {
     try {
-      const raw = localStorage.getItem(STORAGE_KEY);
-      if (raw) setIsAuthenticated(JSON.parse(raw) === true);
-    } catch {}
-  }, []);
+      const response = await fetch("localhost:3000/users/:login", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(data),
+      });
+      const res = await response.json();
+      if (res.data) {
+        setUser(res.data.user);
+        setToken(res.token);
+        localStorage.setItem("site", res.token);
+        navigate("/");
+        return;
+      }
+      throw new Error(res.message);
+    } catch (err) {
+      console.error(err);
+    }
+  };
 
-  useEffect(() => {
+  const login = async (data) => {
     try {
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(isAuthenticated));
-    } catch {}
-  }, [isAuthenticated]);
+      const response = await fetch("localhost:3000/users/:login", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(data),
+      });
+      const res = await response.json();
+      if (res.data) {
+        setUser(res.data.user);
+        setToken(res.token);
+        localStorage.setItem("site", res.token);
+        navigate("/home");
+        return;
+      }
+      throw new Error(res.message);
+    } catch (err) {
+      console.error(err);
+    }
+  };
+  
+  const logout = async () => {
+    await fetch("localhost:3000/users/:logout", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        
+    });
+  };
 
-  const value = useMemo<AuthContextValue>(() => ({
-    isAuthenticated,
-    login: () => {
-      setIsAuthenticated(true);
-    },
-    logout: () => {
-      setIsAuthenticated(false);
-      navigate("/", { replace: true });
-    },
-  }), [isAuthenticated, navigate]);
-
-  return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
+  return <AuthContext.Provider value={{token, user, register, login, logout}}>{children}</AuthContext.Provider>;
 }
 
 export function useAuth() {

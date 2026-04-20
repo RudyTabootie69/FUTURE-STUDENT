@@ -21,7 +21,7 @@ server.listen(port, () => {
 server.use(cookieParser);
 
 
-/* If we're using Amazon EC2 these settings should not need to change */
+/* If we're using Amazon EC2 these settings should not need to change, except for DB_PASSWORD */
 const conn= mysql.createPool({
   connectionLimit: 10,
   host: process.env.DB_HOST,
