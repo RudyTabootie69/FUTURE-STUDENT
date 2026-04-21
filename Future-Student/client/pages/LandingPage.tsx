@@ -68,7 +68,7 @@ export default function LandingPage() {
             className="space-y-3"
             onSubmit={(e) => {
               e.preventDefault();
-              login(e);
+              login("test");
               setOpenSignIn(false);
               navigate("/home", { replace: true });
             }}
@@ -112,7 +112,7 @@ export default function LandingPage() {
             className="space-y-3"
             onSubmit={(e) => {
               e.preventDefault();
-              register(e);
+              register("test");
               setOpenSignUp(false);
               navigate("/onboarding", { replace: true });
             }}
