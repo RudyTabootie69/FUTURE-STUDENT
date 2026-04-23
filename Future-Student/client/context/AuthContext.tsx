@@ -1,8 +1,6 @@
 import { bool } from "joi";
 import { createContext, useContext, useEffect, useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
-const express = require('express');
-const cookieParser = require('cookie-parser');
 
 interface AuthContextValue {
   token: any
