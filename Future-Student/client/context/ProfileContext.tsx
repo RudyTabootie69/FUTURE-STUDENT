@@ -29,7 +29,7 @@ const stuProfileContext = createContext<StuProfileContextValue | undefined>(unde
 const parProfileContext = createContext<ParProfileContextValue | undefined>(undefined);
 const staffProfileContext = createContext<StaffProfileContextValue | undefined>(undefined);
 
-export const stuProfileProvider = ({ children }: { children: React.ReactNode }) => {
+export const StuProfileProvider = ({ children }: { children: React.ReactNode }) => {
   const [stuprofile, setStuProfile] = useState<Student | null>(null);
 
   useEffect(() => {
@@ -63,7 +63,7 @@ export function useStuProfile() {
 }
 
 
-export const parProfileProvider = ({ children }: { children: React.ReactNode }) => {
+export const ParProfileProvider = ({ children }: { children: React.ReactNode }) => {
   const [parprofile, setProfile] = useState<Parent | null>(null);
 
   useEffect(() => {
@@ -96,7 +96,7 @@ export function useParentProfile() {
   return ctx;
 }
 
-export const staffProfileProvider = ({ children }: { children: React.ReactNode }) =>{
+export const StaffProfileProvider = ({ children }: { children: React.ReactNode }) =>{
   const [staffprofile, setProfile] = useState<Staff | null>(null);
 
   useEffect(() => {

@@ -8,7 +8,7 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { WishlistProvider } from "@/context/WishlistContext";
 import { AuthProvider } from "@/context/AuthContext";
-import { stuProfileProvider, parProfileProvider, staffProfileProvider } from "@/context/ProfileContext";
+import { StuProfileProvider, ParProfileProvider, StaffProfileProvider } from "@/context/ProfileContext";
 import Calendar from "./pages/Calendar";
 import CourseFinder from "./pages/CourseFinder";
 import Profile from "./pages/Profile";
@@ -32,9 +32,9 @@ const App = () => (
       <Sonner />
       <BrowserRouter>
         <AuthProvider>
-          <stuProfileProvider>
-            <parProfileProvider>
-              <staffProfileProvider>
+          <StuProfileProvider>
+            <ParProfileProvider>
+              <StaffProfileProvider>
                 <WishlistProvider>
                   <Routes>
                   <Route path="/" element={<LandingPage />} />
@@ -50,9 +50,9 @@ const App = () => (
                   <Route path="*" element={<NotFound />} />
                   </Routes>
                 </WishlistProvider>
-              </staffProfileProvider>
-            </parProfileProvider>
-          </stuProfileProvider>
+              </StaffProfileProvider>
+            </ParProfileProvider>
+          </StuProfileProvider>
         </AuthProvider>
       </BrowserRouter>
     </TooltipProvider>
