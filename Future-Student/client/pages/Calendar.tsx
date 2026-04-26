@@ -1,8 +1,9 @@
 import { useEffect, useMemo, useState } from "react";
-import { ChevronLeft, ChevronRight } from "lucide-react";
+import { ChevronLeft, ChevronRight, Search, ChevronDown } from "lucide-react";
 import Navigation from "@/components/Navigation";
 import { useWishlist } from "@/context/WishlistContext";
 import { buildMonthMatrix, isoKey, monthLabel } from "@/lib/utils";
+import { useSavedEvents } from "@/context/EventContext";
 
   //How to load into this
   //On server start connect to local MySQL database
@@ -29,7 +30,8 @@ export default function Calendar() {
   }, {});
 
   const { wishlist } = useWishlist();
-
+  const { savedevents } = useSavedEvents();
+  
   function parseDMY(s?: string | null): Date | null {
     if (!s) return null;
     const parts = s.split("-");
@@ -131,8 +133,116 @@ export default function Calendar() {
 
   return (
     <div className="min-h-screen bg-bg-soft relative overflow-hidden">
+      
       <Navigation />
+      //  Side panel
+      <div className="hidden lg:block w-[290px] flex-shrink-0">
+          <div className="bg-white border border-[#B3D8FF] rounded-lg p-4 shadow-[0_0_14px_0_rgba(49,133,252,0.15)] space-y-6">
+            {/* Filter Header */}
+            <div className="flex items-center gap-4">
+              <svg
+                width="32"
+                height="32"
+                viewBox="0 0 32 32"
+                fill="none"
+                xmlns="http://www.w3.org/2000/svg"
+              >
+                <path
+                  d="M23.5 7H8.5C8.22386 7 8 7.22386 8 7.5V9.78005C8 9.9202 8.05882 10.0539 8.16214 10.1486L13.8379 15.3514C13.9412 15.4461 14 15.5798 14 15.72V25.0979C14 25.4906 14.432 25.73 14.765 25.5219L17.765 23.6469C17.9112 23.5555 18 23.3953 18 23.2229V15.72C18 15.5798 18.0588 15.4461 18.1621 15.3514L23.8379 10.1486C23.9412 10.0539 24 9.9202 24 9.78005V7.5C24 7.22386 23.7761 7 23.5 7Z"
+                  stroke="#6E7491"
+                  strokeWidth="2"
+                />
+              </svg>
+              <h2 className="text-2xl font-bold text-[#1A1A1A]">Filters</h2>
+            </div>
 
+            {/* Search */}
+            <div className="flex items-center gap-2 px-3 py-2 border border-[#777] rounded bg-bg-soft">
+              <Search className="w-5 h-5 text-grey-400" />
+              <input
+                type="text"
+                value={search}
+                onChange={(e) => setSearch(e.target.value)}
+                placeholder="Filter by course, institution, or code"
+                className="flex-1 bg-transparent text-sm text-primary-blue placeholder:text-primary-blue outline-none"
+              />
+            </div>
+
+            {/* Field of Study */}
+            <div className="space-y-2">
+              <label className="block text-sm font-medium text-black">
+                Field of Study
+              </label>
+              <div className="relative">
+                <select
+                  value={fieldFilter}
+                  onChange={(e) => setFieldFilter(e.target.value)}
+                  className="w-full px-3 py-2.5 border border-[#777] rounded bg-bg-soft text-sm text-[#5D5D5D] appearance-none cursor-pointer"
+                >
+                  {fieldOptions.map((opt) => (
+                    <option key={opt}>{opt}</option>
+                  ))}
+                </select>
+                <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-grey-400 pointer-events-none" />
+              </div>
+            </div>
+
+            {/* University */}
+            <div className="space-y-2">
+              <label className="block text-sm font-medium text-black">
+                University
+              </label>
+              <div className="relative">
+                <select
+                  value={universityFilter}
+                  onChange={(e) => setUniversityFilter(e.target.value)}
+                  className="w-full px-3 py-2.5 border border-[#777] rounded bg-bg-soft text-sm text-[#5D5D5D] appearance-none cursor-pointer"
+                >
+                  <option>All Universities</option>
+                  {universityNames.map((u) => (
+                    <option key={u}>{u}</option>
+                  ))}
+                </select>
+                <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-grey-400 pointer-events-none" />
+              </div>
+            </div>
+
+            {/* ATAR Slider */}
+            <div className="space-y-3">
+              <label className="block text-base text-[#1E1E1E]">
+                ATAR Requirement: {atarMin.toFixed(2)} – {atarMax.toFixed(2)}
+              </label>
+              <div className="relative">
+                <input
+                  type="range"
+                  min={30}
+                  max={99.95}
+                  step={0.05}
+                  value={atarMin}
+                  onChange={(e) =>
+                    setAtarMin(Math.min(Number(e.target.value), atarMax))
+                  }
+                  className="w-full h-2 bg-[#E6E6E6] rounded-full appearance-none"
+                />
+                <input
+                  type="range"
+                  min={30}
+                  max={99.95}
+                  step={0.05}
+                  value={atarMax}
+                  onChange={(e) =>
+                    setAtarMax(Math.max(Number(e.target.value), atarMin))
+                  }
+                  className="w-full h-2 bg-transparent -mt-2 appearance-none"
+                />
+              </div>
+              <div className="flex justify-between text-sm text-[#777]">
+                <span>{atarMin.toFixed(2)}</span>
+                <span>{atarMax.toFixed(2)}</span>
+              </div>
+            </div>
+          </div>
+        </div>
       <div className="absolute left-6 top-[131px] w-[279px] h-[279px] rounded-full bg-[#B3D8FF] opacity-40 pointer-events-none" />
       <div className="absolute left-[42px] top-[835px] w-[662px] h-[662px] rounded-full bg-[#B3D8FF] opacity-40 pointer-events-none" />
       <div className="absolute right-[88px] top-[657px] w-[150px] h-[150px] rounded-full bg-[#B3D8FF] opacity-40 pointer-events-none" />

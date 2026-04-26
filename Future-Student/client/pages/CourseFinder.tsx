@@ -16,6 +16,7 @@ export default function CourseFinder() {
   const [sortBy, setSortBy] = useState<"none" | "uni" | "course">("none");
 
   //The functionality here needs to be replaced with searching and saving universities
+  //Make iterable loadedUniversities and loadedDegrees
   const universities = [
     {
       name: "University of Wollongong",
@@ -189,6 +190,7 @@ export default function CourseFinder() {
   }
 
   // Generate varied entries (12 universities x 12 degrees = 144)
+  //Replace with call for ALL courses?
   const courses: Course[] = useMemo(() => {
     const chosenDegrees = degrees;
     const out: Course[] = [];

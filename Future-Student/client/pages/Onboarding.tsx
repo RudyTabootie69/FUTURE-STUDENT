@@ -40,34 +40,20 @@ export default function Onboarding() {
   const [parform, setParForm] = useState<Partial<Parent>>({
     firstName: "",
     lastName: "",
-    nesaNumber: "",
-    uacId: "",
-    usi: "",
-    entryYear: defaultEntryYear,
     dob: "",
     sex: "",
     schoolName: "",
     address: "",
-    firstInFamily: "",
-    indigenous: "",
-    culturalBackground: "",
     payment: null,
   });
 
   const [staffform, setStaffForm] = useState<Partial<Staff>>({
     firstName: "",
     lastName: "",
-    nesaNumber: "",
-    uacId: "",
-    usi: "",
-    entryYear: defaultEntryYear,
     dob: "",
     sex: "",
     schoolName: "",
     address: "",
-    firstInFamily: "",
-    indigenous: "",
-    culturalBackground: "",
     payment: null,
   });
 
@@ -124,14 +110,7 @@ export default function Onboarding() {
         sex: (parform.sex as any) || "",
         address: parform.address || "",
         payment,
-        nesaNumber: parform.nesaNumber || "",
-        uacId: parform.uacId || "",
-        usi: parform.usi || "",
-        entryYear: Number(parform.entryYear) || defaultEntryYear,
         schoolName: parform.schoolName || "",
-        firstInFamily: parform.firstInFamily || "",
-        indigenous: parform.indigenous || "",
-        culturalBackground: parform.culturalBackground || "",
         getUserType: () => "Parent",
       };
     
@@ -146,16 +125,9 @@ export default function Onboarding() {
         email: staffform.lastName || "",
         dob: staffform.dob || "",
         sex: (staffform.sex as any) || "",
-        address: staffform.address || "",
+        address: staffform.address,
         payment,
-        nesaNumber: staffform.nesaNumber || "",
-        uacId: staffform.uacId || "",
-        usi: staffform.usi || "",
-        entryYear: Number(staffform.entryYear) || defaultEntryYear,
-        schoolName: staffform.schoolName || "",
-        firstInFamily: staffform.firstInFamily || "",
-        indigenous: staffform.indigenous || "",
-        culturalBackground: staffform.culturalBackground || "",
+        schoolName: staffform.schoolName,
         getUserType: () => "Staff",
       };
       staffsave(staffPayload);
@@ -293,22 +265,6 @@ export default function Onboarding() {
                   <input className="w-full px-3 py-2 border rounded-lg bg-bg-soft" value={parform.lastName || ""} onChange={(e)=>setParForm({...parform, lastName:e.target.value})} />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-black">NESA account number</label>
-                  <input className="w-full px-3 py-2 border rounded-lg bg-bg-soft" value={parform.nesaNumber || ""} onChange={(e)=>setParForm({...parform, nesaNumber:e.target.value})} />
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-black">UAC ID (if known)</label>
-                  <input className="w-full px-3 py-2 border rounded-lg bg-bg-soft" value={parform.uacId || ""} onChange={(e)=>setParForm({...parform, uacId:e.target.value})} />
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-black">USI (if known)</label>
-                  <input className="w-full px-3 py-2 border rounded-lg bg-bg-soft" value={parform.usi || ""} onChange={(e)=>setParForm({...parform, usi:e.target.value})} />
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-black">Year of anticipated university entry</label>
-                  <input type="number" className="w-full px-3 py-2 border rounded-lg bg-bg-soft" value={parform.entryYear as number} onChange={(e)=>setParForm({...parform, entryYear:Number(e.target.value)})} />
-                </div>
-                <div>
                   <label className="block text-sm font-medium text-black">Date of birth</label>
                   <input type="date" className="w-full px-3 py-2 border rounded-lg bg-bg-soft" value={parform.dob || ""} onChange={(e)=>setParForm({...parform, dob:e.target.value})} />
                 </div>
@@ -327,28 +283,6 @@ export default function Onboarding() {
                 <div className="sm:col-span-2">
                   <label className="block text-sm font-medium text-black">Home address</label>
                   <input className="w-full px-3 py-2 border rounded-lg bg-bg-soft" value={parform.address || ""} onChange={(e)=>setParForm({...parform, address:e.target.value})} />
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-black">First in the family to go on to higher education?</label>
-                  <select className="w-full px-3 py-2 border rounded-lg bg-bg-soft" value={parform.firstInFamily || ""} onChange={(e)=>setParForm({...parform, firstInFamily:e.target.value})}>
-                    <option value="">Select</option>
-                    <option>Yes</option>
-                    <option>No</option>
-                    <option>Prefer not to say</option>
-                  </select>
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-black">Indigenous or Torres Strait Islander?</label>
-                  <select className="w-full px-3 py-2 border rounded-lg bg-bg-soft" value={parform.indigenous || ""} onChange={(e)=>setParForm({...parform, indigenous:e.target.value})}>
-                    <option value="">Select</option>
-                    <option>Yes</option>
-                    <option>No</option>
-                    <option>Prefer not to say</option>
-                  </select>
-                </div>
-                <div className="sm:col-span-2">
-                  <label className="block text-sm font-medium text-black">Cultural Background</label>
-                  <input className="w-full px-3 py-2 border rounded-lg bg-bg-soft" value={parform.culturalBackground || ""} onChange={(e)=>setParForm({...parform, culturalBackground:e.target.value})} />
                 </div>
               </div>
 
@@ -384,22 +318,6 @@ export default function Onboarding() {
                   <input className="w-full px-3 py-2 border rounded-lg bg-bg-soft" value={staffform.lastName || ""} onChange={(e)=>setStaffForm({...staffform, lastName:e.target.value})} />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-black">NESA account number</label>
-                  <input className="w-full px-3 py-2 border rounded-lg bg-bg-soft" value={staffform.nesaNumber || ""} onChange={(e)=>setStaffForm({...staffform, nesaNumber:e.target.value})} />
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-black">UAC ID (if known)</label>
-                  <input className="w-full px-3 py-2 border rounded-lg bg-bg-soft" value={staffform.uacId || ""} onChange={(e)=>setStaffForm({...staffform, uacId:e.target.value})} />
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-black">USI (if known)</label>
-                  <input className="w-full px-3 py-2 border rounded-lg bg-bg-soft" value={staffform.usi || ""} onChange={(e)=>setStaffForm({...staffform, usi:e.target.value})} />
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-black">Year of anticipated university entry</label>
-                  <input type="number" className="w-full px-3 py-2 border rounded-lg bg-bg-soft" value={staffform.entryYear as number} onChange={(e)=>setStaffForm({...staffform, entryYear:Number(e.target.value)})} />
-                </div>
-                <div>
                   <label className="block text-sm font-medium text-black">Date of birth</label>
                   <input type="date" className="w-full px-3 py-2 border rounded-lg bg-bg-soft" value={staffform.dob || ""} onChange={(e)=>setStaffForm({...staffform, dob:e.target.value})} />
                 </div>
@@ -418,28 +336,6 @@ export default function Onboarding() {
                 <div className="sm:col-span-2">
                   <label className="block text-sm font-medium text-black">Home address</label>
                   <input className="w-full px-3 py-2 border rounded-lg bg-bg-soft" value={staffform.address || ""} onChange={(e)=>setStaffForm({...staffform, address:e.target.value})} />
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-black">First in the family to go on to higher education?</label>
-                  <select className="w-full px-3 py-2 border rounded-lg bg-bg-soft" value={staffform.firstInFamily || ""} onChange={(e)=>setStaffForm({...staffform, firstInFamily:e.target.value})}>
-                    <option value="">Select</option>
-                    <option>Yes</option>
-                    <option>No</option>
-                    <option>Prefer not to say</option>
-                  </select>
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-black">Indigenous or Torres Strait Islander?</label>
-                  <select className="w-full px-3 py-2 border rounded-lg bg-bg-soft" value={staffform.indigenous || ""} onChange={(e)=>setStaffForm({...staffform, indigenous:e.target.value})}>
-                    <option value="">Select</option>
-                    <option>Yes</option>
-                    <option>No</option>
-                    <option>Prefer not to say</option>
-                  </select>
-                </div>
-                <div className="sm:col-span-2">
-                  <label className="block text-sm font-medium text-black">Cultural Background</label>
-                  <input className="w-full px-3 py-2 border rounded-lg bg-bg-soft" value={staffform.culturalBackground || ""} onChange={(e)=>setStaffForm({...staffform, culturalBackground:e.target.value})} />
                 </div>
               </div>
 

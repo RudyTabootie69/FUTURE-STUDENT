@@ -3,7 +3,7 @@ import type { Event } from "@/types/event";
 import { toString } from "@/types/event";
 
 interface eventContextValue {
-  event: Event[];
+  savedevents: Event[];
   add: (c: Event) => void;
   remove: (id: string) => void;
   has: (id: string) => boolean;
@@ -16,7 +16,7 @@ const STORAGE_KEY = "eventEvents";
 
 export function eventProvider({ children }: { children: React.ReactNode })
  {
-  const [event, setevent] = useState<Event[]>([]);
+  const [savedevents, setevent] = useState<Event[]>([]);
 
   // Load from localStorage
   useEffect(() => {
@@ -35,21 +35,21 @@ export function eventProvider({ children }: { children: React.ReactNode })
     } catch {
       // ignore
     }
-  }, [event]);
+  }, [savedevents]);
 
   const value = useMemo<eventContextValue>(() => ({
-    event,
+    savedevents,
     add: (c: Event) =>
       setevent((prev) => (prev.find((p) => toString(p) === toString(c)) ? prev : [...prev, c])),
     remove: (id: string) => setevent((prev) => prev.filter((p) => toString(p) !== id)),
-    has: (id: string) => event.some((p) => toString(p) === id),
+    has: (id: string) => savedevents.some((p) => toString(p) === id),
     clear: () => setevent([]),
-  }), [event]);
+  }), [savedevents]);
 
   return <eventContext.Provider value={value}>{children}</eventContext.Provider>;
 }
 
-export function useevent() {
+export function useSavedEvents() {
   const ctx = useContext(eventContext);
   if (!ctx) throw new Error("useevent must be used within eventProvider");
   return ctx;

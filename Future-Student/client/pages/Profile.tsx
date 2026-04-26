@@ -246,31 +246,6 @@ export default function Profile() {
             />
 
             <ProfileInput
-              label="NESA account number"
-              value={parprofile?.nesaNumber || ""}
-              onChange={(value) => parupdate({ nesaNumber: value })}
-            />
-
-            <ProfileInput
-              label="UAC ID"
-              value={parprofile?.uacId || ""}
-              onChange={(value) => parupdate({ uacId: value })}
-            />
-
-            <ProfileInput
-              label="USI"
-              value={parprofile?.usi || ""}
-              onChange={(value) => parupdate({ usi: value })}
-            />
-
-            <ProfileInput
-              label="Anticipated entry year"
-              type="number"
-              value={parprofile?.entryYear ?? ""}
-              onChange={(value) => parupdate({ entryYear: Number(value) })}
-            />
-
-            <ProfileInput
               label="Date of birth"
               type="date"
               value={parprofile?.dob || ""}
@@ -298,35 +273,6 @@ export default function Profile() {
               label="Home address"
               value={parprofile?.address || ""}
               onChange={(value) => parupdate({ address: value })}
-            />
-
-            <ProfileSelect
-              label="First in family to attend higher education?"
-              value={parprofile?.firstInFamily || ""}
-              onChange={(value) => parupdate({ firstInFamily: value })}
-              options={[
-                { label: "Yes", value: "Yes" },
-                { label: "No", value: "No" },
-                { label: "Prefer not to say", value: "Prefer not to say" },
-              ]}
-            />
-
-            <ProfileSelect
-              label="Indigenous or Torres Strait Islander?"
-              value={parprofile?.indigenous || ""}
-              onChange={(value) => parupdate({ indigenous: value })}
-              options={[
-                { label: "Yes", value: "Yes" },
-                { label: "No", value: "No" },
-                { label: "Prefer not to say", value: "Prefer not to say" },
-              ]}
-            />
-
-            <ProfileInput
-              className="sm:col-span-2"
-              label="Cultural Background"
-              value={parprofile?.culturalBackground || ""}
-              onChange={(value) => parupdate({ culturalBackground: value })}
             />
           </div>
         </ProfileSectionCard>
@@ -447,30 +393,6 @@ export default function Profile() {
               onChange={(value) => staffupdate({ lastName: value })}
             />
 
-            <ProfileInput
-              label="NESA account number"
-              value={staffprofile?.nesaNumber || ""}
-              onChange={(value) => staffupdate({ nesaNumber: value })}
-            />
-
-            <ProfileInput
-              label="UAC ID"
-              value={staffprofile?.uacId || ""}
-              onChange={(value) => staffupdate({ uacId: value })}
-            />
-
-            <ProfileInput
-              label="USI"
-              value={staffprofile?.usi || ""}
-              onChange={(value) => staffupdate({ usi: value })}
-            />
-
-            <ProfileInput
-              label="Anticipated entry year"
-              type="number"
-              value={staffprofile?.entryYear ?? ""}
-              onChange={(value) => staffupdate({ entryYear: Number(value) })}
-            />
 
             <ProfileInput
               label="Date of birth"
@@ -500,35 +422,6 @@ export default function Profile() {
               label="Home address"
               value={staffprofile?.address || ""}
               onChange={(value) => staffupdate({ address: value })}
-            />
-
-            <ProfileSelect
-              label="First in family to attend higher education?"
-              value={staffprofile?.firstInFamily || ""}
-              onChange={(value) => staffupdate({ firstInFamily: value })}
-              options={[
-                { label: "Yes", value: "Yes" },
-                { label: "No", value: "No" },
-                { label: "Prefer not to say", value: "Prefer not to say" },
-              ]}
-            />
-
-            <ProfileSelect
-              label="Indigenous or Torres Strait Islander?"
-              value={staffprofile?.indigenous || ""}
-              onChange={(value) => staffupdate({ indigenous: value })}
-              options={[
-                { label: "Yes", value: "Yes" },
-                { label: "No", value: "No" },
-                { label: "Prefer not to say", value: "Prefer not to say" },
-              ]}
-            />
-
-            <ProfileInput
-              className="sm:col-span-2"
-              label="Cultural Background"
-              value={staffprofile?.culturalBackground || ""}
-              onChange={(value) => staffupdate({ culturalBackground: value })}
             />
           </div>
         </ProfileSectionCard>
