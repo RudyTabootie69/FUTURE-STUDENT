@@ -29,27 +29,27 @@ CREATE TABLE IF NOT EXISTS User(
 );
 
 CREATE TABLE IF NOT EXISTS Student(
-    id INT PRIMARY KEY,
+    stuID INT PRIMARY KEY,
     school varchar(255),
     ecomStatus ENUM('low', 'medium', 'high'),
     indigenousStatus BOOL,
     studentPathStage int,
     studentPathStagePage int,
-    FOREIGN KEY (id) REFERENCES User(id),
+    FOREIGN KEY (stuID) REFERENCES User(id),
     FOREIGN KEY (school) REFERENCES School(name)
 );
 
-CREATE TABLE IF NOT EXISTS SchoolStaff(
-    id INT PRIMARY KEY,
+CREATE TABLE IF NOT EXISTS Staff(
+    staffID INT PRIMARY KEY,
     school varchar(255),
-    FOREIGN KEY (id) REFERENCES User(id),
+    FOREIGN KEY (staffID) REFERENCES User(id),
     FOREIGN KEY (school) REFERENCES School(name)
 );
 
 CREATE TABLE IF NOT EXISTS Parent(
-    id INT PRIMARY KEY,
+    parID INT PRIMARY KEY,
     childID INT,
-    FOREIGN KEY (id) REFERENCES User(id),
+    FOREIGN KEY (parID) REFERENCES User(id),
     FOREIGN KEY (childID) REFERENCES Student(id)
 );
 

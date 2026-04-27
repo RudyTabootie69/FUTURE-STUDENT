@@ -1,6 +1,7 @@
 import { bool } from "joi";
 import { createContext, useContext, useEffect, useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { useStuProfile, useParentProfile, useStaffProfile } from "@/context/ProfileContext";
 
 interface AuthContextValue {
   token: any
@@ -12,9 +13,16 @@ interface AuthContextValue {
 
 const AuthContext = createContext<AuthContextValue | undefined>(undefined);
 
+//To do
+//Extract user type from retrieved user, if authenticated make a call to profile context and add profile
 
 
 export const AuthProvider = ({ children }) => {
+  const { stusave } = useStuProfile();
+  const { parsave } = useParentProfile();
+  const { staffsave } = useStaffProfile();
+  const [selected, setSelected] = useState<string>("");
+  
   const [user, setUser] = useState(null);
   const [token, setToken] = useState(localStorage.getItem("site") || "");
   const [isAuthenticated, setIsAuthenticated] = useState<boolean>(false);
