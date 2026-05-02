@@ -5,13 +5,8 @@ import { useProfile } from "@/context/ProfileContext";
 import type { User } from "@/types/user";
 
 export default function Onboarding() {
-  const [search, setSearch] = useState<string>("");
-  const [fieldFilter, setFieldFilter] = useState<string>("All Fields");
-  const [universityFilter, setUniversityFilter] =
-    useState<string>("All Universities");
-  const [atarMin, setAtarMin] = useState<number>(30);
-  const [atarMax, setAtarMax] = useState<number>(99.95);
-  const [sortBy, setSortBy] = useState<"none" | "uni" | "course">("none");
+  const [showErr, setShow] = useState(false)
+  const setShowErr = () => setShow(true)
   const navigate = useNavigate();
   const { save } = useProfile();
   const [selected, setSelected] = useState<string>("");
@@ -80,6 +75,10 @@ export default function Onboarding() {
       : null;
 
     if (selected === "Current Year 12 Student"){
+      if (stuform.firstName == "" || stuform.lastName == "" || stuform.username == "" || stuform.email == ""){
+        setShowErr();
+        return;
+      } 
       const studentPayload: User = {
         id: 0,
         firstName: stuform.firstName || "",
@@ -105,6 +104,10 @@ export default function Onboarding() {
       save(studentPayload);
     }
     else if (selected === "Parent / Caregiver of current Year 12 Student"){
+      if (parform.firstName == "" || parform.lastName == "" || parform.username == "" || parform.email == ""){
+        setShowErr();
+        return;
+      } 
       const parentPayload: User = {
         id: 0,
         firstName: parform.firstName || "",
@@ -122,19 +125,23 @@ export default function Onboarding() {
       save(parentPayload);
     }
     else if (selected === "Representative of a Secondary Institution"){
-      const staffPayload: User = {
-        id: 0,
-        firstName: staffform.firstName || "",
-        lastName: staffform.firstName || "",
-        username: staffform.lastName || "",
-        email: staffform.lastName || "",
-        dob: staffform.dob || "",
-        sex: (staffform.sex as any) || "",
-        address: staffform.address,
-        payment,
-        schoolName: staffform.schoolName,
-        userType: "Staff Member"
-      };
+        if (staffform.firstName == "" || staffform.lastName == "" || staffform.username == "" || staffform.email == ""){
+        setShowErr();
+        return;
+      } 
+        const staffPayload: User = {
+          id: 0,
+          firstName: staffform.firstName || "",
+          lastName: staffform.firstName || "",
+          username: staffform.lastName || "",
+          email: staffform.lastName || "",
+          dob: staffform.dob || "",
+          sex: (staffform.sex as any) || "",
+          address: staffform.address,
+          payment,
+          schoolName: staffform.schoolName,
+          userType: "School Staff Member"
+      }
       save(staffPayload);
     }
     navigate("/home");
@@ -364,12 +371,19 @@ export default function Onboarding() {
           )}
 
           <button
-            onClick={() => this.handleSubmit(selected)}
+            onClick={() => handleSubmit(selected)}
             disabled={!selected}
             className="w-full mt-8 px-6 py-3 bg-primary-blue text-white rounded-lg font-medium hover:bg-blue-600 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
           >
             Continue
           </button>
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mt-4 items-center justify-center text-red">
+            <div className="sm:col-span-2 ">
+              <label className="text-xl font-medium text-red">
+                {showErr && <div>There are empty fields, please try again</div>}
+              </label>
+            </div>
+          </div>
         </div>
       </div>
 

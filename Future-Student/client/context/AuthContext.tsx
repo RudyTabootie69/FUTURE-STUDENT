@@ -18,8 +18,8 @@ const AuthContext = createContext<AuthContextValue | undefined>(undefined);
 
 
 export const AuthProvider = ({ children }) => {
-  const { save } = useProfile();
-  const [selected, setSelected] = useState<string>("");
+  //const { save } = useProfile();
+  //const [selected, setSelected] = useState<string>("");
   
   const [user, setUser] = useState(null);
   const [token, setToken] = useState(localStorage.getItem("site") || "");

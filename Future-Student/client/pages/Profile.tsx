@@ -362,7 +362,7 @@ export default function Profile() {
       </div>
     );
   }
-  else if(profile.userType == "Staf"){
+  else if(profile.userType == "School Staff Member"){
   return (
       <div className="min-h-screen bg-bg-soft">
         <Navigation />
