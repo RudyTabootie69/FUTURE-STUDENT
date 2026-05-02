@@ -1,13 +1,16 @@
 /*You will want to run this locally on your pc running mySQL*/
 DROP DATABASE IF EXISTS futurestudentdb;
+CREATE USER IF NOT EXISTS 'future-student'@'localhost';
+GRANT CREATE, ALTER, DROP, INSERT, UPDATE, DELETE, SELECT, REFERENCES, RELOAD on *.* TO 'future-student'@'localhost' WITH GRANT OPTION;
 CREATE DATABASE IF NOT EXISTS futurestudentdb;
 USE futurestudentdb;
-CREATE USER IF NOT EXISTS 'FutureStudent'@'localhost';
-GRANT CREATE, ALTER, DROP, INSERT, UPDATE, DELETE, SELECT, REFERENCES, RELOAD on *.* TO 'FutureStudent'@'localhost' WITH GRANT OPTION;
 
 CREATE TABLE IF NOT EXISTS University(
-    name varchar(255) PRIMARY KEY,
-    location varchar(255)
+    acronym varchar(255) PRIMARY KEY,
+    name varchar(255),
+    criscos varchar(255),
+    teqsa varchar(255),
+    rto varchar(255)
 );
 
 CREATE TABLE IF NOT EXISTS School(
@@ -50,47 +53,78 @@ CREATE TABLE IF NOT EXISTS Parent(
     parID INT PRIMARY KEY,
     childID INT,
     FOREIGN KEY (parID) REFERENCES User(id),
-    FOREIGN KEY (childID) REFERENCES Student(id)
+    FOREIGN KEY (childID) REFERENCES Student(stuID)
 );
 
 CREATE TABLE IF NOT EXISTS UniAdmin(
     id INT PRIMARY KEY,
     uni varchar(255),
-    FOREIGN KEY (uni) REFERENCES University(name)
+    FOREIGN KEY (uni) REFERENCES University(acronym)
 );
 
 CREATE TABLE IF NOT EXISTS Course(
-    uacID INT PRIMARY KEY,
-    uniID varchar(255), 
+    courseID varchar(255) PRIMARY KEY,
+    uniAcronym varchar(255),
     title varchar(255),
-    uniName varchar(255),
-    atarMin float,
-    atarAvg float,
-    durationYears float,
+    header TEXT(8192),
+    careerOptions TEXT(8192),
+    studyDetails TEXT(8192),
+    pracDetails TEXT(8192),
+    feeurl TEXT(255),
+    courseurl TEXT(2048),
+    FOREIGN KEY (uniAcronym) REFERENCES University(acronym),
+    CONSTRAINT U_Course UNIQUE (courseID, title, uniAcronym)
+);
+
+CREATE TABLE IF NOT EXISTS CourseVariant(
+    courseID varchar(255),
+    variantID varchar(255) PRIMARY KEY, 
+    campus varchar(255),
+    feeType varchar(255),
+    FOREIGN KEY (courseID) REFERENCES Course(courseID)
+);
+
+#
+CREATE TABLE IF NOT EXISTS CourseOffering(
+    variantID varchar(255), 
     startDate date,
-    fee int,
-    description varchar(255),
-    url varchar(255),
-    FOREIGN KEY (uniName) REFERENCES University(name),
-    CONSTRAINT U_Course UNIQUE (uniID, title, uniName)
+    lastDate date,
+    FOREIGN KEY (variantID) REFERENCES CourseVariant(variantID),
+    CONSTRAINT PK_REQUIREMENTS PRIMARY KEY (variantID, startDate)
+);
+
+CREATE TABLE IF NOT EXISTS ModeOfAttendance(
+    variantID varchar(255), 
+    mode varchar(255),
+    FOREIGN KEY (variantID) REFERENCES CourseVariant(variantID),
+    CONSTRAINT PK_REQUIREMENTS PRIMARY KEY (variantID, mode)
+);
+
+CREATE TABLE IF NOT EXISTS Duration(
+    variantID varchar(255), 
+    duration varchar(255),
+    FOREIGN KEY (variantID) REFERENCES CourseVariant(variantID),
+    CONSTRAINT PK_REQUIREMENTS PRIMARY KEY (variantID, duration)
 );
 
 CREATE TABLE IF NOT EXISTS Requirement(
-    uacID INT,
-    title varchar(255),
-    score FLOAT NULL, /* Not required */
-    FOREIGN KEY (uacID) REFERENCES Course(uacID),
-    CONSTRAINT PK_REQUIREMENTS PRIMARY KEY (uacID, title)
+    variantID varchar(255),
+    lowestAtar FLOAT,
+    medianAtar FLOAT,
+    lowestRank FLOAT,
+    medianRank FLOAT,
+    FOREIGN KEY (variantID) REFERENCES CourseVariant(variantID),
+    CONSTRAINT PK_REQUIREMENTS PRIMARY KEY (variantID, lowestAtar)
 );
 
 CREATE TABLE IF NOT EXISTS Application(
-    uacID INT,
+    courseID varchar(255),
     studentID INT, 
     applier ENUM('student', 'uni'),
     accepted BOOL,
-    CONSTRAINT PK_APPLICATION PRIMARY KEY (uacID, studentID),
-    FOREIGN KEY (uacID) REFERENCES Course(uacID),
-    FOREIGN KEY (studentID) REFERENCES Student(id)
+    CONSTRAINT PK_APPLICATION PRIMARY KEY (courseID, studentID),
+    FOREIGN KEY (courseID) REFERENCES Course(courseID),
+    FOREIGN KEY (studentID) REFERENCES Student(stuID)
 );
 
 CREATE TABLE IF NOT EXISTS Event(
@@ -106,10 +140,10 @@ CREATE TABLE IF NOT EXISTS Tag(
 );
 
 CREATE TABLE IF NOT EXISTS CourseTag(
-    uacID INT,
+    courseID varchar(255),
     tagID INT,
-    CONSTRAINT PK_APPLICATION PRIMARY KEY (uacID, tagID),
-    FOREIGN KEY (uacID) REFERENCES Course(uacID),
+    CONSTRAINT PK_APPLICATION PRIMARY KEY (courseID, tagID),
+    FOREIGN KEY (courseID) REFERENCES Course(courseID),
     FOREIGN KEY (tagID) REFERENCES Tag(tagID)
 );
 
@@ -126,7 +160,7 @@ CREATE TABLE IF NOT EXISTS StudentTag(
     studentID INT,
     CONSTRAINT PK_APPLICATION PRIMARY KEY (eventID, studentID),
     FOREIGN KEY (eventID) REFERENCES Event(eventID),
-    FOREIGN KEY (studentID) REFERENCES Student(id)
+    FOREIGN KEY (studentID) REFERENCES Student(stuID)
 );
 /*CREATE TABLE IF NOT EXISTS Pathway(
     studentID SERIAL,
