@@ -1,9 +1,17 @@
 import { useMemo, useState } from "react";
+import { Search, ChevronDown } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { useProfile } from "@/context/ProfileContext";
 import type { User } from "@/types/user";
 
 export default function Onboarding() {
+  const [search, setSearch] = useState<string>("");
+  const [fieldFilter, setFieldFilter] = useState<string>("All Fields");
+  const [universityFilter, setUniversityFilter] =
+    useState<string>("All Universities");
+  const [atarMin, setAtarMin] = useState<number>(30);
+  const [atarMax, setAtarMax] = useState<number>(99.95);
+  const [sortBy, setSortBy] = useState<"none" | "uni" | "course">("none");
   const navigate = useNavigate();
   const { save } = useProfile();
   const [selected, setSelected] = useState<string>("");

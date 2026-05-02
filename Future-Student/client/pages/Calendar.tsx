@@ -11,6 +11,13 @@ import { useSavedEvents } from "@/context/EventContext";
   //Call server side function on calendar open
 
 export default function Calendar() {
+  const [search, setSearch] = useState<string>("");
+  const [fieldFilter, setFieldFilter] = useState<string>("All Fields");
+  const [universityFilter, setUniversityFilter] =
+    useState<string>("All Universities");
+  const [atarMin, setAtarMin] = useState<number>(30);
+  const [atarMax, setAtarMax] = useState<number>(99.95);
+  const [sortBy, setSortBy] = useState<"none" | "uni" | "course">("none");
   const [viewDate, setViewDate] = useState(new Date(2026, 3, 26));
 
   const weeks = useMemo(() => buildMonthMatrix(viewDate), [viewDate]);
@@ -166,45 +173,6 @@ export default function Calendar() {
                 placeholder="Filter by course, institution, or code"
                 className="flex-1 bg-transparent text-sm text-primary-blue placeholder:text-primary-blue outline-none"
               />
-            </div>
-
-            {/* Field of Study */}
-            <div className="space-y-2">
-              <label className="block text-sm font-medium text-black">
-                Field of Study
-              </label>
-              <div className="relative">
-                <select
-                  value={fieldFilter}
-                  onChange={(e) => setFieldFilter(e.target.value)}
-                  className="w-full px-3 py-2.5 border border-[#777] rounded bg-bg-soft text-sm text-[#5D5D5D] appearance-none cursor-pointer"
-                >
-                  {fieldOptions.map((opt) => (
-                    <option key={opt}>{opt}</option>
-                  ))}
-                </select>
-                <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-grey-400 pointer-events-none" />
-              </div>
-            </div>
-
-            {/* University */}
-            <div className="space-y-2">
-              <label className="block text-sm font-medium text-black">
-                University
-              </label>
-              <div className="relative">
-                <select
-                  value={universityFilter}
-                  onChange={(e) => setUniversityFilter(e.target.value)}
-                  className="w-full px-3 py-2.5 border border-[#777] rounded bg-bg-soft text-sm text-[#5D5D5D] appearance-none cursor-pointer"
-                >
-                  <option>All Universities</option>
-                  {universityNames.map((u) => (
-                    <option key={u}>{u}</option>
-                  ))}
-                </select>
-                <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-grey-400 pointer-events-none" />
-              </div>
             </div>
 
             {/* ATAR Slider */}
