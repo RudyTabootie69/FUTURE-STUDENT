@@ -25,7 +25,6 @@ CREATE TABLE IF NOT EXISTS User(
     address varchar(255),
     username varchar(255) NOT NULL,
     email varchar(255),
-    pfpPath varchar(255),
     passwordHash varchar(255) NOT NULL,
     hashSalt varchar(255) NOT NULL,
     CONSTRAINT U_User UNIQUE (id, username)
@@ -36,8 +35,13 @@ CREATE TABLE IF NOT EXISTS Student(
     school varchar(255),
     ecomStatus ENUM('low', 'medium', 'high'),
     indigenousStatus BOOL,
+    culturalBackground varchar(255),
     studentPathStage int,
     studentPathStagePage int,
+    usi varchar (255),
+    entryYear int,
+    
+
     FOREIGN KEY (stuID) REFERENCES User(id),
     FOREIGN KEY (school) REFERENCES School(name)
 );

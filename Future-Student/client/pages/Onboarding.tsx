@@ -1,15 +1,11 @@
 import { useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { useStuProfile, useParentProfile, useStaffProfile } from "@/context/ProfileContext";
-import type { Student } from "@/types/user";
-import type { Parent } from "@/types/user";
-import type { Staff } from "@/types/user";
+import { useProfile } from "@/context/ProfileContext";
+import type { User } from "@/types/user";
 
 export default function Onboarding() {
   const navigate = useNavigate();
-  const { stusave } = useStuProfile();
-  const { parsave } = useParentProfile();
-  const { staffsave } = useStaffProfile();
+  const { save } = useProfile();
   const [selected, setSelected] = useState<string>("");
 
   const options = [
@@ -20,7 +16,7 @@ export default function Onboarding() {
 
   const defaultEntryYear = useMemo(() => new Date().getFullYear() + 1, []);
 
-  const [stuform, setStuForm] = useState<Partial<Student>>({
+  const [stuform, setForm] = useState<Partial<User>>({
     firstName: "",
     lastName: "",
     nesaNumber: "",
@@ -37,7 +33,7 @@ export default function Onboarding() {
     payment: null,
   });
 
-  const [parform, setParForm] = useState<Partial<Parent>>({
+  const [parform, setParForm] = useState<Partial<User>>({
     firstName: "",
     lastName: "",
     dob: "",
@@ -47,7 +43,7 @@ export default function Onboarding() {
     payment: null,
   });
 
-  const [staffform, setStaffForm] = useState<Partial<Staff>>({
+  const [staffform, setStaffForm] = useState<Partial<User>>({
     firstName: "",
     lastName: "",
     dob: "",
@@ -76,7 +72,7 @@ export default function Onboarding() {
       : null;
 
     if (selected === "Current Year 12 Student"){
-      const studentPayload: Student = {
+      const studentPayload: User = {
         id: 0,
         firstName: stuform.firstName || "",
         lastName: stuform.firstName || "",
@@ -94,13 +90,14 @@ export default function Onboarding() {
         firstInFamily: stuform.firstInFamily || "",
         indigenous: stuform.indigenous || "",
         culturalBackground: stuform.culturalBackground || "",
-        getUserType: () => "Student",
+        userType: "Student"
+        
       };
     
-      stusave(studentPayload);
+      save(studentPayload);
     }
     else if (selected === "Parent / Caregiver of current Year 12 Student"){
-      const parentPayload: Parent = {
+      const parentPayload: User = {
         id: 0,
         firstName: parform.firstName || "",
         lastName: parform.firstName || "",
@@ -111,13 +108,13 @@ export default function Onboarding() {
         address: parform.address || "",
         payment,
         schoolName: parform.schoolName || "",
-        getUserType: () => "Parent",
+        userType: "Parent"
       };
     
-      parsave(parentPayload);
+      save(parentPayload);
     }
     else if (selected === "Representative of a Secondary Institution"){
-      const staffPayload: Staff = {
+      const staffPayload: User = {
         id: 0,
         firstName: staffform.firstName || "",
         lastName: staffform.firstName || "",
@@ -128,9 +125,9 @@ export default function Onboarding() {
         address: staffform.address,
         payment,
         schoolName: staffform.schoolName,
-        getUserType: () => "Staff",
+        userType: "Staff Member"
       };
-      staffsave(staffPayload);
+      save(staffPayload);
     }
     navigate("/home");
   };
@@ -167,35 +164,35 @@ export default function Onboarding() {
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div className="sm:col-span-2">
                   <label className="block text-sm font-medium text-black">First Name</label>
-                  <input className="w-full px-3 py-2 border rounded-lg bg-bg-soft" value={stuform.firstName || ""} onChange={(e)=>setStuForm({...stuform, firstName:e.target.value})} />
+                  <input className="w-full px-3 py-2 border rounded-lg bg-bg-soft" value={stuform.firstName || ""} onChange={(e)=>setForm({...stuform, firstName:e.target.value})} />
                 </div>
                 <div className="sm:col-span-2">
                   <label className="block text-sm font-medium text-black">Last Name</label>
-                  <input className="w-full px-3 py-2 border rounded-lg bg-bg-soft" value={stuform.lastName || ""} onChange={(e)=>setStuForm({...stuform, lastName:e.target.value})} />
+                  <input className="w-full px-3 py-2 border rounded-lg bg-bg-soft" value={stuform.lastName || ""} onChange={(e)=>setForm({...stuform, lastName:e.target.value})} />
                 </div>
                 <div>
                   <label className="block text-sm font-medium text-black">NESA account number</label>
-                  <input className="w-full px-3 py-2 border rounded-lg bg-bg-soft" value={stuform.nesaNumber || ""} onChange={(e)=>setStuForm({...stuform, nesaNumber:e.target.value})} />
+                  <input className="w-full px-3 py-2 border rounded-lg bg-bg-soft" value={stuform.nesaNumber || ""} onChange={(e)=>setForm({...stuform, nesaNumber:e.target.value})} />
                 </div>
                 <div>
                   <label className="block text-sm font-medium text-black">UAC ID (if known)</label>
-                  <input className="w-full px-3 py-2 border rounded-lg bg-bg-soft" value={stuform.uacId || ""} onChange={(e)=>setStuForm({...stuform, uacId:e.target.value})} />
+                  <input className="w-full px-3 py-2 border rounded-lg bg-bg-soft" value={stuform.uacId || ""} onChange={(e)=>setForm({...stuform, uacId:e.target.value})} />
                 </div>
                 <div>
                   <label className="block text-sm font-medium text-black">USI (if known)</label>
-                  <input className="w-full px-3 py-2 border rounded-lg bg-bg-soft" value={stuform.usi || ""} onChange={(e)=>setStuForm({...stuform, usi:e.target.value})} />
+                  <input className="w-full px-3 py-2 border rounded-lg bg-bg-soft" value={stuform.usi || ""} onChange={(e)=>setForm({...stuform, usi:e.target.value})} />
                 </div>
                 <div>
                   <label className="block text-sm font-medium text-black">Year of anticipated university entry</label>
-                  <input type="number" className="w-full px-3 py-2 border rounded-lg bg-bg-soft" value={stuform.entryYear as number} onChange={(e)=>setStuForm({...stuform, entryYear:Number(e.target.value)})} />
+                  <input type="number" className="w-full px-3 py-2 border rounded-lg bg-bg-soft" value={stuform.entryYear as number} onChange={(e)=>setForm({...stuform, entryYear:Number(e.target.value)})} />
                 </div>
                 <div>
                   <label className="block text-sm font-medium text-black">Date of birth</label>
-                  <input type="date" className="w-full px-3 py-2 border rounded-lg bg-bg-soft" value={stuform.dob || ""} onChange={(e)=>setStuForm({...stuform, dob:e.target.value})} />
+                  <input type="date" className="w-full px-3 py-2 border rounded-lg bg-bg-soft" value={stuform.dob || ""} onChange={(e)=>setForm({...stuform, dob:e.target.value})} />
                 </div>
                 <div>
                   <label className="block text-sm font-medium text-black">Sex</label>
-                  <select className="w-full px-3 py-2 border rounded-lg bg-bg-soft" value={stuform.sex || ""} onChange={(e)=>setStuForm({...stuform, sex:e.target.value as any})}>
+                  <select className="w-full px-3 py-2 border rounded-lg bg-bg-soft" value={stuform.sex || ""} onChange={(e)=>setForm({...stuform, sex:e.target.value as any})}>
                     <option value="">Select</option>
                     <option value="male">Male</option>
                     <option value="female">Female</option>
@@ -203,15 +200,15 @@ export default function Onboarding() {
                 </div>
                 <div>
                   <label className="block text-sm font-medium text-black">School name</label>
-                  <input className="w-full px-3 py-2 border rounded-lg bg-bg-soft" value={stuform.schoolName || ""} onChange={(e)=>setStuForm({...stuform, schoolName:e.target.value})} />
+                  <input className="w-full px-3 py-2 border rounded-lg bg-bg-soft" value={stuform.schoolName || ""} onChange={(e)=>setForm({...stuform, schoolName:e.target.value})} />
                 </div>
                 <div className="sm:col-span-2">
                   <label className="block text-sm font-medium text-black">Home address</label>
-                  <input className="w-full px-3 py-2 border rounded-lg bg-bg-soft" value={stuform.address || ""} onChange={(e)=>setStuForm({...stuform, address:e.target.value})} />
+                  <input className="w-full px-3 py-2 border rounded-lg bg-bg-soft" value={stuform.address || ""} onChange={(e)=>setForm({...stuform, address:e.target.value})} />
                 </div>
                 <div>
                   <label className="block text-sm font-medium text-black">First in the family to go on to higher education?</label>
-                  <select className="w-full px-3 py-2 border rounded-lg bg-bg-soft" value={stuform.firstInFamily || ""} onChange={(e)=>setStuForm({...stuform, firstInFamily:e.target.value})}>
+                  <select className="w-full px-3 py-2 border rounded-lg bg-bg-soft" value={stuform.firstInFamily || ""} onChange={(e)=>setForm({...stuform, firstInFamily:e.target.value})}>
                     <option value="">Select</option>
                     <option>Yes</option>
                     <option>No</option>
@@ -220,7 +217,7 @@ export default function Onboarding() {
                 </div>
                 <div>
                   <label className="block text-sm font-medium text-black">Indigenous or Torres Strait Islander?</label>
-                  <select className="w-full px-3 py-2 border rounded-lg bg-bg-soft" value={stuform.indigenous || ""} onChange={(e)=>setStuForm({...stuform, indigenous:e.target.value})}>
+                  <select className="w-full px-3 py-2 border rounded-lg bg-bg-soft" value={stuform.indigenous || ""} onChange={(e)=>setForm({...stuform, indigenous:e.target.value})}>
                     <option value="">Select</option>
                     <option>Yes</option>
                     <option>No</option>
@@ -229,7 +226,7 @@ export default function Onboarding() {
                 </div>
                 <div className="sm:col-span-2">
                   <label className="block text-sm font-medium text-black">Cultural Background</label>
-                  <input className="w-full px-3 py-2 border rounded-lg bg-bg-soft" value={stuform.culturalBackground || ""} onChange={(e)=>setStuForm({...stuform, culturalBackground:e.target.value})} />
+                  <input className="w-full px-3 py-2 border rounded-lg bg-bg-soft" value={stuform.culturalBackground || ""} onChange={(e)=>setForm({...stuform, culturalBackground:e.target.value})} />
                 </div>
               </div>
 

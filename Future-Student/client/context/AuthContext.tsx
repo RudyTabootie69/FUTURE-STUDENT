@@ -1,7 +1,7 @@
 import { bool } from "joi";
 import { createContext, useContext, useEffect, useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { useStuProfile, useParentProfile, useStaffProfile } from "@/context/ProfileContext";
+import { useProfile } from "@/context/ProfileContext";
 
 interface AuthContextValue {
   token: any
@@ -18,9 +18,7 @@ const AuthContext = createContext<AuthContextValue | undefined>(undefined);
 
 
 export const AuthProvider = ({ children }) => {
-  const { stusave } = useStuProfile();
-  const { parsave } = useParentProfile();
-  const { staffsave } = useStaffProfile();
+  const { save } = useProfile();
   const [selected, setSelected] = useState<string>("");
   
   const [user, setUser] = useState(null);

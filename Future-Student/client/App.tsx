@@ -8,7 +8,7 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { WishlistProvider } from "@/context/WishlistContext";
 import { AuthProvider } from "@/context/AuthContext";
-import { StuProfileProvider, ParProfileProvider, StaffProfileProvider } from "@/context/ProfileContext";
+import { ProfileProvider } from "@/context/ProfileContext";
 import Calendar from "./pages/Calendar";
 import CourseFinder from "./pages/CourseFinder";
 import Profile from "./pages/Profile";
@@ -32,27 +32,23 @@ const App = () => (
       <Sonner />
       <BrowserRouter>
         <AuthProvider>
-          <StuProfileProvider>
-            <ParProfileProvider>
-              <StaffProfileProvider>
-                <WishlistProvider>
-                  <Routes>
-                  <Route path="/" element={<LandingPage />} />
-                  <Route path="/onboarding" element={<Onboarding />} />
-                  <Route path="/home" element={<Home />} />
-                  <Route path="/calendar" element={<Calendar />} />
-                  <Route path="/course-finder" element={<CourseFinder />} />
-                  <Route path="/wishlist" element={<Wishlist />} />
-                  <Route path="/profile" element={<Profile />} />
-                  <Route path="/about" element={<AboutUs />} />
-                  <Route path="/contact" element={<ContactUs />} />
-                  {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
-                  <Route path="*" element={<NotFound />} />
-                  </Routes>
-                </WishlistProvider>
-              </StaffProfileProvider>
-            </ParProfileProvider>
-          </StuProfileProvider>
+          <ProfileProvider>
+            <WishlistProvider>
+              <Routes>
+              <Route path="/" element={<LandingPage />} />
+              <Route path="/onboarding" element={<Onboarding />} />
+              <Route path="/home" element={<Home />} />
+              <Route path="/calendar" element={<Calendar />} />
+              <Route path="/course-finder" element={<CourseFinder />} />
+              <Route path="/wishlist" element={<Wishlist />} />
+              <Route path="/profile" element={<Profile />} />
+              <Route path="/about" element={<AboutUs />} />
+              <Route path="/contact" element={<ContactUs />} />
+              {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
+              <Route path="*" element={<NotFound />} />
+              </Routes>
+            </WishlistProvider>
+          </ProfileProvider>
         </AuthProvider>
       </BrowserRouter>
     </TooltipProvider>

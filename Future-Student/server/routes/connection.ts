@@ -1,6 +1,6 @@
 import { json } from "stream/consumers";
 import { any } from "zod/v4";
-import { Student, Parent, Staff, User } from "@/types/user";
+import { User } from "@/types/user";
 
 const express = require('express');
 const mysql = require('mysql');
@@ -75,7 +75,7 @@ server.post('/users/:register', (req, res) => {
 server.post('/users/:login', (req, res) => {
   const { username, password, userType, stayLogged} = req.body;
 
-  let user = new User(-1, "John", "Doe", "123456789", "TestAccount", "test@test.com", "Northfields Ave");
+  let user = new User(-1, "John", "Doe", "TestAccount", "test@test.com");
 
   try {
         conn.query('select hashSalt, passwordHash from Users where username = ?', username, (err, result) => {
@@ -100,12 +100,20 @@ server.post('/users/:login', (req, res) => {
   switch(userType){
     case "Student":
       try {
-        conn.query('SELECT Users.id, Users.firstName, Users.lastName, Users.userName, Users.email, Users.dob, Users.address, Student.nesaNumber, Student.entryYear, Student.school, FROM Users INNER JOIN Users.id = Student.id AND Users.username = ?', username, (err, result) => {
+        conn.query('SELECT Users.id, Users.firstName, Users.lastName, Users.userName, Users.email, Users.dob, Users.address,  Student.school, Student.nesaNumber, Student.usi, Student.entryYear, Student.firstInFamily, Student.indigenousStatus, Student.culturalBackground FROM Users INNER JOIN Users.id = Student.id AND Users.username = ?', username, (err, result) => {
           if (err) throw err;
 
           /* Edit to remove password later */
-          user = new Student(result.first[0], result.first[1], result.first[2], result.first[3], result.first[4], result.first[5], result.first[6], result.first[7], result.first[8], result.first[9]);
-          
+          user = new User(result.first[0], result.first[1], result.first[2], result.first[3], result.first[4]);
+          user.address = result.first[5];
+          user.schoolName = result.first[6];
+          user.nesaNumber = result.first[7];
+          user.usi = result.first[8];
+          user.entryYear = result.first[9];
+          user.firstInFamily = result.first[10];
+          user.indigenous = result.first[11];
+          user.culturalBackground = result.first[12];
+          user.userType = "Student";
           console.log('Log in success (Student)');
           res.send(user);
       });
@@ -120,7 +128,11 @@ server.post('/users/:login', (req, res) => {
 
 
           /* Edit to remove password later */
-          user = new Staff(result.first[0], result.first[1], result.first[2], result.first[3], result.first[4], result.first[5], result.first[6], result.first[7]);
+          user = new User(result.first[0], result.first[1], result.first[2], result.first[3], result.first[4]);
+          user.dob = result.first[5];
+          user.address = result.first[6];
+          user.schoolName = result.first[7]
+          user.userType = "School Staff Member"
           console.log('Log in success (Staff)');
           res.send(user);
         });
@@ -133,7 +145,11 @@ server.post('/users/:login', (req, res) => {
       try {
         conn.query('SELECT Users.id, Users.firstName, Users.lastName, Users.userName, Users.email, Users.dob, Users.address, SchoolStaff.school, FROM Users INNER JOIN Users.id = Parent.id AND Users.username = ?', username, (err, result) => {
           /* Edit to remove password later */
-          user = new Parent(result.first[0], result.first[1], result.first[2], result.first[3], result.first[4], result.first[5], result.first[6], result.first[7]);
+          user = new User(result.first[0], result.first[1], result.first[2], result.first[3], result.first[4]);
+          user.dob = result.first[5];
+          user.address = result.first[6];
+          user.schoolName = result.first[7]
+          user.userType = "Parent"
           console.log('Log in success (Parent)');
           res.send(user);
           
