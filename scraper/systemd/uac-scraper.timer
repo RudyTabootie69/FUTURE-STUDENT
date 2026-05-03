@@ -1,0 +1,10 @@
+[Unit]
+Description=Weekly UAC scraper schedule
+
+[Timer]
+OnCalendar=Mon 03:00
+Persistent=true
+Unit=uac-scraper.service
+
+[Install]
+WantedBy=timers.target
