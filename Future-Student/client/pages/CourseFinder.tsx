@@ -431,9 +431,11 @@ export default function CourseFinder() {
                     <tr
                       key={toString(course) + index}
                       className="hover:bg-gray-50 transition-colors"
+                      onClick = {() => goToCourse(course)}
                     >
                       <td className="p-4">
-                        <button className="flex items-center gap-4">
+                        <div className="flex items-center gap-4">
+                        
                           <div className="w-12 h-12 rounded-full bg-primary-blue flex-shrink-0" />
                           <div className="min-w-0 flex-1 grid grid-cols-1 md:grid-cols-5 gap-4 items-center">
                             <div className="space-y-1">
@@ -478,7 +480,7 @@ export default function CourseFinder() {
                                 </button>
                               ) : (
                                 <button
-                                  onClick={() => add(course)}
+                                  onClick={(e) => {e.stopPropagation(), add(course)}}
                                   className="px-3 py-2 text-sm border border-primary-blue text-primary-blue rounded-md hover:bg-blue-50"
                                 >
                                   Add to Wishlist
@@ -486,8 +488,7 @@ export default function CourseFinder() {
                               )}
                             </div>
                           </div>
-                          onClick={() => goToCourse(course)}
-                        </button>
+                        </div>
                       </td>
                     </tr>
                   ))}

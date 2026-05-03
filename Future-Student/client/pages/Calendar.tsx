@@ -323,7 +323,7 @@ export default function Calendar() {
                     const dateKey = day ? isoKey(viewDate, day) : "";
                     const dayEvents = day ? filteredEvents[dateKey] || [] : [];
                     return (
-                      <Button
+                      <div
                         key={dIdx}
                         className="h-20 sm:h-24 lg:h-[120px] bg-white border-r border-b border-[#F1F5F9] last:border-r-0 p-2 hover:bg-gray-50 transition-colors relative"
                       >
@@ -335,25 +335,25 @@ export default function Calendar() {
                             {dayEvents.length > 0 && (
                               <div className="mt-1 space-y-1 pr-1 overflow-hidden">
                                 {dayEvents.map((ev, i) => (
-                                  <div
+                                  <button
                                     key={i}
                                     className="text-[10px] leading-tight px-1.5 py-0.5 rounded truncate"
                                     style={{
                                       backgroundColor: ev.bgColor,
                                       color: ev.color,
                                     }}
+                                    onClick = {() => goToEvent(ev.eventID)}
                                   >
                                     {ev.label}
-                                    onClick = {() => goToEvent(ev.eventID)}
                                     
-                                  </div>
+                                  </button>
                                 ))}
                               </div>
                             )}
                           </>
                         )}
                        
-                      </Button>
+                      </div>
                     );
                   })}
                 </div>
