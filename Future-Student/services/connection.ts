@@ -9,16 +9,11 @@ const dotenv = require('dotenv');
 const jwt = require('jsonwebtoken');
 const server = express();
 const port = process.env.PORT || 3000;
-const cookieParser = require('cookie-parser');
-
-server.use(express.json());
-server.use(express.urlencoded({ extended: true }));
 
 server.listen(port, () => {
   console.log(`Server is running on port ${port}`);
 });
 
-server.use(cookieParser);
 
 
 /* If we're using Amazon EC2 these settings should not need to change, except for DB_PASSWORD */
@@ -185,7 +180,7 @@ server.post('/users/:logout', (req, res) => {
   }).send({ success: true });
 });
 
-server.post('/users/:auth', (req, res, next) => {
+const verifyToken = (req, res, next) => {
     const token = req.cookies.token;
     if (!token) {
       return res.status(401).send({ message: 'Unauthorized access' });
@@ -206,7 +201,7 @@ server.post('/users/:auth', (req, res, next) => {
         // Pass control to the next middleware or route handler
         next();
     });
-});
+};
 
  // Get all users
 server.get('/users', (req, res) => {
@@ -259,5 +254,5 @@ server.get('/eventtags/:id', (req, res) => {
   });
 });
 
-
+module.exports = verifyToken;
 

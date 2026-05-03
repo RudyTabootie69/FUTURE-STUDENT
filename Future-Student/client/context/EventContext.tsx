@@ -2,55 +2,35 @@ import { createContext, useContext, useEffect, useMemo, useState } from "react";
 import type { Event } from "@/types/event";
 import { toString } from "@/types/event";
 
-interface eventContextValue {
-  savedevents: Event[];
-  add: (c: Event) => void;
+interface EventContextValue {
+  events: Event[];
+  add: (e: Event) => void;
   remove: (id: string) => void;
   has: (id: string) => boolean;
   clear: () => void;
 }
 
-const eventContext = createContext<eventContextValue | undefined>(undefined);
+const EventContext = createContext<EventContextValue | undefined>(undefined);
 
-const STORAGE_KEY = "eventEvents";
 
-export function eventProvider({ children }: { children: React.ReactNode })
+export function EventProvider({ children }: { children: React.ReactNode })
  {
-  const [savedevents, setevent] = useState<Event[]>([]);
+  const [events, setevent] = useState<Event[]>([]);
 
-  // Load from localStorage
-  useEffect(() => {
-    try {
-      const raw = localStorage.getItem(STORAGE_KEY);
-      if (raw) setevent(JSON.parse(raw));
-    } catch {
-      // ignore
-    }
-  }, []);
-
-  // Persist
-  useEffect(() => {
-    try {
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(event));
-    } catch {
-      // ignore
-    }
-  }, [savedevents]);
-
-  const value = useMemo<eventContextValue>(() => ({
-    savedevents,
-    add: (c: Event) =>
-      setevent((prev) => (prev.find((p) => toString(p) === toString(c)) ? prev : [...prev, c])),
+  const value = useMemo<EventContextValue>(() => ({
+    events,
+    add: (e: Event) =>
+      setevent((prev) => (prev.find((p) => toString(p) === toString(e)) ? prev : [...prev, e])),
     remove: (id: string) => setevent((prev) => prev.filter((p) => toString(p) !== id)),
-    has: (id: string) => savedevents.some((p) => toString(p) === id),
+    has: (id: string) => events.some((p) => toString(p) === id),
     clear: () => setevent([]),
-  }), [savedevents]);
+  }), [events]);
 
-  return <eventContext.Provider value={value}>{children}</eventContext.Provider>;
+  return <EventContext.Provider value={value}>{children}</EventContext.Provider>;
 }
 
-export function useSavedEvents() {
-  const ctx = useContext(eventContext);
+export function useEvents() {
+  const ctx = useContext(EventContext);
   if (!ctx) throw new Error("useevent must be used within eventProvider");
   return ctx;
 }

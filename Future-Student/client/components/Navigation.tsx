@@ -12,6 +12,8 @@ export default function Navigation() {
     { label: "My Wishlist", path: "/wishlist" },
     { label: "Calendar", path: "/calendar" },
     { label: "Profile", path: "/profile" },
+    { label: "Event", path: "/event" },
+    { label: "Course", path: "/course" },
   ];
 
   return (

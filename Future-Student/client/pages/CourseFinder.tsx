@@ -4,8 +4,10 @@ import Navigation from "@/components/Navigation";
 import type { Course } from "@/types/course";
 import { toString } from "@/types/course";
 import { useWishlist } from "@/context/WishlistContext";
+import { useNavigate } from "react-router-dom";
 
 export default function CourseFinder() {
+  const navigate = useNavigate();
   // Filters & sort
   const [search, setSearch] = useState<string>("");
   const [fieldFilter, setFieldFilter] = useState<string>("All Fields");
@@ -227,7 +229,7 @@ export default function CourseFinder() {
 
   const universityNames = useMemo(() => universities.map((u) => u.name), []);
   const fieldOptions = useMemo(
-    () => ["All Fields", ...Array.from(new Set(degrees.map((d) => d.field)))],
+    () => [...Array.from(new Set(degrees.map((d) => d.field)))],
     [],
   );
 
@@ -269,6 +271,12 @@ export default function CourseFinder() {
     atarMax,
     sortBy,
   ]);
+
+  const goToCourse = (course: Course) => {
+    if(course){
+      navigate("/course",{state: { course: course }});
+    }
+  }
 
   return (
     <div className="min-h-screen bg-bg-soft">
@@ -332,6 +340,7 @@ export default function CourseFinder() {
                   onChange={(e) => setFieldFilter(e.target.value)}
                   className="w-full px-3 py-2.5 border border-[#777] rounded bg-bg-soft text-sm text-[#5D5D5D] appearance-none cursor-pointer"
                 >
+                  <option>All Fields</option>
                   {fieldOptions.map((opt) => (
                     <option key={opt}>{opt}</option>
                   ))}
@@ -424,7 +433,7 @@ export default function CourseFinder() {
                       className="hover:bg-gray-50 transition-colors"
                     >
                       <td className="p-4">
-                        <div className="flex items-center gap-4">
+                        <button className="flex items-center gap-4">
                           <div className="w-12 h-12 rounded-full bg-primary-blue flex-shrink-0" />
                           <div className="min-w-0 flex-1 grid grid-cols-1 md:grid-cols-5 gap-4 items-center">
                             <div className="space-y-1">
@@ -477,7 +486,8 @@ export default function CourseFinder() {
                               )}
                             </div>
                           </div>
-                        </div>
+                          onClick={() => goToCourse(course)}
+                        </button>
                       </td>
                     </tr>
                   ))}

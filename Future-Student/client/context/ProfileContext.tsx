@@ -14,8 +14,10 @@ const ProfileContext = createContext<ProfileContextValue | undefined>(undefined)
 export const ProfileProvider = ({ children }: { children: React.ReactNode }) => {
   const [profile, setProfile] = useState<User | null>(null);
 
+  
   useEffect(() => {
     try {
+      //Replace this with call to AuthContext
       const raw = localStorage.getItem(STORAGE_KEY);
       if (raw) setProfile(JSON.parse(raw));
     } catch {}
