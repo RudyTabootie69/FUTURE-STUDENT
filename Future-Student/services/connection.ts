@@ -47,7 +47,7 @@ server.post('/users/:register', (req, res) => {
     }else{
         conn.query('select username from Users where username = ?', username, (err, rows) => {
           if (err) throw err;
-          results = res.json(rows[0]);
+          results = rows[0];
         });
 
         if (Object.keys(results).length > 0){
@@ -66,9 +66,9 @@ server.post('/users/:register', (req, res) => {
 );
 
 
-// Check user for log in
+// Check user for log in first time
 server.post('/users/:login', (req, res) => {
-  const { username, password, userType, stayLogged} = req.body;
+  const { username, password, userType} = req.body;
 
   let user = new User(-1, "John", "Doe", "TestAccount", "test@test.com");
 
@@ -83,7 +83,7 @@ server.post('/users/:login', (req, res) => {
           if (compareInput != compareDB){
 
               console.log('Log in Failure');
-              res.send(user);  //Comment out this line to stop testing
+              //res.send(user);  //Comment out this line to stop testing
               return;
           }     
       });
@@ -146,7 +146,6 @@ server.post('/users/:login', (req, res) => {
           user.schoolName = result.first[7]
           user.userType = "Parent"
           console.log('Log in success (Parent)');
-          res.send(user);
           
         });
       }catch (error) {
@@ -157,30 +156,30 @@ server.post('/users/:login', (req, res) => {
     
     default:
       console.log("Error in user type");
-      break;
+      return;
   }
-
-  if (stayLogged){
-    const token = jwt.sign(
-      { user: user },  // Payload (data inside the token)
+  
+  const token = jwt.sign(
+      { userID: user.id },  // Payload (data inside the token)
       process.env.JWT_SECRET,      // Secret key for signing the token
       { expiresIn: "1h" }          // Token expiration time (1 hour)
     );
     res.cookie('token', token, {
       httpOnly: true,   // Not accessible via JavaScript
       secure: false,    // Set to true in production (HTTPS)
-    }).send({ success: true });
-  }
+    });
+    res.send(user);
 });
 
-server.post('/users/:logout', (req, res) => {
+server.post('/users/:logout', (res) => {
   res.clearCookie('token', {
     httpOnly: true,
     secure: false,
   }).send({ success: true });
+  
 });
 
-const verifyToken = (req, res, next) => {
+server.post('/users/:authJWT', (req, res) => {
     const token = req.cookies.token;
     if (!token) {
       return res.status(401).send({ message: 'Unauthorized access' });
@@ -195,13 +194,39 @@ const verifyToken = (req, res, next) => {
     jwt.verify(token, process.env.JWT_SECRET, (err, user) => {
         if (err) return res.status(401).send('Invalid Token'); // Token verification failed
 
-        // If verification is successful, attach user data to request object
-        let authuser = req.user;
-
-        // Pass control to the next middleware or route handler
-        next();
+        res.json(true);
     });
-};
+});
+
+server.post("/users/:refresh", (req, res) => {
+  const newToken = jwt.sign(
+    { userID: req.userID },
+    process.env.JWT_SECRET,
+    { expiresIn: "15m" }
+  );
+
+  res.cookie("token", newToken, {
+    httpOnly: true,
+    secure: true,
+    sameSite: "none",
+  });
+
+  res.json({ success: true });
+});
+
+//Same as previous function but using cookie
+server.get('/users/:autologin', (req, res) => {
+  const token = req.cookies.token;
+  const decoded = jwt.verify(token, process.env.JWT_SECRET, (err) => {
+        if (err) return res.status(401).send('Invalid Token'); // Token verification failed
+  });
+  const userId = decoded.userID;
+  conn.query('SELECT * FROM users WHERE id = ?', userId, (err, rows) => {
+    if (err) throw err;
+    res.json(rows[0]);
+  });
+
+});
 
  // Get all users
 server.get('/users', (req, res) => {
@@ -213,6 +238,11 @@ server.get('/users', (req, res) => {
 
 // Get user by ID
 server.get('/users/:id', (req, res) => {
+  const token = req.cookies.token;
+  const decoded = jwt.verify(token, process.env.JWT_SECRET, (err) => {
+        if (err) return res.status(401).send('Invalid Token'); // Token verification failed
+        
+  });
   const userId = req.params.id;
   conn.query('SELECT * FROM users WHERE id = ?', userId, (err, rows) => {
     if (err) throw err;
@@ -220,8 +250,15 @@ server.get('/users/:id', (req, res) => {
   });
 });
 
+
+
  // Get all events
 server.get('/events', (req, res) => {
+  const token = req.cookies.token;
+  jwt.verify(token, process.env.JWT_SECRET, (err) => {
+        if (err) return res.status(401).send('Invalid Token'); // Token verification failed
+  });
+
   conn.query('select * from Event', (err, rows) => {
     if (err) throw err;
     res.json(rows);
@@ -230,6 +267,7 @@ server.get('/events', (req, res) => {
 
  // Get event by ID
 server.get('/events/:id', (req, res) => {
+
   const eventId = req.params.id;
   conn.query('SELECT * FROM Event WHERE eventID = ?', eventId, (err, rows) => {
     if (err) throw err;
@@ -253,6 +291,4 @@ server.get('/eventtags/:id', (req, res) => {
     res.json(rows[0]);
   });
 });
-
-module.exports = verifyToken;
 

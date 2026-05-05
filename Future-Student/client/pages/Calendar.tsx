@@ -3,6 +3,7 @@ import { ChevronLeft, ChevronRight, Search, ChevronDown } from "lucide-react";
 import Navigation from "@/components/Navigation";
 import { useSavedEvents } from "@/context/SavedEventContext";
 import { useEvents } from "@/context/EventContext";
+import type { Event } from "@/types/event";
 import { buildMonthMatrix, isoKey, monthLabel } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { useNavigate } from "react-router-dom";
@@ -13,6 +14,7 @@ import { useNavigate } from "react-router-dom";
   //Call server side function on calendar open
 
 export default function Calendar() {
+  const events =  useEvents().events;
   const [search, setSearch] = useState<string>("");
   const [fieldFilter, setFieldFilter] = useState<string>("All Fields");
   const [eventFilter, setEventFilter] =
@@ -37,7 +39,6 @@ export default function Calendar() {
   }, {});
 
   const { savedevents } = useSavedEvents();
-  const { events } = useEvents();
 
   function parseDMY(s?: string | null): Date | null {
     if (!s) return null;

@@ -1,13 +1,10 @@
 import { createContext, useContext, useEffect, useMemo, useState } from "react";
 import type { Event } from "@/types/event";
-import { toString } from "@/types/event";
 
 interface EventContextValue {
   events: Event[];
-  add: (e: Event) => void;
-  remove: (id: string) => void;
-  has: (id: string) => boolean;
-  clear: () => void;
+  loading: boolean;
+  fetchEvents: () => Promise<void>;
 }
 
 const EventContext = createContext<EventContextValue | undefined>(undefined);
@@ -15,18 +12,32 @@ const EventContext = createContext<EventContextValue | undefined>(undefined);
 
 export function EventProvider({ children }: { children: React.ReactNode })
  {
-  const [events, setevent] = useState<Event[]>([]);
+  const [events, setEvents] = useState([]);
+  const [loading, setLoading] = useState(true);
 
-  const value = useMemo<EventContextValue>(() => ({
-    events,
-    add: (e: Event) =>
-      setevent((prev) => (prev.find((p) => toString(p) === toString(e)) ? prev : [...prev, e])),
-    remove: (id: string) => setevent((prev) => prev.filter((p) => toString(p) !== id)),
-    has: (id: string) => events.some((p) => toString(p) === id),
-    clear: () => setevent([]),
-  }), [events]);
 
-  return <EventContext.Provider value={value}>{children}</EventContext.Provider>;
+  const fetchEvents = async () => {
+    try {
+      const res = await fetch("/events", {
+        credentials: "include",
+      });
+
+      const data = await res.json();
+      setEvents(data);
+    } catch (err) {
+      console.error("Failed to load events", err);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchEvents();
+  }, []);
+
+
+
+  return <EventContext.Provider value={{events, loading, fetchEvents}}>{children}</EventContext.Provider>;
 }
 
 export function useEvents() {

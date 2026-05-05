@@ -1,43 +1,63 @@
 import { createContext, useContext, useEffect, useMemo, useState } from "react";
-import type { User } from "@/types/user";
+import { useAuth } from "@/context/AuthContext";
+import type { User } from "@/types/user";;
 
 interface ProfileContextValue {
   profile: User | null;
-  save: (p: User) => void;
-  update: (p: Partial<User>) => void;
-  clear: () => void;
 }
-const STORAGE_KEY = "user.profile";
+
 const ProfileContext = createContext<ProfileContextValue | undefined>(undefined);
 
 
 export const ProfileProvider = ({ children }: { children: React.ReactNode }) => {
   const [profile, setProfile] = useState<User | null>(null);
-
-  
-  useEffect(() => {
-    try {
-      //Replace this with call to AuthContext
-      const raw = localStorage.getItem(STORAGE_KEY);
-      if (raw) setProfile(JSON.parse(raw));
-    } catch {}
-  }, []);
+  const { token } = useAuth();
+  const { isAuthenticated } = useAuth();
 
   useEffect(() => {
+    if (!isAuthenticated) {
+      setProfile(null);
+      return;
+    }
+
+    const fetchUser = async () => {
+      try {
+        const res = await fetch("/users/autologin", {
+          credentials: "include",
+        });
+
+        const data = await res.json();
+        setProfile(data);
+      } catch (err) {
+        console.error(err);
+        setProfile(null);
+      }
+    };
+    fetchUser();
+
+  }, [isAuthenticated]);
+
+  const refreshProfile = async () => {
+    if (!isAuthenticated) return;
+
     try {
-      if (profile) localStorage.setItem(STORAGE_KEY, JSON.stringify(profile));
-      else localStorage.removeItem(STORAGE_KEY);
-    } catch {}
-  }, [profile]);
+      const res = await fetch("/users/:refresh", {
+        credentials: "include",
+      });
 
-  const value = useMemo<ProfileContextValue>(() => ({
-    profile,
-    save: (p) => setProfile(p),
-    update: (p) => setProfile((prev) => ({ ...(prev ?? {} as User), ...p } as User)),
-    clear: () => setProfile(null),
-  }), [profile]);
+      if (!res.ok) throw new Error("Failed");
 
-  return <ProfileContext.Provider value={value}> {children} </ProfileContext.Provider>;
+      const data = await res.json();
+      setProfile(data);
+    } catch (err) {
+      console.error(err);
+      setProfile(null);
+    }
+  }
+
+
+
+  return <ProfileContext.Provider value={{profile, ...refreshProfile}}> {children} </ProfileContext.Provider>;
 }
 
 export function useProfile() {

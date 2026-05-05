@@ -1,11 +1,10 @@
 import { bool } from "joi";
 import { createContext, useContext, useEffect, useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { useProfile } from "@/context/ProfileContext";
 
 interface AuthContextValue {
   token: any
-  user: any
+  isAuthenticated: boolean;
   register: (any) => Promise<void>;
   login: (any) => Promise<void>;
   logout: () => Promise<void>;
@@ -18,13 +17,21 @@ const AuthContext = createContext<AuthContextValue | undefined>(undefined);
 
 
 export const AuthProvider = ({ children }) => {
-  //const { save } = useProfile();
-  //const [selected, setSelected] = useState<string>("");
-  
-  const [user, setUser] = useState(null);
+
   const [token, setToken] = useState(localStorage.getItem("site") || "");
   const [isAuthenticated, setIsAuthenticated] = useState<boolean>(false);
   const navigate = useNavigate();
+
+  useEffect(() => {
+    // Check if user is already logged in (cookie exists)
+    fetch("/users/authJWT", {
+      credentials: "include",
+    })
+      .then((res) => {
+        setIsAuthenticated(res.ok);
+      })
+      .catch(() => setIsAuthenticated(false));
+  }, []);
 
   const register = async (data) => {
     try {
@@ -37,7 +44,6 @@ export const AuthProvider = ({ children }) => {
       });
       const res = await response.json();
       if (res.data) {
-        setUser(res.data.user);
         setToken(res.token);
         localStorage.setItem("site", res.token);
         navigate("/");
@@ -60,7 +66,7 @@ export const AuthProvider = ({ children }) => {
       });
       const res = await response.json();
       if (res.data) {
-        setUser(res.data.user);
+        setIsAuthenticated(res.ok)
         setToken(res.token);
         localStorage.setItem("site", res.token);
         navigate("/home");
@@ -82,7 +88,7 @@ export const AuthProvider = ({ children }) => {
     });
   };
 
-  return <AuthContext.Provider value={{token, user, register, login, logout}}>{children}</AuthContext.Provider>;
+  return <AuthContext.Provider value={{token, isAuthenticated, register, login, logout}}>{children}</AuthContext.Provider>;
 }
 
 export function useAuth() {
