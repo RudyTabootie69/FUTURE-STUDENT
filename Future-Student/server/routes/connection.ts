@@ -243,5 +243,28 @@ server.get('/eventtags/:id', (req, res) => {
   });
 });
 
+// Get specific user info
+server.get('/users/info/:id', (req, res) => {
+  const userId = req.params.id;
+  conn.query('SELECT getUserInfo(?)', [userId], (err, rows) => {
+    if (err) throw err;
+    res.json(rows[0]);
+  });
+});
 
+// Get all users via procedure
+server.get('/users/all', (req, res) => {
+  conn.query('CALL getAllUsers()', (err, rows) => {
+    if (err) throw err;
+    res.json(rows[0]);
+  });
+});
+
+// Get user statistics
+server.get('/users/stats', (req, res) => {
+  conn.query('SELECT getUserStats()', (err, rows) => {
+    if (err) throw err;
+    res.json(rows[0]);
+  });
+});
 
