@@ -1,51 +1,63 @@
-import { createContext, useContext, useEffect, useMemo, useState } from "react";
+import { createContext, Dispatch, SetStateAction, useContext, useEffect, useMemo, useState } from "react";
 import type { Course } from "@/types/course";
 import { toString } from "@/types/course";
+import {useAuth} from "@/context/AuthContext"
 
 interface CourseContextValue {
   courses: Course[];
-  add: (c: Course) => void;
-  remove: (id: string) => void;
-  has: (id: string) => boolean;
-  clear: () => void;
+  loading: boolean;
+  search: string;
+  error: string;
+  setSearch:  Dispatch<SetStateAction<string>>;
 }
 
 const CourseContext = createContext<CourseContextValue | undefined>(undefined);
 
-const STORAGE_KEY = "coursesCourses";
-
 export function CourseProvider({ children }: { children: React.ReactNode }) {
-  const [courses, setCourse] = useState<Course[]>([]);
+  const [search, setSearch] = useState("");
+  const [courses, setCourses] = useState<Course[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
 
-  // Load from localStorage
   useEffect(() => {
-    try {
-      const raw = localStorage.getItem(STORAGE_KEY);
-      if (raw) setCourse(JSON.parse(raw));
-    } catch {
-      // ignore
+    if (search.trim().length < 4) {
+      setCourses([]);
+      return;
     }
-  }, []);
-  
-  // Persist
-  useEffect(() => {
+
+    const timeout = setTimeout(() => {
+      fetchCourses(search);
+    }, 500);
+
+    return () => clearTimeout(timeout);
+  }, [search]);
+
+  async function fetchCourses(search) {
     try {
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(courses));
-    } catch {
-      // ignore
+      setLoading(true);
+      setError(null);
+
+      const res = await fetch(
+        `/eventSearch=${encodeURIComponent(search)}`, {
+        credentials: "include",
+      });
+
+      if (!res.ok) {
+        throw new Error("Failed to fetch results");
+      }
+
+      const data = await res.json();
+
+      setCourses(data);
+    } catch (err) {
+      setError(err.message);
+    } finally {
+      setLoading(false);
     }
-  }, [courses]);
+  }
+ 
 
-  const value = useMemo<CourseContextValue>(() => ({
-    courses,
-    add: (c: Course) =>
-      setCourse((prev) => (prev.find((p) => toString(p) === toString(c)) ? prev : [...prev, c])),
-    remove: (id: string) => setCourse((prev) => prev.filter((p) => toString(p) !== id)),
-    has: (id: string) => courses.some((p) => toString(p) === id),
-    clear: () => setCourse([]),
-  }), [courses]);
-
-  return <CourseContext.Provider value={value}>{children}</CourseContext.Provider>;
+  return <CourseContext.Provider value={{courses, loading, search, error, setSearch}}>{children}</CourseContext.Provider>;
 }
 
 export function useCourse() {

@@ -1,3 +1,7 @@
+import json
+import time
+
+
 data = []
 newdata = []
 with open('uac_details.jl', 'r') as file:
@@ -31,6 +35,8 @@ for line in data:
     line = line.replace(">", "")
     line = line.replace(";", "")
     line = line.replace("'", "’")
+    line = line.replace(" / ", "’")
+    line = line.replace(" \\ ", "’")
     newdata.append(line)
     
 

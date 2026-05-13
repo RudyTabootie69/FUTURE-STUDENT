@@ -10,7 +10,8 @@
             "type": "debugpy",
             "request": "launch",
             "program": "${file}",
-            "console": "integratedTerminal"
+            "console": "integratedTerminal",
+            "cwd": "${workspaceFolder}"
         },
         {
             "type": "node-terminal",
@@ -21,10 +22,11 @@
         },
         {
             "type": "node-terminal",
-            "name": "Run Script: Build",
+            "name": "Run Script: Build and Launch (Debugging)",
             "request": "launch",
-            "command": "npm run build",
-            "cwd": "${workspaceFolder}/Future-Student"
+            "command": "npm run dev && npx vite --port=4000",
+            "cwd": "${workspaceFolder}/Future-Student",
+            "sourceMaps": true
         },
         {
             "type": "node-terminal",

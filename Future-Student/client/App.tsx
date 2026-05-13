@@ -11,6 +11,7 @@ import { AuthProvider } from "@/context/AuthContext";
 import { ProfileProvider } from "@/context/ProfileContext";
 import { SavedEventProvider } from "@/context/SavedEventContext";
 import { EventProvider } from "@/context/EventContext";
+import { TagProvider } from "@/context/TagContext";
 import Calendar from "./pages/Calendar";
 import CourseFinder from "./pages/CourseFinder";
 import Profile from "./pages/Profile";
@@ -40,21 +41,23 @@ const App = () => (
             <EventProvider>
               <SavedEventProvider>
                 <WishlistProvider>
-                  <Routes>
-                  <Route path="/" element={<LandingPage />} />
-                  <Route path="/onboarding" element={<Onboarding />} />
-                  <Route path="/home" element={<Home />} />
-                  <Route path="/calendar" element={<Calendar />} />
-                  <Route path="/course-finder" element={<CourseFinder />} />
-                  <Route path="/wishlist" element={<Wishlist />} />
-                  <Route path="/profile" element={<Profile />} />
-                  <Route path="/about" element={<AboutUs />} />
-                  <Route path="/contact" element={<ContactUs />} />
-                  <Route path="/course" element={<CoursePage />} />
-                  <Route path="/event" element={<EventPage />} />
-                  {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
-                  <Route path="*" element={<NotFound />} />
-                  </Routes>
+                  <TagProvider>
+                    <Routes>
+                    <Route path="/" element={<LandingPage />} />
+                    <Route path="/onboarding" element={<Onboarding />} />
+                    <Route path="/home" element={<Home />} />
+                    <Route path="/calendar" element={<Calendar />} />
+                    <Route path="/course-finder" element={<CourseFinder />} />
+                    <Route path="/wishlist" element={<Wishlist />} />
+                    <Route path="/profile" element={<Profile />} />
+                    <Route path="/about" element={<AboutUs />} />
+                    <Route path="/contact" element={<ContactUs />} />
+                    <Route path="/course" element={<CoursePage />} />
+                    <Route path="/event" element={<EventPage />} />
+                    {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
+                    <Route path="*" element={<NotFound />} />
+                    </Routes>
+                  </TagProvider>
                 </WishlistProvider>
               </SavedEventProvider>  
             </EventProvider>

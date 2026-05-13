@@ -159,13 +159,6 @@ CREATE TABLE IF NOT EXISTS EventTag(
     FOREIGN KEY (tagID) REFERENCES Tag(tagID)
 );
 
-CREATE TABLE IF NOT EXISTS StudentTag(
-    eventID INT,
-    studentID INT,
-    CONSTRAINT PK_APPLICATION PRIMARY KEY (eventID, studentID),
-    FOREIGN KEY (eventID) REFERENCES Event(eventID),
-    FOREIGN KEY (studentID) REFERENCES Student(stuID)
-);
 /*CREATE TABLE IF NOT EXISTS Pathway(
     studentID SERIAL,
     stage INT,

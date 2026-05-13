@@ -5,8 +5,8 @@ import { useNavigate } from "react-router-dom";
 interface AuthContextValue {
   token: any
   isAuthenticated: boolean;
-  register: (any) => Promise<void>;
-  login: (any) => Promise<void>;
+  register: (firstname: string, lastname: string, username: string, password: string) => Promise<void>;
+  login: (username: string, password: string) => Promise<void>;
   logout: () => Promise<void>;
 }
 
@@ -33,9 +33,11 @@ export const AuthProvider = ({ children }) => {
       .catch(() => setIsAuthenticated(false));
   }, []);
 
-  const register = async (data) => {
+  const register = async (firstname, lastname, username, password) => {
     try {
-      const response = await fetch("localhost:3000/users/:login", {
+      console.log("test")
+      let data = {firstname:  firstname, lastname: lastname, username: username, password: password};
+      const response = await fetch("localhost:3000/users/:register", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -45,8 +47,8 @@ export const AuthProvider = ({ children }) => {
       const res = await response.json();
       if (res.data) {
         setToken(res.token);
-        localStorage.setItem("site", res.token);
-        navigate("/");
+        localStorage.setItem("token", res.token);
+        navigate("/onboarding", { replace: true });
         return;
       }
       throw new Error(res.message);
@@ -55,8 +57,9 @@ export const AuthProvider = ({ children }) => {
     }
   };
 
-  const login = async (data) => {
+  const login = async (username, password) => {
     try {
+      let data = {username: username, password: password};
       const response = await fetch("localhost:3000/users/:login", {
         method: "POST",
         headers: {
@@ -68,7 +71,7 @@ export const AuthProvider = ({ children }) => {
       if (res.data) {
         setIsAuthenticated(res.ok)
         setToken(res.token);
-        localStorage.setItem("site", res.token);
+        localStorage.setItem("token", res.token);
         navigate("/home");
         return;
       }

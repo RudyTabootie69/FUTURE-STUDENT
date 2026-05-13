@@ -27,8 +27,8 @@ const conn= mysql.createPool({
 
 // Create a new user
 server.post('/users/:register', (req, res) => {
-    const { username, password} = req.body;
-
+    const {firstname, lastname, username, password} = req.body;
+    
     const saltRounds = 10;
     const salt = bcrypt.genSalt(saltRounds);
     const hash = bcrypt.hash(password, salt);
@@ -55,7 +55,7 @@ server.post('/users/:register', (req, res) => {
             return;
         } 
         else{
-            conn.query('insert into Users (username, passwordHash, hashSalt) values (?, ?, ?)', [username, hash, salt], (err, result) => {
+            conn.query('insert into Users (firstName, lastName, username, passwordHash, hashSalt) values (?, ?, ?, ?, ?)', [firstname, lastname, username, hash, salt], (err, result) => {
               if (err) throw err;
               res.send('User added successfully');
               return;
@@ -179,15 +179,11 @@ server.post('/users/:logout', (res) => {
   
 });
 
+
 server.post('/users/:authJWT', (req, res) => {
     const token = req.cookies.token;
     if (!token) {
       return res.status(401).send({ message: 'Unauthorized access' });
-    }
-
-    // If no token is provided, deny access
-    if (!token) {
-        return res.status(401).send('Access Denied');
     }
 
     // Verify the JWT using the secret key
@@ -220,12 +216,14 @@ server.get('/users/:autologin', (req, res) => {
   const decoded = jwt.verify(token, process.env.JWT_SECRET, (err) => {
         if (err) return res.status(401).send('Invalid Token'); // Token verification failed
   });
+
   const userId = decoded.userID;
+
   conn.query('SELECT * FROM users WHERE id = ?', userId, (err, rows) => {
     if (err) throw err;
     res.json(rows[0]);
   });
-
+  
 });
 
  // Get all users
@@ -240,8 +238,7 @@ server.get('/users', (req, res) => {
 server.get('/users/:id', (req, res) => {
   const token = req.cookies.token;
   const decoded = jwt.verify(token, process.env.JWT_SECRET, (err) => {
-        if (err) return res.status(401).send('Invalid Token'); // Token verification failed
-        
+        if (err) return res.status(401).send('Invalid Token'); // Token verification failed  
   });
   const userId = req.params.id;
   conn.query('SELECT * FROM users WHERE id = ?', userId, (err, rows) => {
@@ -256,7 +253,7 @@ server.get('/users/:id', (req, res) => {
 server.get('/events', (req, res) => {
   const token = req.cookies.token;
   jwt.verify(token, process.env.JWT_SECRET, (err) => {
-        if (err) return res.status(401).send('Invalid Token'); // Token verification failed
+      if (err) return res.status(401).send('Invalid Token'); // Token verification failed
   });
 
   conn.query('select * from Event', (err, rows) => {

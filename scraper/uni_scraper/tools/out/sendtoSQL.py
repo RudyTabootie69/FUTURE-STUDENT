@@ -2,12 +2,12 @@ from sqlalchemy import create_engine, MetaData, Table, table, Column, Numeric, i
 from sqlalchemy.engine import result
 import json
 
-
 user = "future-student"
-password = ""
+password = "fsdbpw"
 host = "127.0.0.1"
 port = 3306
 database = "futurestudentdb"
+
 
 unis = []
 uniacronyms = []
@@ -24,10 +24,6 @@ events = []
 courseID, uniAcronym, courseTitle = "", "", ""
 offeringID, durationID, modecounter = 0, 0, 0 
 
-#Aidan, I have no idea how ai works but I'm defining a function here that returns itself and have used it in the program, in this function do AI transform?
-def aiTransform(inputString):
-    outputString = inputString
-    return outputString
 
 def checkNone(inputType):
     if inputType is None:
@@ -107,13 +103,13 @@ with open('uac_details_html_removed.jl', 'r') as file:
         newteqsaId = checkNone(data["details_json"]["course"]["providerTeqsaId"])
         newCourseCode = data["course_url"]
         newCourseTitle = data["title"]
-        newHeader = aiTransform(data["details_json"]["contentJson"]["aboutIntro"])
-        newCareerOptions = aiTransform(data["details_json"]["contentJson"]["aboutDetails"]["careerOpportunities"])
-        newstudyDetails = aiTransform(data["details_json"]["contentJson"]["aboutDetails"]["areasOfStudy"])
+        newHeader = data["details_json"]["contentJson"]["aboutIntro"]
+        newCareerOptions = data["details_json"]["contentJson"]["aboutDetails"]["careerOpportunities"]
+        newstudyDetails = data["details_json"]["contentJson"]["aboutDetails"]["areasOfStudy"]
 
 
         if "practicalExperience" in data["details_json"]["contentJson"]["aboutDetails"]:
-            newpracticalDetails = aiTransform(data["details_json"]["contentJson"]["aboutDetails"]["practicalExperience"])
+            newpracticalDetails = data["details_json"]["contentJson"]["aboutDetails"]["practicalExperience"]
         else:
             newpracticalDetails = "N/A"
 

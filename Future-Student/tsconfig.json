@@ -16,6 +16,7 @@
     "esModuleInterop": true,
     "allowSyntheticDefaultImports": true,
     "forceConsistentCasingInFileNames": true,
+    "sourceMap": true,
 
     /* Linting */
     "strict": false,
@@ -38,6 +39,6 @@
     "shared/**/*",
     "vite.config.ts",
     "vite.config.server.ts"
-, "services/connection.ts"  ],
+, "server/connection.ts"  ],
   "exclude": ["node_modules", "dist"]
 }
