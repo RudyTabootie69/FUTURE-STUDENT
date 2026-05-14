@@ -26,9 +26,8 @@ const conn= mysql.createPool({
 });
 
 // Create a new user
-server.post('/users/:register', (req, res) => {
+server.post('/api/users/register', (req, res) => {
     const {firstname, lastname, username, password} = req.body;
-    
     const saltRounds = 10;
     const salt = bcrypt.genSalt(saltRounds);
     const hash = bcrypt.hash(password, salt);
@@ -43,7 +42,6 @@ server.post('/users/:register', (req, res) => {
 
     if(password.length<7 || noCapitals){
         res.send('Bad password');
-        return;
     }else{
         conn.query('select username from Users where username = ?', username, (err, rows) => {
           if (err) throw err;
@@ -67,7 +65,7 @@ server.post('/users/:register', (req, res) => {
 
 
 // Check user for log in first time
-server.post('/users/:login', (req, res) => {
+server.post('/api/users/login', (req, res) => {
   const { username, password, userType} = req.body;
 
   let user = new User(-1, "John", "Doe", "TestAccount", "test@test.com");
@@ -171,7 +169,7 @@ server.post('/users/:login', (req, res) => {
     res.send(user);
 });
 
-server.post('/users/:logout', (res) => {
+server.post('/api/users/logout', (res) => {
   res.clearCookie('token', {
     httpOnly: true,
     secure: false,
@@ -180,7 +178,7 @@ server.post('/users/:logout', (res) => {
 });
 
 
-server.post('/users/:authJWT', (req, res) => {
+server.post('/api/users/authJWT', (req, res) => {
     const token = req.cookies.token;
     if (!token) {
       return res.status(401).send({ message: 'Unauthorized access' });
@@ -194,7 +192,7 @@ server.post('/users/:authJWT', (req, res) => {
     });
 });
 
-server.post("/users/:refresh", (req, res) => {
+server.post("/api/users/refresh", (req, res) => {
   const newToken = jwt.sign(
     { userID: req.userID },
     process.env.JWT_SECRET,
@@ -211,7 +209,7 @@ server.post("/users/:refresh", (req, res) => {
 });
 
 //Same as previous function but using cookie
-server.get('/users/:autologin', (req, res) => {
+server.get('/api/users/autologin', (req, res) => {
   const token = req.cookies.token;
   const decoded = jwt.verify(token, process.env.JWT_SECRET, (err) => {
         if (err) return res.status(401).send('Invalid Token'); // Token verification failed
@@ -227,7 +225,7 @@ server.get('/users/:autologin', (req, res) => {
 });
 
  // Get all users
-server.get('/users', (req, res) => {
+server.get('/api/users', (req, res) => {
   conn.query('SELECT * FROM users', (err, rows) => {
     if (err) throw err;
     res.json(rows);
@@ -235,7 +233,7 @@ server.get('/users', (req, res) => {
 });
 
 // Get user by ID
-server.get('/users/:id', (req, res) => {
+server.get('/api/users/id', (req, res) => {
   const token = req.cookies.token;
   const decoded = jwt.verify(token, process.env.JWT_SECRET, (err) => {
         if (err) return res.status(401).send('Invalid Token'); // Token verification failed  
@@ -250,7 +248,7 @@ server.get('/users/:id', (req, res) => {
 
 
  // Get all events
-server.get('/events', (req, res) => {
+server.get('/api/events', (req, res) => {
   const token = req.cookies.token;
   jwt.verify(token, process.env.JWT_SECRET, (err) => {
       if (err) return res.status(401).send('Invalid Token'); // Token verification failed
@@ -263,7 +261,7 @@ server.get('/events', (req, res) => {
 });
 
  // Get event by ID
-server.get('/events/:id', (req, res) => {
+server.get('/api/events/id', (req, res) => {
 
   const eventId = req.params.id;
   conn.query('SELECT * FROM Event WHERE eventID = ?', eventId, (err, rows) => {
@@ -273,7 +271,7 @@ server.get('/events/:id', (req, res) => {
 });
 
  // Get all event tags
-server.get('/eventtags', (req, res) => {
+server.get('/api/eventtags', (req, res) => {
   conn.query('select * from EventTag', (err, rows) => {
     if (err) throw err;
     res.json(rows);
@@ -281,11 +279,10 @@ server.get('/eventtags', (req, res) => {
 });
 
  // Get event tag by ID
-server.get('/eventtags/:id', (req, res) => {
+server.get('/api/eventtags/id', (req, res) => {
   const {eventId, tagId } = req.body;
   conn.query('SELECT * FROM Event WHERE eventID = ? AND tagID = ?',  [eventId, tagId], (err, rows) => {
     if (err) throw err;
     res.json(rows[0]);
   });
 });
-

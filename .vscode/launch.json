@@ -18,13 +18,14 @@
             "name": "Run Script: Build and Launch",
             "request": "launch",
             "command": "npm run build && npx vite --port=4000",
-            "cwd": "${workspaceFolder}/Future-Student"
+            "cwd": "${workspaceFolder}/Future-Student",
+            "sourceMaps": true
         },
         {
             "type": "node-terminal",
             "name": "Run Script: Build and Launch (Debugging)",
             "request": "launch",
-            "command": "npm run dev && npx vite --port=4000",
+            "command": "npm run dev",
             "cwd": "${workspaceFolder}/Future-Student",
             "sourceMaps": true
         },
@@ -33,7 +34,24 @@
             "name": "Run Script: Launch",
             "request": "launch",
             "command": "npx vite --port=4000",
-            "cwd": "${workspaceFolder}/Future-Student"
+            "cwd": "${workspaceFolder}"
+        },
+        {
+            "name": "Firefox",
+            "type": "firefox",
+            "request": "launch",
+            "url": "http://localhost:4000",
+            "webRoot": "${workspaceFolder}",
+            "pathMappings": [
+                {
+                    "url": "http://localhost:4000/client",
+                    "path": "${workspaceFolder}/Future-Student/client"
+                },
+                {
+                    "url": "webpack:///Future-Student/",
+                    "path": "${workspaceFolder}/Future-Student"
+                }
+            ]
         }
     ]
 }

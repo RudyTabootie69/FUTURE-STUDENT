@@ -22,7 +22,7 @@ export const ProfileProvider = ({ children }: { children: React.ReactNode }) => 
 
     const fetchUser = async () => {
       try {
-        const res = await fetch("/users/autologin", {
+        const res = await fetch("/api/users/autologin", {
           credentials: "include",
         });
 
@@ -41,7 +41,7 @@ export const ProfileProvider = ({ children }: { children: React.ReactNode }) => 
     if (!isAuthenticated) return;
 
     try {
-      const res = await fetch("/users/:refresh", {
+      const res = await fetch("/api/users/refresh", {
         credentials: "include",
       });
 
@@ -54,8 +54,6 @@ export const ProfileProvider = ({ children }: { children: React.ReactNode }) => 
       setProfile(null);
     }
   }
-
-
 
   return <ProfileContext.Provider value={{profile, ...refreshProfile}}> {children} </ProfileContext.Provider>;
 }

@@ -18,7 +18,7 @@ export function EventProvider({ children }: { children: React.ReactNode })
 
   const fetchEvents = async () => {
     try {
-      const res = await fetch("/events", {
+      const res = await fetch("/api/events", {
         credentials: "include",
       });
 

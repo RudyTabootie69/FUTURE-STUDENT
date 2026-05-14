@@ -17,6 +17,7 @@
     "allowSyntheticDefaultImports": true,
     "forceConsistentCasingInFileNames": true,
     "sourceMap": true,
+    "outDir": "./dist",
 
     /* Linting */
     "strict": false,
@@ -40,5 +41,6 @@
     "vite.config.ts",
     "vite.config.server.ts"
 , "server/connection.ts"  ],
-  "exclude": ["node_modules", "dist"]
+  "exclude": ["node_modules", "dist"],
+  
 }

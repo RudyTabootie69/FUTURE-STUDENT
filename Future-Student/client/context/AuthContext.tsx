@@ -24,7 +24,7 @@ export const AuthProvider = ({ children }) => {
 
   useEffect(() => {
     // Check if user is already logged in (cookie exists)
-    fetch("/users/authJWT", {
+    fetch("/api/users/authJWT", {
       credentials: "include",
     })
       .then((res) => {
@@ -35,9 +35,8 @@ export const AuthProvider = ({ children }) => {
 
   const register = async (firstname, lastname, username, password) => {
     try {
-      console.log("test")
       let data = {firstname:  firstname, lastname: lastname, username: username, password: password};
-      const response = await fetch("localhost:3000/users/:register", {
+      const response = await fetch("/api/users/register", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -60,7 +59,7 @@ export const AuthProvider = ({ children }) => {
   const login = async (username, password) => {
     try {
       let data = {username: username, password: password};
-      const response = await fetch("localhost:3000/users/:login", {
+      const response = await fetch("/api/users/login", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -82,7 +81,7 @@ export const AuthProvider = ({ children }) => {
   };
   
   const logout = async () => {
-    await fetch("localhost:3000/users/:logout", {
+    await fetch("/api/users/logout", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
