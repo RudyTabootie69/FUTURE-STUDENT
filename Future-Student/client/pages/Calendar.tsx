@@ -3,7 +3,7 @@ import { ChevronLeft, ChevronRight, Search, ChevronDown } from "lucide-react";
 import Navigation from "@/components/Navigation";
 import { useSavedEvents } from "@/context/SavedEventContext";
 import { useEvents } from "@/context/EventContext";
-import type { Event } from "@/types/event";
+import type { Event } from "@shared/types/event";
 import { buildMonthMatrix, isoKey, monthLabel } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { useNavigate } from "react-router-dom";

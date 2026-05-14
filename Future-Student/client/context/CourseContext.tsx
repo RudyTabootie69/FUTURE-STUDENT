@@ -1,6 +1,6 @@
 import { createContext, Dispatch, SetStateAction, useContext, useEffect, useMemo, useState } from "react";
-import type { Course } from "@/types/course";
-import { toString } from "@/types/course";
+import type { Course } from "@shared/types/course";
+import { toString } from "@shared/types/course";
 import {useAuth} from "@/context/AuthContext"
 
 interface CourseContextValue {

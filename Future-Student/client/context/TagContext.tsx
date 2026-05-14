@@ -1,5 +1,5 @@
 import { createContext, useContext, useEffect, useMemo, useState } from "react";
-import type { Tag } from "@/types/tag";
+import type { Tag } from "@shared/types/tag";
 
 interface TagContextValue {
   tags: Tag[];

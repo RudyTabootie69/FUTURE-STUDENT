@@ -1,5 +1,5 @@
 import { SectionWrapper } from "@/components/SectionWrapper";
-import type { JourneyStep } from "@/types/types";
+import type { JourneyStep } from "@shared/types/types";
 
 type ApplicationJourneyProps = {
   savedCourses: number;

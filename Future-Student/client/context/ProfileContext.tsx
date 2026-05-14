@@ -1,6 +1,6 @@
 import { createContext, useContext, useEffect, useMemo, useState } from "react";
 import { useAuth } from "@/context/AuthContext";
-import type { User } from "@/types/user";;
+import type { User } from "@shared/types/user";;
 
 interface ProfileContextValue {
   profile: User | null;

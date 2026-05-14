@@ -1,4 +1,4 @@
-import type { ActionCard, JourneyStep } from "@/types/types";
+import type { ActionCard, JourneyStep } from "@shared/types/types";
 
 export const actionCards: ActionCard[] = [
   {

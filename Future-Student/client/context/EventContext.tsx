@@ -1,5 +1,5 @@
 import { createContext, useContext, useEffect, useMemo, useState } from "react";
-import type { Event } from "@/types/event";
+import type { Event } from "@shared/types/event";
 
 interface EventContextValue {
   events: Event[];

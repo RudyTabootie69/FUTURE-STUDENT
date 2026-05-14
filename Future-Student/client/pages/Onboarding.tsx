@@ -2,7 +2,7 @@ import { useMemo, useState } from "react";
 import { Search, ChevronDown } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { useProfile } from "@/context/ProfileContext";
-import type { User } from "@/types/user";
+import type { User } from "@shared/types/user";
 
 export default function Onboarding() {
   const [showErr, setShow] = useState(false)

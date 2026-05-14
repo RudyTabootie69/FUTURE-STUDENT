@@ -1,12 +1,14 @@
 import { json } from "stream/consumers";
 import { any } from "zod/v4";
-import { User } from "@/types/user";
+import { User } from "../shared/types/user.ts";
 
-const express = require('express');
-const mysql = require('mysql');
-const bcrypt = require('bcrypt');
-const dotenv = require('dotenv');
-const jwt = require('jsonwebtoken');
+import express from "express";
+import http from "http";
+import mysql from "mysql2/promise";
+import bcrypt from "bcryptjs";
+import dotenv from "dotenv";
+import jwt from "jsonwebtoken"
+
 const server = express();
 const port = process.env.PORT || 3000;
 
@@ -26,10 +28,11 @@ const conn= mysql.createPool({
 });
 
 // Create a new user
-server.post('/api/users/register', (req, res) => {
+server.post('/api/users/register', async (req, res) => {
+    console.log("Registering... ")
     const {firstname, lastname, username, password} = req.body;
     const saltRounds = 10;
-    const salt = bcrypt.genSalt(saltRounds);
+    const salt = await bcrypt.genSalt(saltRounds);
     const hash = bcrypt.hash(password, salt);
     let noCapitals = true;
     let results = json;
@@ -43,48 +46,50 @@ server.post('/api/users/register', (req, res) => {
     if(password.length<7 || noCapitals){
         res.send('Bad password');
     }else{
-        conn.query('select username from Users where username = ?', username, (err, rows) => {
-          if (err) throw err;
+
+        try{
+          const [rows] = await conn.query('select username from Users where username = ?', [username])
           results = rows[0];
-        });
+        }catch(err){
+          console.log(err);
+        }
+        };
 
         if (Object.keys(results).length > 0){
             res.send('User exists');
             return;
         } 
         else{
-            conn.query('insert into Users (firstName, lastName, username, passwordHash, hashSalt) values (?, ?, ?, ?, ?)', [firstname, lastname, username, hash, salt], (err, result) => {
-              if (err) throw err;
-              res.send('User added successfully');
-              return;
-            });
+          try{
+            await conn.query('insert into Users (firstName, lastName, username, passwordHash, hashSalt) values (?, ?, ?, ?, ?)', [firstname, lastname, username, hash, salt]);
+          }catch(err){
+            console.log(err);
+          }
         }
     }
-  },
 );
 
 
 // Check user for log in first time
-server.post('/api/users/login', (req, res) => {
+server.post('/api/users/login', async (req, res) => {
   const { username, password, userType} = req.body;
 
   let user = new User(-1, "John", "Doe", "TestAccount", "test@test.com");
 
   try {
-        conn.query('select hashSalt, passwordHash from Users where username = ?', username, (err, result) => {
-          if (err) throw err;
-          let salt = result.first[0];
-          let compareInput = bcrypt.hash(password, salt);
-          let compareDB = result.first[1];
-          console.log("Compareinput = " + compareInput);
-          console.log("CompareDB = " + compareDB);
-          if (compareInput != compareDB){
+        const [rows] = await conn.query('select hashSalt, passwordHash from Users where username = ?', username)
+        const first = rows[0]
+        let salt = first.hashSalt;
+        let compareInput = bcrypt.hash(password, salt);
+        let compareDB = first.passwordHash;
+        console.log("Compareinput = " + compareInput);
+        console.log("CompareDB = " + compareDB);
+        if (compareInput != compareDB){
 
-              console.log('Log in Failure');
-              //res.send(user);  //Comment out this line to stop testing
-              return;
-          }     
-      });
+            console.log('Log in Failure');
+            //res.send(user);  //Comment out this line to stop testing
+            return;
+        }     
       }catch (error) { 
         res.status(500).send('Login failed');
         return;
@@ -93,23 +98,20 @@ server.post('/api/users/login', (req, res) => {
   switch(userType){
     case "Student":
       try {
-        conn.query('SELECT Users.id, Users.firstName, Users.lastName, Users.userName, Users.email, Users.dob, Users.address,  Student.school, Student.nesaNumber, Student.usi, Student.entryYear, Student.firstInFamily, Student.indigenousStatus, Student.culturalBackground FROM Users INNER JOIN Users.id = Student.id AND Users.username = ?', username, (err, result) => {
-          if (err) throw err;
-
-          /* Edit to remove password later */
-          user = new User(result.first[0], result.first[1], result.first[2], result.first[3], result.first[4]);
-          user.address = result.first[5];
-          user.schoolName = result.first[6];
-          user.nesaNumber = result.first[7];
-          user.usi = result.first[8];
-          user.entryYear = result.first[9];
-          user.firstInFamily = result.first[10];
-          user.indigenous = result.first[11];
-          user.culturalBackground = result.first[12];
-          user.userType = "Student";
-          console.log('Log in success (Student)');
-          res.send(user);
-      });
+        const [rows] = await conn.query('SELECT Users.id, Users.firstName, Users.lastName, Users.userName, Users.email, Users.dob, Users.address,  Student.school, Student.nesaNumber, Student.usi, Student.entryYear, Student.firstInFamily, Student.indigenousStatus, Student.culturalBackground FROM Users INNER JOIN Users.id = Student.id AND Users.username = ?', username)
+        const result = rows[0];
+        user = new User(result.id, result.firstName, result.lastName, result.userName, result.email);
+        user.address = result.address;
+        user.schoolName = result.school;
+        user.nesaNumber = result.nesaNumber;
+        user.usi = result.usi;
+        user.entryYear = result.entryYear;
+        user.firstInFamily = result.firstInFamily;
+        user.indigenous = result.indigenousStatus;
+        user.culturalBackground = result.culturalBackground;
+        user.userType = "Student";
+        console.log('Log in success (Student)');
+        res.send(user);
       }catch (error) {
         res.status(500).send('Login failed'); // Handle any unexpected errors
       }
@@ -117,35 +119,32 @@ server.post('/api/users/login', (req, res) => {
 
     case "Staff":
       try {
-        conn.query('SELECT Users.id, Users.firstName, Users.lastName, Users.userName, Users.email, Users.dob, Users.address, SchoolStaff.school, FROM Users INNER JOIN Users.id = SchoolStaff.id AND Users.username = ?', username, (err, result) => {
+        const [rows] = await conn.query('SELECT Users.id, Users.firstName, Users.lastName, Users.userName, Users.email, Users.dob, Users.address, SchoolStaff.school, FROM Users INNER JOIN Users.id = SchoolStaff.id AND Users.username = ?', username);
+        const result = rows[0];
+        user = new User(result.id, result.firstName, result.lastName, result.userName, result.email);
+        user.dob = result.dob;
+        user.address = result.address;
+        user.schoolName = result.schoolName
+        user.userType = "School Staff Member"
+        console.log('Log in success (Staff)');
+        res.send(user);
 
-
-          /* Edit to remove password later */
-          user = new User(result.first[0], result.first[1], result.first[2], result.first[3], result.first[4]);
-          user.dob = result.first[5];
-          user.address = result.first[6];
-          user.schoolName = result.first[7]
-          user.userType = "School Staff Member"
-          console.log('Log in success (Staff)');
-          res.send(user);
-        });
-    }catch (error) {
+      }catch (error) {
       res.status(500).send('Login failed'); // Handle any unexpected errors
     }
     break;
 
     case "Parent":
       try {
-        conn.query('SELECT Users.id, Users.firstName, Users.lastName, Users.userName, Users.email, Users.dob, Users.address, SchoolStaff.school, FROM Users INNER JOIN Users.id = Parent.id AND Users.username = ?', username, (err, result) => {
-          /* Edit to remove password later */
-          user = new User(result.first[0], result.first[1], result.first[2], result.first[3], result.first[4]);
-          user.dob = result.first[5];
-          user.address = result.first[6];
-          user.schoolName = result.first[7]
+        const [rows] = await conn.query('SELECT Users.id, Users.firstName, Users.lastName, Users.userName, Users.email, Users.dob, Users.address, SchoolStaff.school, FROM Users INNER JOIN Users.id = Parent.id AND Users.username = ?', username)
+          
+          const result = rows[0];
+          user = new User(result.id, result.firstName, result.lastName, result.userName, result.email);
+          user.dob = result.dob;
+          user.address = result.address;
+          user.schoolName = result.schoolName
           user.userType = "Parent"
           console.log('Log in success (Parent)');
-          
-        });
       }catch (error) {
         res.status(500).send('Login failed'); // Handle any unexpected errors
       }
@@ -169,7 +168,7 @@ server.post('/api/users/login', (req, res) => {
     res.send(user);
 });
 
-server.post('/api/users/logout', (res) => {
+server.post('/api/users/logout', (req, res) => {
   res.clearCookie('token', {
     httpOnly: true,
     secure: false,
@@ -194,7 +193,7 @@ server.post('/api/users/authJWT', (req, res) => {
 
 server.post("/api/users/refresh", (req, res) => {
   const newToken = jwt.sign(
-    { userID: req.userID },
+    { userID: req.body.userID },
     process.env.JWT_SECRET,
     { expiresIn: "15m" }
   );
@@ -209,80 +208,94 @@ server.post("/api/users/refresh", (req, res) => {
 });
 
 //Same as previous function but using cookie
-server.get('/api/users/autologin', (req, res) => {
+server.get('/api/users/autologin', async (req, res) => {
   const token = req.cookies.token;
   const decoded = jwt.verify(token, process.env.JWT_SECRET, (err) => {
         if (err) return res.status(401).send('Invalid Token'); // Token verification failed
   });
 
   const userId = decoded.userID;
-
-  conn.query('SELECT * FROM users WHERE id = ?', userId, (err, rows) => {
-    if (err) throw err;
+  try{
+    const [rows] = await conn.query('SELECT * FROM users WHERE id = ?', userId)
     res.json(rows[0]);
-  });
+  }catch(err){
+    console.log(err);
+  }
   
 });
 
  // Get all users
-server.get('/api/users', (req, res) => {
-  conn.query('SELECT * FROM users', (err, rows) => {
-    if (err) throw err;
+server.get('/api/users', async (req, res) => {
+  try{
+    const [rows] = await conn.query('SELECT * FROM users')
     res.json(rows);
-  });
+  }catch(err){
+    console.log(err);
+  }
+
 });
 
 // Get user by ID
-server.get('/api/users/id', (req, res) => {
+server.get('/api/users/id', async (req, res) => {
   const token = req.cookies.token;
   const decoded = jwt.verify(token, process.env.JWT_SECRET, (err) => {
         if (err) return res.status(401).send('Invalid Token'); // Token verification failed  
   });
-  const userId = req.params.id;
-  conn.query('SELECT * FROM users WHERE id = ?', userId, (err, rows) => {
-    if (err) throw err;
+  try{
+    const userId = req.body.id;
+    const [rows] = await conn.query('SELECT * FROM users WHERE id = ?', userId);
     res.json(rows[0]);
-  });
+
+  }catch(err){
+    console.log(err)
+  }
 });
 
 
 
  // Get all events
-server.get('/api/events', (req, res) => {
+server.get('/api/events', async (req, res) => {
   const token = req.cookies.token;
   jwt.verify(token, process.env.JWT_SECRET, (err) => {
       if (err) return res.status(401).send('Invalid Token'); // Token verification failed
   });
 
-  conn.query('select * from Event', (err, rows) => {
-    if (err) throw err;
+  try{
+    const [rows] = await conn.query('select * from Event') 
     res.json(rows);
-  });
+  }catch(err){
+    console.log(err)
+  }
 });
 
  // Get event by ID
-server.get('/api/events/id', (req, res) => {
-
-  const eventId = req.params.id;
-  conn.query('SELECT * FROM Event WHERE eventID = ?', eventId, (err, rows) => {
-    if (err) throw err;
+server.get('/api/events/id', async (req, res) => {
+  try{
+    const eventId = req.body.id;
+    const [rows] = await conn.query('SELECT * FROM Event WHERE eventID = ?', eventId)
     res.json(rows[0]);
-  });
+  }catch(err){
+    console.log(err)
+  }
 });
 
  // Get all event tags
-server.get('/api/eventtags', (req, res) => {
-  conn.query('select * from EventTag', (err, rows) => {
-    if (err) throw err;
+server.get('/api/eventtags', async (req, res) => {
+  try{
+    const [rows] = await conn.query('select * from EventTag')
     res.json(rows);
-  });
+  }catch(err){
+    console.log(err)
+  }
 });
 
  // Get event tag by ID
-server.get('/api/eventtags/id', (req, res) => {
+server.get('/api/eventtags/id', async (req, res) => {
   const {eventId, tagId } = req.body;
-  conn.query('SELECT * FROM Event WHERE eventID = ? AND tagID = ?',  [eventId, tagId], (err, rows) => {
-    if (err) throw err;
+  try{
+    const [rows] = await conn.query('SELECT * FROM Event WHERE eventID = ? AND tagID = ?',  [eventId, tagId])
     res.json(rows[0]);
-  });
+  }catch(err){
+    console.log(err)
+  }
 });

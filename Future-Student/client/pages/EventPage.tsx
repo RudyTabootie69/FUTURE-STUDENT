@@ -1,8 +1,8 @@
 import { useMemo, useState } from "react";
 import { Search, ChevronDown } from "lucide-react";
 import Navigation from "@/components/Navigation";
-import type { Event } from "@/types/event";
-import { toString } from "@/types/course";
+import type { Event } from "@shared/types/event";
+import { toString } from "@shared/types/course";
 import { useWishlist } from "@/context/WishlistContext";
 import { useLocation } from "react-router-dom";
 
