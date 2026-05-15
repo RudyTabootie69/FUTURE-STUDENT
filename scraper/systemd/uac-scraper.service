@@ -1,0 +1,15 @@
+[Unit]
+Description=Run UAC Scrapy course scraper
+Wants=network-online.target
+After=network-online.target
+
+[Service]
+Type=oneshot
+WorkingDirectory=/opt/csit321/scraper/uni_scraper
+ExecStart=/opt/csit321/scraper/.venv/bin/scrapy crawl uac_full_pipeline -O uac_full_pipeline_latest.jl
+ExecStartPost=/opt/csit321/scraper/.venv/bin/python tools/flatten_uac.py
+User=csit321
+Group=csit321
+
+StandardOutput=append:/var/log/uac-scraper.log
+StandardError=append:/var/log/uac-scraper-error.log
