@@ -16,7 +16,7 @@
             "type": "node-terminal",
             "name": "Run Script: Build and Launch",
             "request": "launch",
-            "command": "npm run build && npx vite --port=4000 && nodemon --inspect /server/connection.ts ",
+            "command": "npm run build && npx vite --port=4000",
             "cwd": "${workspaceFolder}/Future-Student",
             "sourceMaps": true,
             "skipFiles": ["<node_internals>/**"],
@@ -26,7 +26,7 @@
             "type": "node",
             "request": "launch",
             "name": "Backend Debug",
-            "program": "${workspaceFolder}/Future-Student/server/connection.ts",
+            "program": "${workspaceFolder}/Future-Student/server/index.ts",
             "console": "integratedTerminal",
             "sourceMaps": true,
             "restart": true,
@@ -45,7 +45,7 @@
         {
             "name": "Full Stack Debug",
             "configurations": [
-                "Backend Debug",
+                //"Backend Debug",
                 "Run Script: Build and Launch",
                 "Frontend Debug (Firefox)"
             ]

@@ -1,5 +1,4 @@
-import { bool } from "joi";
-import { createContext, useContext, useEffect, useMemo, useState } from "react";
+import { createContext, useContext, useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 
 interface AuthContextValue {
@@ -24,7 +23,7 @@ export const AuthProvider = ({ children }) => {
 
   useEffect(() => {
     // Check if user is already logged in (cookie exists)
-    fetch("/api/users/authJWT", {
+    fetch("/backend/users/authJWT", {
       credentials: "include",
     })
       .then((res) => {
@@ -33,16 +32,20 @@ export const AuthProvider = ({ children }) => {
       .catch(() => setIsAuthenticated(false));
   }, []);
 
-  const register = async (firstname, lastname, username, password) => {
+  const register = async (firstName, lastName, userName, passWord) => {
     try {
-      let data = {firstname:  firstname, lastname: lastname, username: username, password: password};
-      const response = await fetch("/api/users/register", {
+      const response = await fetch("/backend/users/register", {
         method: "POST",
         headers: {
-          "Content-Type": "application/json",
+          'Content-Type': 'application/json'
         },
-        body: JSON.stringify(data),
+        body: 
+          JSON.stringify({"firstname":  firstName, "lastname": lastName, "username": userName, "password": passWord}), 
       });
+      if (!response.ok) {
+          const res = await response.json();
+          throw new Error(res || "Request failed");
+      }
       const res = await response.json();
       console.log(res)
       if (res.data) {
@@ -60,7 +63,7 @@ export const AuthProvider = ({ children }) => {
   const login = async (username, password) => {
     try {
       let data = {username: username, password: password};
-      const response = await fetch("/api/users/login", {
+      const response = await fetch("/backend/users/login", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -82,7 +85,7 @@ export const AuthProvider = ({ children }) => {
   };
   
   const logout = async () => {
-    await fetch("/api/users/logout", {
+    await fetch("/backend/users/logout", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

@@ -21,7 +21,7 @@ export function TagProvider({ children }: { children: React.ReactNode })
 
   const fetchTags = async () => {
     try {
-      const res = await fetch("/api/tags", {
+      const res = await fetch("/backend/tags", {
         credentials: "include",
       });
 

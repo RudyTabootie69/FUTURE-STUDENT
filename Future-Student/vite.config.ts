@@ -9,12 +9,11 @@ export default defineConfig({
     host: "::",
     port: 4000,
     proxy: {
-      '/api': {
+      '/backend': {
         target: "http://localhost:3000",
         changeOrigin: true,
         secure: false,      
-        ws: true,
-        rewrite: (path) => path.replace(/^\/api/, ''),
+        rewrite: (path) => path.replace(/^\/backend/, ''),
         configure: (proxy, _options) => {
             proxy.on('error', (err, _req, _res) => {
               console.log('proxy error', err);
@@ -48,9 +47,6 @@ function expressPlugin(): Plugin {
     apply: "serve", // Only apply during development (serve mode)
     configureServer(server) {
       const app = createServer();
-
-      // Add Express app as middleware to Vite dev server
-      server.middlewares.use(app);
     },
   };
 }
