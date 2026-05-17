@@ -23,11 +23,45 @@ export const actionCards: ActionCard[] = [
   },
 ];
 
-export const journeySteps: JourneyStep[] = [
-  { label: "Start Journey", active: true },
-  { label: "Check Eligibility", active: false },
-  { label: "Choose Courses", active: false },
-  { label: "Upload Docs", active: false },
-  { label: "Apply", active: false },
-  { label: "Track Offers", active: false },
+export const journeySteps = [
+  {
+    title: "Build Your Course Shortlist",
+    description:
+      "Start shaping your future by saving courses you are interested in. This helps us track deadlines, compare options, and guide your next steps.",
+    status: "active",
+    actionLabel: "Explore Courses",
+    actionHref: "/course-finder",
+    tasks: [
+      {
+        label: "Complete your student profile",
+        description: "Tell us about your study goals and preferences.",
+        completed: true,
+      },
+      {
+        label: "Save at least 3 courses",
+        description:
+          "Add courses to your wishlist so you can compare them later.",
+        completed: false,
+      },
+      {
+        label: "Review entry requirements",
+        description: "Check ATAR, prerequisites, and assumed knowledge.",
+        completed: false,
+      },
+    ],
+  },
+  {
+    title: "Compare Your Options",
+    description:
+      "Compare your saved courses by location, entry score, study area, and application deadlines.",
+    status: "locked",
+    tasks: [],
+  },
+  {
+    title: "Prepare Your Application",
+    description:
+      "Gather the information you need before submitting preferences.",
+    status: "locked",
+    tasks: [],
+  },
 ];

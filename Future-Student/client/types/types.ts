@@ -2,10 +2,19 @@
 
 /* Where all global class objects are defined */
 
+export type JourneyTask = {
+  label: string;
+  description?: string;
+  completed: boolean;
+};
 
 export type JourneyStep = {
-  label: string;
-  active: boolean;
+  title: string;
+  description: string;
+  status: "complete" | "active" | "locked";
+  actionLabel?: string;
+  actionHref?: string;
+  tasks: JourneyTask[];
 };
 
 export type ActionCard = {
@@ -17,7 +26,7 @@ export type ActionCard = {
 // COURSE TYPES
 export class Course {
   uacID: number;
-  uniID?: string; 
+  uniID?: string;
   title: string;
   description?: string;
   university: string;
@@ -69,21 +78,34 @@ export class User {
   passwordHash: string;
   hashSalt: string;
   payment?: PaymentSummary | null;
-  
-  constructor(id: number, userType: string, firstName: string, lastName: string, nesaNumber: string, username: string, email: string, entryYear: number, dob: string, schoolName: string, address: string, passwordHash: string, hashSalt: string) {
-      this.id = id;  
-      this.userType = userType; 
-      this.firstName = firstName;
-      this.lastName = lastName;
-      this.nesaNumber = nesaNumber;
-      this.username = username;
-      this.email = email;
-      this.entryYear = entryYear;
-      this.dob = dob;
-      this.schoolName = schoolName;
-      this.address = address;
-      this.passwordHash = passwordHash;
-      this.hashSalt = hashSalt;
-        
+
+  constructor(
+    id: number,
+    userType: string,
+    firstName: string,
+    lastName: string,
+    nesaNumber: string,
+    username: string,
+    email: string,
+    entryYear: number,
+    dob: string,
+    schoolName: string,
+    address: string,
+    passwordHash: string,
+    hashSalt: string,
+  ) {
+    this.id = id;
+    this.userType = userType;
+    this.firstName = firstName;
+    this.lastName = lastName;
+    this.nesaNumber = nesaNumber;
+    this.username = username;
+    this.email = email;
+    this.entryYear = entryYear;
+    this.dob = dob;
+    this.schoolName = schoolName;
+    this.address = address;
+    this.passwordHash = passwordHash;
+    this.hashSalt = hashSalt;
   }
 }
