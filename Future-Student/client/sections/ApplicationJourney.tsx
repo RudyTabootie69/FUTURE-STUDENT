@@ -63,14 +63,26 @@ export function ApplicationJourney({
       );
 
       gsap.from("[data-journey-item]", {
-        y: 48,
+        y: 56,
         opacity: 0,
-        duration: 0.7,
-        stagger: 0.12,
+        duration: 0.8,
+        stagger: 0.14,
         ease: "power3.out",
         scrollTrigger: {
           trigger: section,
-          start: "top 65%",
+          start: "top 70%",
+        },
+      });
+
+      gsap.to("[data-journey-current]", {
+        y: -24,
+        scale: 0.98,
+        ease: "none",
+        scrollTrigger: {
+          trigger: section,
+          start: "top top",
+          end: "bottom center",
+          scrub: true,
         },
       });
     }, section);
@@ -143,7 +155,11 @@ export function ApplicationJourney({
                 ))}
               </div>
             )}
-            <div data-journey-item className="relative">
+            <div
+              data-journey-current
+              data-journey-item
+              className="relative lg:sticky lg:top-24"
+            >
               <div className="mb-5 inline-flex items-center gap-3 rounded-full bg-primary-blue px-5 py-2 text-white">
                 <span className="flex h-8 w-8 items-center justify-center rounded-full bg-white text-sm font-bold text-primary-blue">
                   {currentStepIndex + 1}
@@ -208,12 +224,12 @@ export function ApplicationJourney({
               </div>
             </div>
 
-            <div className="space-y-5">
+            <div className="space-y-8 pb-24">
               {upcomingSteps.map((step, index) => (
                 <div
                   key={step.title}
                   data-journey-item
-                  className="flex max-w-[760px] items-center gap-5 rounded-3xl border border-[#DCEEFF] bg-white/70 p-5 opacity-70"
+                  className="flex max-w-[760px] items-center gap-5 rounded-3xl border border-[#DCEEFF] bg-white/70 p-5 opacity-70 shadow-sm backdrop-blur transition-all duration-300 hover:opacity-100 hover:shadow-md"
                 >
                   <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-[#E5F2FF] text-primary-blue">
                     <Lock size={20} />
