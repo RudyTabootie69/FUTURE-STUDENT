@@ -1,208 +1,521 @@
-import { useMemo, useState } from "react";
+import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useProfile } from "@/context/ProfileContext";
-import type { StudentProfile } from "@/types/user";
+import {
+  Student,
+  Parent,
+  SecondaryRep,
+  TertiaryRep,
+  defaultStudentFormData,
+  defaultParentFormData,
+  defaultSecondaryRepFormData,
+  defaultTertiaryRepFormData,
+} from "@/types/user";
+import type {
+  StudentFormData,
+  ParentFormData,
+  LinkedChild,
+  Gender,
+  SecondaryRepFormData,
+  TertiaryRepFormData,
+  TertiaryInstitutionType,
+} from "@/types/user";
+import UserTypeSelector from "@/components/UserTypeSelector";
+import StudentDetailsForm from "@/components/StudentDetailsForm";
+import ParentDetailsForm from "@/components/ParentDetailsForm";
+import SecondaryRepForm from "@/components/SecondaryRepDetailsForm";
+import TertiaryRepForm from "@/components/TertiaryRepDetailsForm";
+import type { StudentFormErrors } from "@/components/StudentDetailsForm";
+import type { ParentFormErrors } from "@/components/ParentDetailsForm";
+import type { SecondaryRepFormErrors } from "@/components/SecondaryRepDetailsForm";
+import type { TertiaryRepFormErrors } from "@/components/TertiaryRepDetailsForm";
+
+// ---------------------------------------------------------------------------
+// Constants
+// ---------------------------------------------------------------------------
+
+const USER_TYPE_OPTIONS = [
+  "Current Year 12 Student",
+  "Parent / Caregiver of current Year 12 Student",
+  "Representative of a Tertiary Institution",
+  "Representative of a Secondary Institution",
+];
+
+const REQUIRED_STUDENT_FIELDS: (keyof StudentFormData)[] = [
+  "firstName",
+  "lastName",
+  "nesaNumber",
+  "entryYear",
+  "dob",
+  "schoolName",
+  "address",
+];
+
+const REQUIRED_PARENT_FIELDS: (keyof Omit<ParentFormData, "children">)[] = [
+  "firstName",
+  "lastName",
+  "email",
+  "phone",
+];
+
+const REQUIRED_SECONDARY_FIELDS: (keyof SecondaryRepFormData)[] = [
+  "firstName",
+  "lastName",
+  "email",
+  "phone",
+  "role",
+  "schoolName",
+  "schoolAddress",
+];
+
+const REQUIRED_TERTIARY_FIELDS: (keyof TertiaryRepFormData)[] = [
+  "firstName",
+  "lastName",
+  "email",
+  "phone",
+  "role",
+  "institutionType",
+  "institutionName",
+  "institutionAddress",
+];
+
+// ---------------------------------------------------------------------------
+// Shared validators
+// ---------------------------------------------------------------------------
+
+function isValidEmail(v: string) {
+  return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v);
+}
+
+function isValidPhone(v: string) {
+  return /^[\d\s()+\-]{8,15}$/.test(v);
+}
+
+// ---------------------------------------------------------------------------
+// Validation — Student
+// ---------------------------------------------------------------------------
+
+function validateStudentField(
+  field: keyof StudentFormData,
+  value: unknown,
+): string {
+  if (REQUIRED_STUDENT_FIELDS.includes(field) && !value)
+    return "This field is required.";
+  if (field === "dob" && value) {
+    const age =
+      new Date().getFullYear() - new Date(value as string).getFullYear();
+    if (age < 14 || age > 25) return "Please enter a valid date of birth.";
+  }
+  if (field === "entryYear" && value) {
+    const year = Number(value);
+    const current = new Date().getFullYear();
+    if (year < current || year > current + 5)
+      return "Please enter a valid entry year.";
+  }
+  return "";
+}
+
+function validateAllStudent(form: StudentFormData): StudentFormErrors {
+  return Object.fromEntries(
+    (Object.keys(form) as (keyof StudentFormData)[])
+      .map((f) => [f, validateStudentField(f, form[f])])
+      .filter(([, e]) => e),
+  );
+}
+
+// ---------------------------------------------------------------------------
+// Validation — Parent
+// ---------------------------------------------------------------------------
+
+function validateParentField(
+  field: keyof Omit<ParentFormData, "children">,
+  value: unknown,
+): string {
+  if (REQUIRED_PARENT_FIELDS.includes(field) && !value)
+    return "This field is required.";
+  if (field === "email" && value && !isValidEmail(value as string))
+    return "Please enter a valid email address.";
+  if (field === "phone" && value && !isValidPhone(value as string))
+    return "Please enter a valid phone number.";
+  return "";
+}
+
+function validateAllParent(form: ParentFormData): ParentFormErrors {
+  const topLevel = Object.fromEntries(
+    (Object.keys(form) as (keyof Omit<ParentFormData, "children">)[])
+      .map((f) => [f, validateParentField(f, form[f as keyof typeof form])])
+      .filter(([, e]) => e),
+  );
+  const children = form.children.map((child) => ({
+    firstName: child.firstName ? "" : "This field is required.",
+    lastName: child.lastName ? "" : "This field is required.",
+    schoolName: child.schoolName ? "" : "This field is required.",
+  }));
+  return { ...topLevel, children };
+}
+
+function hasParentErrors(errors: ParentFormErrors): boolean {
+  const topLevel = Object.entries(errors)
+    .filter(([k]) => k !== "children")
+    .some(([, v]) => !!v);
+  const childErrors = (errors.children ?? []).some((c) =>
+    Object.values(c ?? {}).some(Boolean),
+  );
+  return topLevel || childErrors;
+}
+
+// ---------------------------------------------------------------------------
+// Validation — Secondary rep
+// ---------------------------------------------------------------------------
+
+function validateSecondaryField(
+  field: keyof SecondaryRepFormData,
+  value: unknown,
+): string {
+  if (REQUIRED_SECONDARY_FIELDS.includes(field) && !value)
+    return "This field is required.";
+  if (field === "email" && value && !isValidEmail(value as string))
+    return "Please enter a valid email address.";
+  if (field === "phone" && value && !isValidPhone(value as string))
+    return "Please enter a valid phone number.";
+  return "";
+}
+
+function validateAllSecondary(
+  form: SecondaryRepFormData,
+): SecondaryRepFormErrors {
+  return Object.fromEntries(
+    (Object.keys(form) as (keyof SecondaryRepFormData)[])
+      .map((f) => [f, validateSecondaryField(f, form[f])])
+      .filter(([, e]) => e),
+  );
+}
+
+// ---------------------------------------------------------------------------
+// Validation — Tertiary rep
+// ---------------------------------------------------------------------------
+
+function validateTertiaryField(
+  field: keyof TertiaryRepFormData,
+  value: unknown,
+): string {
+  if (REQUIRED_TERTIARY_FIELDS.includes(field) && !value)
+    return "This field is required.";
+  if (field === "email" && value && !isValidEmail(value as string))
+    return "Please enter a valid email address.";
+  if (field === "phone" && value && !isValidPhone(value as string))
+    return "Please enter a valid phone number.";
+  return "";
+}
+
+function validateAllTertiary(form: TertiaryRepFormData): TertiaryRepFormErrors {
+  return Object.fromEntries(
+    (Object.keys(form) as (keyof TertiaryRepFormData)[])
+      .map((f) => [f, validateTertiaryField(f, form[f])])
+      .filter(([, e]) => e),
+  );
+}
+
+// ---------------------------------------------------------------------------
+// Component
+// ---------------------------------------------------------------------------
 
 export default function Onboarding() {
   const navigate = useNavigate();
   const { save } = useProfile();
-  const [selected, setSelected] = useState<string>("");
 
-  const options = [
-    "Current Year 12 Student",
-    "Parent / Caregiver of current Year 12 Student",
-    "Representative of a Tertiary Institution",
-    "Representative of a Secondary Institution",
-  ];
+  const [userType, setUserType] = useState("");
 
-  const defaultEntryYear = useMemo(() => new Date().getFullYear() + 1, []);
+  // Per-type form state — kept separate so switching never bleeds data
+  const [studentForm, setStudentForm] = useState<StudentFormData>(
+    defaultStudentFormData,
+  );
+  const [studentErrors, setStudentErrors] = useState<StudentFormErrors>({});
 
-  const [form, setForm] = useState<Partial<StudentProfile>>({
-    fullName: "",
-    nesaNumber: "",
-    uacId: "",
-    usi: "",
-    entryYear: defaultEntryYear,
-    dob: "",
-    sex: "",
-    schoolName: "",
-    address: "",
-    firstInFamily: "",
-    indigenous: "",
-    culturalBackground: "",
-    payment: null,
-  });
+  const [parentForm, setParentForm] = useState<ParentFormData>(
+    defaultParentFormData,
+  );
+  const [parentErrors, setParentErrors] = useState<ParentFormErrors>({});
 
-  const [addPayment, setAddPayment] = useState(false);
-  const [cardInput, setCardInput] = useState("");
+  const [secondaryForm, setSecondaryForm] = useState<SecondaryRepFormData>(
+    defaultSecondaryRepFormData,
+  );
+  const [secondaryErrors, setSecondaryErrors] =
+    useState<SecondaryRepFormErrors>({});
 
-  function detectBrand(num: string): string | null {
-    const n = num.replace(/\s+/g, "");
-    if (!n) return null;
-    if (/^4/.test(n)) return "Visa";
-    if (/^(34|37)/.test(n)) return "AmEx";
-    if (/^5[1-5]/.test(n)) return "Mastercard";
-    return "Card";
+  const [tertiaryForm, setTertiaryForm] = useState<TertiaryRepFormData>(
+    defaultTertiaryRepFormData,
+  );
+  const [tertiaryErrors, setTertiaryErrors] = useState<TertiaryRepFormErrors>(
+    {},
+  );
+
+  const isStudent = userType === "Current Year 12 Student";
+  const isParent = userType === "Parent / Caregiver of current Year 12 Student";
+  const isSecondary = userType === "Representative of a Secondary Institution";
+  const isTertiary = userType === "Representative of a Tertiary Institution";
+
+  // -- Student handlers --
+  function handleStudentChange(updates: Partial<StudentFormData>) {
+    setStudentForm((prev) => ({ ...prev, ...updates }));
+  }
+  function handleStudentBlur(field: keyof StudentFormData) {
+    setStudentErrors((prev) => ({
+      ...prev,
+      [field]: validateStudentField(field, studentForm[field]),
+    }));
   }
 
-  const handleSubmit = () => {
-    if (!selected) return;
-    const payment = addPayment && cardInput
-      ? { brand: detectBrand(cardInput), last4: cardInput.replace(/\s+/g, "").slice(-4) }
-      : null;
+  // -- Parent handlers --
+  function handleParentChange(updates: Partial<ParentFormData>) {
+    setParentForm((prev) => ({ ...prev, ...updates }));
+  }
+  function handleParentBlur(field: keyof Omit<ParentFormData, "children">) {
+    setParentErrors((prev) => ({
+      ...prev,
+      [field]: validateParentField(
+        field,
+        parentForm[field as keyof typeof parentForm] as string,
+      ),
+    }));
+  }
+  function handleChildChange(index: number, updates: Partial<LinkedChild>) {
+    setParentForm((prev) => {
+      const children = [...prev.children];
+      children[index] = { ...children[index], ...updates };
+      return { ...prev, children };
+    });
+  }
+  function handleChildBlur(index: number, field: keyof LinkedChild) {
+    const error = parentForm.children[index][field]
+      ? ""
+      : "This field is required.";
+    setParentErrors((prev) => {
+      const children = [
+        ...(prev.children ?? parentForm.children.map(() => ({}))),
+      ];
+      children[index] = { ...children[index], [field]: error };
+      return { ...prev, children };
+    });
+  }
+  function handleAddChild() {
+    setParentForm((prev) => ({
+      ...prev,
+      children: [
+        ...prev.children,
+        { firstName: "", lastName: "", schoolName: "" },
+      ],
+    }));
+  }
+  function handleRemoveChild(index: number) {
+    setParentForm((prev) => ({
+      ...prev,
+      children: prev.children.filter((_, i) => i !== index),
+    }));
+  }
 
-    const payload: StudentProfile = {
-      userType: selected,
-      fullName: form.fullName || "",
-      nesaNumber: form.nesaNumber || "",
-      uacId: form.uacId || "",
-      usi: form.usi || "",
-      entryYear: Number(form.entryYear) || defaultEntryYear,
-      dob: form.dob || "",
-      sex: (form.sex as any) || "",
-      schoolName: form.schoolName || "",
-      address: form.address || "",
-      firstInFamily: form.firstInFamily || "",
-      indigenous: form.indigenous || "",
-      culturalBackground: form.culturalBackground || "",
-      payment,
-    };
+  // -- Secondary rep handlers --
+  function handleSecondaryChange(updates: Partial<SecondaryRepFormData>) {
+    setSecondaryForm((prev) => ({ ...prev, ...updates }));
+  }
+  function handleSecondaryBlur(field: keyof SecondaryRepFormData) {
+    setSecondaryErrors((prev) => ({
+      ...prev,
+      [field]: validateSecondaryField(field, secondaryForm[field]),
+    }));
+  }
 
-    save(payload);
+  // -- Tertiary rep handlers --
+  function handleTertiaryChange(updates: Partial<TertiaryRepFormData>) {
+    setTertiaryForm((prev) => ({ ...prev, ...updates }));
+  }
+  function handleTertiaryBlur(field: keyof TertiaryRepFormData) {
+    setTertiaryErrors((prev) => ({
+      ...prev,
+      [field]: validateTertiaryField(field, tertiaryForm[field]),
+    }));
+  }
+
+  // -- Submit --
+  function handleSubmit() {
+    if (!userType) return;
+
+    if (isStudent) {
+      const errors = validateAllStudent(studentForm);
+      if (Object.keys(errors).length > 0) {
+        setStudentErrors(errors);
+        return;
+      }
+      const student = new Student(
+        Date.now(),
+        studentForm.firstName,
+        studentForm.lastName,
+        "",
+        "",
+        studentForm.dob,
+        studentForm.address,
+        studentForm.nesaNumber,
+        studentForm.entryYear,
+        studentForm.schoolName,
+      );
+      student.gender = studentForm.gender as Gender;
+      student.uacId = studentForm.uacId || undefined;
+      student.usi = studentForm.usi || undefined;
+      student.firstInFamily = studentForm.firstInFamily || undefined;
+      student.indigenous = studentForm.indigenous || undefined;
+      student.culturalBackground = studentForm.culturalBackground || undefined;
+      save(student);
+    } else if (isParent) {
+      const errors = validateAllParent(parentForm);
+      if (hasParentErrors(errors)) {
+        setParentErrors(errors);
+        return;
+      }
+      const parent = new Parent(
+        Date.now(),
+        parentForm.firstName,
+        parentForm.lastName,
+        "",
+        parentForm.email,
+        "",
+        parentForm.address,
+        parentForm.children,
+      );
+      parent.phone = parentForm.phone;
+      save(parent);
+    } else if (isSecondary) {
+      const errors = validateAllSecondary(secondaryForm);
+      if (Object.keys(errors).length > 0) {
+        setSecondaryErrors(errors);
+        return;
+      }
+      const rep = new SecondaryRep(
+        Date.now(),
+        secondaryForm.firstName,
+        secondaryForm.lastName,
+        "",
+        secondaryForm.email,
+        "",
+        "",
+        secondaryForm.schoolName,
+        secondaryForm.schoolAddress,
+        secondaryForm.role,
+      );
+      rep.phone = secondaryForm.phone;
+      rep.nesaSchoolCode = secondaryForm.nesaSchoolCode || undefined;
+      save(rep);
+    } else if (isTertiary) {
+      const errors = validateAllTertiary(tertiaryForm);
+      if (Object.keys(errors).length > 0) {
+        setTertiaryErrors(errors);
+        return;
+      }
+      const rep = new TertiaryRep(
+        Date.now(),
+        tertiaryForm.firstName,
+        tertiaryForm.lastName,
+        "",
+        tertiaryForm.email,
+        "",
+        "",
+        tertiaryForm.institutionName,
+        tertiaryForm.institutionType as TertiaryInstitutionType,
+        tertiaryForm.institutionAddress,
+        tertiaryForm.role,
+      );
+      rep.phone = tertiaryForm.phone;
+      rep.department = tertiaryForm.department || undefined;
+      save(rep);
+    }
+
     navigate("/home");
-  };
+  }
+
+  const buttonLabel = isStudent
+    ? "Create my profile"
+    : isParent
+      ? "Create my account"
+      : isSecondary
+        ? "Register my school"
+        : isTertiary
+          ? "Register my institution"
+          : "Continue";
 
   return (
     <div className="min-h-screen flex">
-      {/* Left Side - Form */}
+      {/* Left — form */}
       <div className="w-full lg:w-1/2 bg-white flex items-center justify-center p-6">
         <div className="w-full max-w-[560px]">
-          <h1 className="text-2xl font-bold text-black mb-8">
-            Which of these best describes you?
+          <h1 className="text-2xl font-bold text-black mb-2">
+            Let's get you set up
           </h1>
+          <p className="text-sm text-grey-300 mb-8">
+            Select the option that best describes you to get started.
+          </p>
 
-          <div className="space-y-4 mb-8">
-            {options.map((option, index) => (
-              <label key={index} className="flex items-center gap-2 py-1 cursor-pointer group">
-                <input
-                  type="radio"
-                  name="userType"
-                  value={option}
-                  checked={selected === option}
-                  onChange={(e) => setSelected(e.target.value)}
-                  className="w-4 h-4 border border-grey-400 rounded appearance-none checked:bg-primary-blue checked:border-primary-blue cursor-pointer transition-colors"
-                />
-                <span className="text-base text-grey-400 font-normal">{option}</span>
-              </label>
-            ))}
-          </div>
+          <UserTypeSelector
+            options={USER_TYPE_OPTIONS}
+            selected={userType}
+            onChange={setUserType}
+          />
 
-          {selected === "Current Year 12 Student" && (
-            <div className="space-y-4">
-              <h2 className="text-xl font-bold text-black">Tell us a bit more</h2>
+          {isStudent && (
+            <StudentDetailsForm
+              form={studentForm}
+              errors={studentErrors}
+              onChange={handleStudentChange}
+              onBlur={handleStudentBlur}
+            />
+          )}
 
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                <div className="sm:col-span-2">
-                  <label className="block text-sm font-medium text-black">Full Name</label>
-                  <input className="w-full px-3 py-2 border rounded-lg bg-bg-soft" value={form.fullName || ""} onChange={(e)=>setForm({...form, fullName:e.target.value})} />
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-black">NESA account number</label>
-                  <input className="w-full px-3 py-2 border rounded-lg bg-bg-soft" value={form.nesaNumber || ""} onChange={(e)=>setForm({...form, nesaNumber:e.target.value})} />
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-black">UAC ID (if known)</label>
-                  <input className="w-full px-3 py-2 border rounded-lg bg-bg-soft" value={form.uacId || ""} onChange={(e)=>setForm({...form, uacId:e.target.value})} />
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-black">USI (if known)</label>
-                  <input className="w-full px-3 py-2 border rounded-lg bg-bg-soft" value={form.usi || ""} onChange={(e)=>setForm({...form, usi:e.target.value})} />
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-black">Year of anticipated university entry</label>
-                  <input type="number" className="w-full px-3 py-2 border rounded-lg bg-bg-soft" value={form.entryYear as number} onChange={(e)=>setForm({...form, entryYear:Number(e.target.value)})} />
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-black">Date of birth</label>
-                  <input type="date" className="w-full px-3 py-2 border rounded-lg bg-bg-soft" value={form.dob || ""} onChange={(e)=>setForm({...form, dob:e.target.value})} />
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-black">Sex</label>
-                  <select className="w-full px-3 py-2 border rounded-lg bg-bg-soft" value={form.sex || ""} onChange={(e)=>setForm({...form, sex:e.target.value as any})}>
-                    <option value="">Select</option>
-                    <option value="male">Male</option>
-                    <option value="female">Female</option>
-                  </select>
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-black">School name</label>
-                  <input className="w-full px-3 py-2 border rounded-lg bg-bg-soft" value={form.schoolName || ""} onChange={(e)=>setForm({...form, schoolName:e.target.value})} />
-                </div>
-                <div className="sm:col-span-2">
-                  <label className="block text-sm font-medium text-black">Home address</label>
-                  <input className="w-full px-3 py-2 border rounded-lg bg-bg-soft" value={form.address || ""} onChange={(e)=>setForm({...form, address:e.target.value})} />
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-black">First in the family to go on to higher education?</label>
-                  <select className="w-full px-3 py-2 border rounded-lg bg-bg-soft" value={form.firstInFamily || ""} onChange={(e)=>setForm({...form, firstInFamily:e.target.value})}>
-                    <option value="">Select</option>
-                    <option>Yes</option>
-                    <option>No</option>
-                    <option>Prefer not to say</option>
-                  </select>
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-black">Indigenous or Torres Strait Islander?</label>
-                  <select className="w-full px-3 py-2 border rounded-lg bg-bg-soft" value={form.indigenous || ""} onChange={(e)=>setForm({...form, indigenous:e.target.value})}>
-                    <option value="">Select</option>
-                    <option>Yes</option>
-                    <option>No</option>
-                    <option>Prefer not to say</option>
-                  </select>
-                </div>
-                <div className="sm:col-span-2">
-                  <label className="block text-sm font-medium text-black">Cultural Background</label>
-                  <input className="w-full px-3 py-2 border rounded-lg bg-bg-soft" value={form.culturalBackground || ""} onChange={(e)=>setForm({...form, culturalBackground:e.target.value})} />
-                </div>
-              </div>
+          {isParent && (
+            <ParentDetailsForm
+              form={parentForm}
+              errors={parentErrors}
+              onChange={handleParentChange}
+              onBlur={handleParentBlur}
+              onChildChange={handleChildChange}
+              onChildBlur={handleChildBlur}
+              onAddChild={handleAddChild}
+              onRemoveChild={handleRemoveChild}
+            />
+          )}
 
-              {/* Optional payment */}
-              <div className="mt-6 border-t pt-4">
-                <label className="inline-flex items-center gap-2">
-                  <input type="checkbox" checked={addPayment} onChange={(e)=>setAddPayment(e.target.checked)} />
-                  <span className="text-sm text-[#1A1A1A] font-medium">Add payment details (optional)</span>
-                </label>
-                {addPayment && (
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mt-4">
-                    <div className="sm:col-span-2">
-                      <label className="block text-sm font-medium text-black">Card Number</label>
-                      <input className="w-full px-3 py-2 border rounded-lg bg-bg-soft" inputMode="numeric" autoComplete="cc-number" placeholder="1234 5678 9012 3456" value={cardInput} onChange={(e)=>setCardInput(e.target.value)} />
-                    </div>
-                  </div>
-                )}
-              </div>
-            </div>
+          {isSecondary && (
+            <SecondaryRepForm
+              form={secondaryForm}
+              errors={secondaryErrors}
+              onChange={handleSecondaryChange}
+              onBlur={handleSecondaryBlur}
+            />
+          )}
+
+          {isTertiary && (
+            <TertiaryRepForm
+              form={tertiaryForm}
+              errors={tertiaryErrors}
+              onChange={handleTertiaryChange}
+              onBlur={handleTertiaryBlur}
+            />
           )}
 
           <button
             onClick={handleSubmit}
-            disabled={!selected}
+            disabled={!userType}
             className="w-full mt-8 px-6 py-3 bg-primary-blue text-white rounded-lg font-medium hover:bg-blue-600 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
           >
-            Continue
+            {buttonLabel}
           </button>
         </div>
       </div>
 
-      {/* Right Side - Branding */}
+      {/* Right — branding */}
       <div className="hidden lg:flex lg:w-1/2 bg-primary-blue items-center justify-center p-12">
-        <div className="flex items-center justify-center">
-          <img
-            src="https://api.builder.io/api/v1/image/assets/TEMP/b25a9f25196a07957d83ef28a0feaea98b4bfb78?width=1000"
-            alt="Future Student Logo"
-            className="w-full max-w-[500px] h-auto rounded-2xl"
-          />
-        </div>
+        <img
+          src="https://api.builder.io/api/v1/image/assets/TEMP/b25a9f25196a07957d83ef28a0feaea98b4bfb78?width=1000"
+          alt="Future Student"
+          className="w-full max-w-[500px] h-auto rounded-2xl"
+        />
       </div>
     </div>
   );

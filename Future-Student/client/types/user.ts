@@ -1,95 +1,292 @@
-export type Sex = "male" | "female" | "";
+export type Gender =
+  | "male"
+  | "female"
+  | "non_binary"
+  | "prefer_not_to_say"
+  | "";
 
-export interface PaymentSummary {
-  brand?: string | null;
-  last4?: string | null;
-}
-
+// ---------------------------------------------------------------------------
+// Base user
+// ---------------------------------------------------------------------------
 export class User {
   id: number;
   firstName: string;
   lastName: string;
   username: string;
   email: string;
+  phone?: string; // optional — not all user types require it at onboarding
   dob: string; // YYYY-MM-DD
-  sex: Sex;
+  gender: Gender;
   address: string;
-  payment?: PaymentSummary | null;
 
-  public getUserType(): string{
+  public getUserType(): string {
     return "Undefined";
   }
 
-  constructor(id: number,  firstName: string, lastName: string, username: string, email: string, dob: string, address: string) {
-      this.id = id;  
-      this.firstName = firstName;
-      this.lastName = lastName;
-      this.username = username;
-      this.email = email;
-      this.dob = dob;
-      this.address = address;
-        
+  constructor(
+    id: number,
+    firstName: string,
+    lastName: string,
+    username: string,
+    email: string,
+    dob: string,
+    address: string,
+  ) {
+    this.id = id;
+    this.firstName = firstName;
+    this.lastName = lastName;
+    this.username = username;
+    this.email = email;
+    this.dob = dob;
+    this.gender = "";
+    this.address = address;
   }
 }
 
-export class Student extends User{
+// ---------------------------------------------------------------------------
+// Student
+// ---------------------------------------------------------------------------
+export class Student extends User {
   nesaNumber: string;
   uacId?: string;
   usi?: string;
   entryYear: number;
   schoolName: string;
-  firstInFamily?: string; // Yes/No/Prefer not to say
-  indigenous?: string; // Yes/No/Prefer not to say
+  firstInFamily?: "yes" | "no" | "prefer_not_to_say";
+  indigenous?: "yes" | "no" | "prefer_not_to_say";
   culturalBackground?: string;
-  
-  public override getUserType(): string{
+
+  public override getUserType(): string {
     return "Student";
   }
 
-  constructor(id: number, firstName: string, lastName: string,  username: string, email: string, dob: string, address: string, nesaNumber: string, entryYear: number, schoolName: string) {
-      super(id, firstName, lastName, username, email, dob, address);
-      this.nesaNumber = nesaNumber;
-      this.entryYear = entryYear;
-      this.schoolName = schoolName; 
+  constructor(
+    id: number,
+    firstName: string,
+    lastName: string,
+    username: string,
+    email: string,
+    dob: string,
+    address: string,
+    nesaNumber: string,
+    entryYear: number,
+    schoolName: string,
+  ) {
+    super(id, firstName, lastName, username, email, dob, address);
+    this.nesaNumber = nesaNumber;
+    this.entryYear = entryYear;
+    this.schoolName = schoolName;
   }
 }
 
-export class Staff extends User{
-  nesaNumber: string;
-  uacId?: string;
-  usi?: string;
-  entryYear: number;
+// ---------------------------------------------------------------------------
+// SecondaryRep — representative of a secondary (school) institution
+// ---------------------------------------------------------------------------
+export class SecondaryRep extends User {
   schoolName: string;
-  firstInFamily?: string; // Yes/No/Prefer not to say
-  indigenous?: string; // Yes/No/Prefer not to say
-  culturalBackground?: string;
-  
-  public override getUserType(): string{
-    return "Staff";
+  schoolAddress: string;
+  nesaSchoolCode?: string;
+  role: string;
+
+  public override getUserType(): string {
+    return "SecondaryRep";
   }
 
-  constructor(id: number, firstName: string, lastName: string,  username: string, email: string, dob: string, address: string, schoolName: string) {
-      super(id, firstName, lastName, username, email, dob, address);
-      this.schoolName = schoolName; 
+  constructor(
+    id: number,
+    firstName: string,
+    lastName: string,
+    username: string,
+    email: string,
+    dob: string,
+    address: string,
+    schoolName: string,
+    schoolAddress: string,
+    role: string,
+  ) {
+    super(id, firstName, lastName, username, email, dob, address);
+    this.schoolName = schoolName;
+    this.schoolAddress = schoolAddress;
+    this.role = role;
   }
 }
 
-export class Parent extends User{
-  nesaNumber: string;
-  uacId?: string;
-  usi?: string;
-  entryYear: number;
+export interface SecondaryRepFormData {
+  firstName: string;
+  lastName: string;
+  email: string;
+  phone: string;
+  role: string;
   schoolName: string;
-  firstInFamily?: string; // Yes/No/Prefer not to say
-  indigenous?: string; // Yes/No/Prefer not to say
-  culturalBackground?: string;
-  
-  public override getUserType(): string{
+  schoolAddress: string;
+  nesaSchoolCode: string;
+}
+
+export const defaultSecondaryRepFormData: SecondaryRepFormData = {
+  firstName: "",
+  lastName: "",
+  email: "",
+  phone: "",
+  role: "",
+  schoolName: "",
+  schoolAddress: "",
+  nesaSchoolCode: "",
+};
+
+// ---------------------------------------------------------------------------
+// TertiaryRep — representative of a tertiary institution (uni, TAFE, college)
+// ---------------------------------------------------------------------------
+export type TertiaryInstitutionType =
+  | "university"
+  | "tafe"
+  | "private_college"
+  | "";
+
+export class TertiaryRep extends User {
+  institutionName: string;
+  institutionType: TertiaryInstitutionType;
+  institutionAddress: string;
+  role: string;
+  department?: string;
+
+  public override getUserType(): string {
+    return "TertiaryRep";
+  }
+
+  constructor(
+    id: number,
+    firstName: string,
+    lastName: string,
+    username: string,
+    email: string,
+    dob: string,
+    address: string,
+    institutionName: string,
+    institutionType: TertiaryInstitutionType,
+    institutionAddress: string,
+    role: string,
+  ) {
+    super(id, firstName, lastName, username, email, dob, address);
+    this.institutionName = institutionName;
+    this.institutionType = institutionType;
+    this.institutionAddress = institutionAddress;
+    this.role = role;
+  }
+}
+
+export interface TertiaryRepFormData {
+  firstName: string;
+  lastName: string;
+  email: string;
+  phone: string;
+  role: string;
+  department: string;
+  institutionName: string;
+  institutionType: TertiaryInstitutionType;
+  institutionAddress: string;
+}
+
+export const defaultTertiaryRepFormData: TertiaryRepFormData = {
+  firstName: "",
+  lastName: "",
+  email: "",
+  phone: "",
+  role: "",
+  department: "",
+  institutionName: "",
+  institutionType: "",
+  institutionAddress: "",
+};
+
+// ---------------------------------------------------------------------------
+// Parent — caregiver of one or more Year 12 students.
+// Children are linked post-onboarding via an invite code generated by the
+// student. linkedStudentIds is populated once that flow is complete.
+// ---------------------------------------------------------------------------
+export interface LinkedChild {
+  firstName: string;
+  lastName: string;
+  schoolName: string;
+}
+
+export class Parent extends User {
+  children: LinkedChild[];
+  linkedStudentIds: number[]; // populated after invite-code auth flow
+
+  public override getUserType(): string {
     return "Parent";
   }
 
-  constructor(id: number, firstName: string, lastName: string,  username: string, email: string, dob: string, address: string, schoolName: string) {
-      super(id, firstName, lastName, username, email, dob, address);
-      this.schoolName = schoolName; 
+  constructor(
+    id: number,
+    firstName: string,
+    lastName: string,
+    username: string,
+    email: string,
+    dob: string,
+    address: string,
+    children: LinkedChild[] = [],
+  ) {
+    super(id, firstName, lastName, username, email, dob, address);
+    this.children = children;
+    this.linkedStudentIds = [];
   }
 }
+
+// ---------------------------------------------------------------------------
+// ParentFormData — plain object for React form state.
+// ---------------------------------------------------------------------------
+export interface ParentFormData {
+  firstName: string;
+  lastName: string;
+  email: string;
+  phone: string;
+  address: string;
+  children: LinkedChild[];
+}
+
+export const defaultParentFormData: ParentFormData = {
+  firstName: "",
+  lastName: "",
+  email: "",
+  phone: "",
+  address: "",
+  children: [{ firstName: "", lastName: "", schoolName: "" }],
+};
+
+// ---------------------------------------------------------------------------
+// StudentFormData — plain object for React form state.
+// Never put class instances in React state; use this for the onboarding form
+// and construct a Student instance from it on submit.
+// ---------------------------------------------------------------------------
+export interface StudentFormData {
+  firstName: string;
+  lastName: string;
+  nesaNumber: string;
+  uacId: string;
+  usi: string;
+  entryYear: number;
+  dob: string;
+  gender: Gender;
+  schoolName: string;
+  address: string;
+  firstInFamily: "yes" | "no" | "prefer_not_to_say" | "";
+  indigenous: "yes" | "no" | "prefer_not_to_say" | "";
+  culturalBackground: string;
+}
+
+export const defaultStudentFormData: StudentFormData = {
+  firstName: "",
+  lastName: "",
+  nesaNumber: "",
+  uacId: "",
+  usi: "",
+  entryYear: new Date().getFullYear() + 1,
+  dob: "",
+  gender: "",
+  schoolName: "",
+  address: "",
+  firstInFamily: "",
+  indigenous: "",
+  culturalBackground: "",
+};
