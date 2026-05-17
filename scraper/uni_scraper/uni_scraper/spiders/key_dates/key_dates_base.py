@@ -57,6 +57,29 @@ def extract_date(text: str):
 
     return None
 
+def extract_date_range(raw_date):
+    parts = re.split(r"\s+–\s+|\s+-\s+", raw_date)
+
+    if len(parts) != 2:
+        return None, None
+
+    start_raw = parts[0].strip()
+    end_raw = parts[1].strip()
+
+    end_date = extract_date(end_raw)
+
+    if not end_date:
+        return None, None
+
+    end_year = end_date.split("-")[0]
+
+    if len(start_raw.split()) == 2:
+        start_raw = f"{start_raw} {end_year}"
+
+    start_date = extract_date(start_raw)
+
+    return start_date, end_date
+
 
 def infer_event_type(text: str) -> str:
     t = text.lower()

@@ -1,5 +1,9 @@
-from .key_dates_base import BaseKeyDatesSpider, infer_event_type, extract_date
-
+from .key_dates_base import (
+    BaseKeyDatesSpider,
+    infer_event_type,
+    extract_date,
+    extract_date_range,
+)
 
 class UowKeyDatesSpider(BaseKeyDatesSpider):
     name = "uow_key_dates"
@@ -36,7 +40,9 @@ class UowKeyDatesSpider(BaseKeyDatesSpider):
                 continue
             seen.add(key)
 
-            parsed_date = extract_date(raw_date)
+            start_date, end_date = extract_date_range(raw_date)
+
+            parsed_date = start_date or extract_date(raw_date)
 
             yield {
                 "provider_id": self.provider_id,
@@ -45,7 +51,7 @@ class UowKeyDatesSpider(BaseKeyDatesSpider):
                 "event_title": title,
                 "raw_date": raw_date,
                 "event_date": parsed_date,
-                "event_end_date": None,
+                "event_end_date": end_date,
                 "source_url": response.url,
                 "confidence": "parsed_date" if parsed_date else "raw_date",
             }
