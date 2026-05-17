@@ -44,6 +44,20 @@ BAD_PATTERNS = [
 
 
 def extract_date(text: str):
+    if not text:
+        return None
+
+    text = text.replace("\xa0", " ").strip()
+
+    week_match = re.search(
+        r"week commencing\s+(\d{1,2}\s+[A-Za-z]+\s+\d{4})",
+        text,
+        re.IGNORECASE,
+    )
+
+    if week_match:
+        text = week_match.group(1)
+
     parsed = dateparser.parse(
         text,
         settings={
