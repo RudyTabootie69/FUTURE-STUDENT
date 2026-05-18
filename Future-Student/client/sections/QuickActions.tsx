@@ -1,6 +1,6 @@
 import { Link } from "react-router-dom";
 import { SectionWrapper } from "@/components/SectionWrapper";
-import type { ActionCard } from "@/types/types";
+import type { ActionCard } from "@shared/types/types";
 
 type QuickActionsProps = {
   cards: ActionCard[];

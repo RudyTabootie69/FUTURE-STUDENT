@@ -12,9 +12,14 @@ import {
 import { LandingFeatures } from "@/sections/LandingFeatureCards";
 
 export default function LandingPage() {
+  const [firstname, setFirstname] = useState<string>("");
+  const [lastname, setLastname] = useState<string>("");
+  const [username, setUsername] = useState<string>("");
+  const [password, setPassword] = useState<string>("");
   const [openSignIn, setOpenSignIn] = useState(false);
   const [openSignUp, setOpenSignUp] = useState(false);
   const navigate = useNavigate();
+  const { register } = useAuth();
   const { login } = useAuth();
 
   return (
@@ -66,17 +71,17 @@ export default function LandingPage() {
             className="space-y-3"
             onSubmit={(e) => {
               e.preventDefault();
-              login();
+              login(username, password);
               setOpenSignIn(false);
-              navigate("/home", { replace: true });
             }}
           >
             <div className="space-y-1">
-              <label className="text-sm font-medium">Email</label>
+              <label className="text-sm font-medium">Username</label>
               <input
-                type="email"
+                type="text"
                 className="w-full px-3 py-2 border rounded-md bg-white"
                 placeholder="you@example.com"
+                onChange={(e) => setUsername(e.target.value)}
               />
             </div>
             <div className="space-y-1">
@@ -85,6 +90,7 @@ export default function LandingPage() {
                 type="password"
                 className="w-full px-3 py-2 border rounded-md bg-white"
                 placeholder="••••••••"
+                onChange={(e) => setPassword(e.target.value)}
               />
             </div>
             <button
@@ -110,25 +116,35 @@ export default function LandingPage() {
             className="space-y-3"
             onSubmit={(e) => {
               e.preventDefault();
-              login();
+              register(firstname, lastname, username, password);
               setOpenSignUp(false);
-              navigate("/onboarding", { replace: true });
             }}
           >
             <div className="space-y-1">
-              <label className="text-sm font-medium">Name</label>
+              <label className="text-sm font-medium">First Name</label>
               <input
                 type="text"
                 className="w-full px-3 py-2 border rounded-md bg-white"
-                placeholder="Your name"
+                placeholder="Your first name"
+                onChange={(e) => setFirstname(e.target.value)}
               />
             </div>
             <div className="space-y-1">
-              <label className="text-sm font-medium">Email</label>
+              <label className="text-sm font-medium">Last Name</label>
               <input
-                type="email"
+                type="text"
                 className="w-full px-3 py-2 border rounded-md bg-white"
-                placeholder="you@example.com"
+                placeholder="Your last name"
+                onChange={(e) => setLastname(e.target.value)}
+              />
+            </div>
+            <div className="space-y-1">
+              <label className="text-sm font-medium">Username</label>
+              <input
+                type="text"
+                className="w-full px-3 py-2 border rounded-md bg-white"
+                placeholder="JohnSmith12"
+                onChange={(e) => setUsername(e.target.value)}
               />
             </div>
             <div className="space-y-1">
@@ -137,6 +153,7 @@ export default function LandingPage() {
                 type="password"
                 className="w-full px-3 py-2 border rounded-md bg-white"
                 placeholder="Create a password"
+                onChange={(e) => setPassword(e.target.value)}
               />
             </div>
             <button

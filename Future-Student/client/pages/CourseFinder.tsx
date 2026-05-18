@@ -1,11 +1,16 @@
 import { useMemo, useState } from "react";
 import { Search, ChevronDown } from "lucide-react";
 import Navigation from "@/components/Navigation";
-import type { Course } from "@/types/course";
-import { toString } from "@/types/course";
+import type { Course } from "@shared/types/course";
+import { toString } from "@shared/types/course";
 import { useWishlist } from "@/context/WishlistContext";
+import { useNavigate } from "react-router-dom";
+import {useTags} from "@/context/TagContext"
 
 export default function CourseFinder() {
+  const navigate = useNavigate();
+  const tags = useTags();
+  const coursetags = tags.courseTags;
   // Filters & sort
   const [search, setSearch] = useState<string>("");
   const [fieldFilter, setFieldFilter] = useState<string>("All Fields");
@@ -14,8 +19,8 @@ export default function CourseFinder() {
   const [atarMin, setAtarMin] = useState<number>(30);
   const [atarMax, setAtarMax] = useState<number>(99.95);
   const [sortBy, setSortBy] = useState<"none" | "uni" | "course">("none");
-
-  //The functionality here needs to be replaced with searching and saving universities
+  
+  const courses = []
   const universities = [
     {
       name: "University of Wollongong",
@@ -69,8 +74,10 @@ export default function CourseFinder() {
       location: "Armidale, NSW",
       abbr: "UNE",
     },
-  ];
-
+  ]; 
+  //The functionality here needs to be replaced with searching and saving universities
+  //Make iterable loadedUniversities and loadedDegrees
+  /*
   const degrees = [
     {
       title: "Bachelor of Computer Science",
@@ -135,6 +142,7 @@ export default function CourseFinder() {
       field: "Arts & Design",
     },
   ];
+  */
 
   const sem1 = { start: "26-FEB-2026", close: "31-JAN-2026" };
   const sem2 = { start: "22-JUL-2026", close: "30-JUN-2026" };
@@ -188,50 +196,16 @@ export default function CourseFinder() {
     return d;
   }
 
-  // Generate varied entries (12 universities x 12 degrees = 144)
-  const courses: Course[] = useMemo(() => {
-    const chosenDegrees = degrees;
-    const out: Course[] = [];
-    let i = 0;
-    universities.forEach((uni, ui) => {
-      chosenDegrees.forEach((deg, di) => {
-        const sem = (ui + di) % 2 === 0 ? sem1 : sem2;
-        const atar = 50 + ((ui * 13 + di * 7) % 50); // ~50–99
-        const startD = parseDMY(sem.start);
-        const closeD = parseDMY(sem.close);
-        const appOpenD = addDays(closeD, -90 - ((ui * 3 + di) % 15));
-        const openDayD = addDays(startD, -45 + ((ui + di) % 10));
-        const offerRelD = addDays(startD, -10 + ((ui * 2 + di) % 5));
-        const expoD = addDays(closeD, -60 + ((ui * 5 + di) % 7));
-        out.push({
-          uacID: i++,
-          university: uni.name,
-          location: uni.location,
-          title: deg.title,
-          code: `${uni.abbr}-${deg.abbr}-${String(di + 1).padStart(2, "0")}`,
-          startDate: sem.start,
-          closingDate: sem.close,
-          applicationOpenDate: fmtDMY(appOpenD),
-          openDayDate: fmtDMY(openDayD),
-          offerReleaseDate: fmtDMY(offerRelD),
-          expoDate: fmtDMY(expoD),
-          atar,
-          field: deg.field,
-        });
-      });
-    });
-    return out;
-  }, []);
-
   const universityNames = useMemo(() => universities.map((u) => u.name), []);
   const fieldOptions = useMemo(
-    () => ["All Fields", ...Array.from(new Set(degrees.map((d) => d.field)))],
+    () => [...Array.from(new Set(coursetags.map((d) => d.title)))],
     [],
   );
 
   const { add, has } = useWishlist();
 
   // Filtering + sorting pipeline
+  /*
   const filteredCourses = useMemo(() => {
     const q = search.trim().toLowerCase();
     let list = courses.filter(
@@ -267,6 +241,13 @@ export default function CourseFinder() {
     atarMax,
     sortBy,
   ]);
+  */
+
+  const goToCourse = (course: Course) => {
+    if(course){
+      navigate("/course",{state: { course: course }});
+    }
+  }
 
   return (
     <div className="min-h-screen bg-bg-soft">
@@ -330,6 +311,7 @@ export default function CourseFinder() {
                   onChange={(e) => setFieldFilter(e.target.value)}
                   className="w-full px-3 py-2.5 border border-[#777] rounded bg-bg-soft text-sm text-[#5D5D5D] appearance-none cursor-pointer"
                 >
+                  <option>All Fields</option>
                   {fieldOptions.map((opt) => (
                     <option key={opt}>{opt}</option>
                   ))}
@@ -420,9 +402,11 @@ export default function CourseFinder() {
                     <tr
                       key={toString(course) + index}
                       className="hover:bg-gray-50 transition-colors"
+                      onClick = {() => goToCourse(course)}
                     >
                       <td className="p-4">
                         <div className="flex items-center gap-4">
+                        
                           <div className="w-12 h-12 rounded-full bg-primary-blue flex-shrink-0" />
                           <div className="min-w-0 flex-1 grid grid-cols-1 md:grid-cols-5 gap-4 items-center">
                             <div className="space-y-1">
@@ -467,7 +451,7 @@ export default function CourseFinder() {
                                 </button>
                               ) : (
                                 <button
-                                  onClick={() => add(course)}
+                                  onClick={(e) => {e.stopPropagation(), add(course)}}
                                   className="px-3 py-2 text-sm border border-primary-blue text-primary-blue rounded-md hover:bg-blue-50"
                                 >
                                   Add to Wishlist

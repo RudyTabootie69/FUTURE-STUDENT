@@ -5,25 +5,50 @@
     "version": "0.2.0",
     "configurations": [
         {
+            "name": "Python Debugger: Current File",
+            "type": "debugpy",
+            "request": "launch",
+            "program": "${file}",
+            "console": "integratedTerminal",
+            "cwd": "${workspaceFolder}"
+        },
+        {
             "type": "node-terminal",
             "name": "Run Script: Build and Launch",
             "request": "launch",
             "command": "npm run build && npx vite --port=4000",
-            "cwd": "${workspaceFolder}/Future-Student"
+            "cwd": "${workspaceFolder}/Future-Student",
+            "sourceMaps": true,
+            "skipFiles": ["<node_internals>/**"],
+            "outFiles": ["${workspaceFolder}/dist/**/*.js"]
+        },  
+        {
+            "type": "node",
+            "request": "launch",
+            "name": "Backend Debug",
+            "program": "${workspaceFolder}/Future-Student/server/index.ts",
+            "console": "integratedTerminal",
+            "sourceMaps": true,
+            "restart": true,
+            "skipFiles": ["<node_internals>/**"],
+            "outFiles": ["${workspaceFolder}/dist/**/*.js"]
         },
         {
-            "type": "node-terminal",
-            "name": "Run Script: Build",
+            "type": "firefox",
             "request": "launch",
-            "command": "npm run build",
-            "cwd": "${workspaceFolder}/Future-Student"
-        },
+            "name": "Frontend Debug (Firefox)",
+            "url": "http://localhost:4000",
+            "webRoot": "${workspaceFolder}/Future-Student/client/"
+        }
+    ],
+    "compounds": [
         {
-            "type": "node-terminal",
-            "name": "Run Script: Launch",
-            "request": "launch",
-            "command": "npx vite --port=4000",
-            "cwd": "${workspaceFolder}/Future-Student"
+            "name": "Full Stack Debug",
+            "configurations": [
+                //"Backend Debug",
+                "Run Script: Build and Launch",
+                "Frontend Debug (Firefox)"
+            ]
         }
     ]
 }

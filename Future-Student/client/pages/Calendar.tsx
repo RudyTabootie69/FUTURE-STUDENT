@@ -1,8 +1,12 @@
 import { useEffect, useMemo, useState } from "react";
-import { ChevronLeft, ChevronRight } from "lucide-react";
+import { ChevronLeft, ChevronRight, Search, ChevronDown } from "lucide-react";
 import Navigation from "@/components/Navigation";
-import { useWishlist } from "@/context/WishlistContext";
+import { useSavedEvents } from "@/context/SavedEventContext";
+import { useEvents } from "@/context/EventContext";
+import type { Event } from "@shared/types/event";
 import { buildMonthMatrix, isoKey, monthLabel } from "@/lib/utils";
+import { Button } from "@/components/ui/button";
+import { useNavigate } from "react-router-dom";
 
   //How to load into this
   //On server start connect to local MySQL database
@@ -10,7 +14,13 @@ import { buildMonthMatrix, isoKey, monthLabel } from "@/lib/utils";
   //Call server side function on calendar open
 
 export default function Calendar() {
+  const events =  useEvents().events;
+  const [search, setSearch] = useState<string>("");
+  const [fieldFilter, setFieldFilter] = useState<string>("All Fields");
+  const [eventFilter, setEventFilter] =
+    useState<string>("All Events");
   const [viewDate, setViewDate] = useState(new Date(2026, 3, 26));
+  const navigate = useNavigate();
 
   const weeks = useMemo(() => buildMonthMatrix(viewDate), [viewDate]);
 
@@ -28,7 +38,7 @@ export default function Calendar() {
     return acc;
   }, {});
 
-  const { wishlist } = useWishlist();
+  const { savedevents } = useSavedEvents();
 
   function parseDMY(s?: string | null): Date | null {
     if (!s) return null;
@@ -57,11 +67,12 @@ export default function Calendar() {
   }
 
 
-  const eventsMap = useMemo(() => {
+  // Filtering + sorting pipeline
+  const filteredEvents = useMemo(() => {
     const map: 
     Record<string,{ label: string; color: string; bgColor: string; order: number }[]> = {};
-
     type Category = "Deadlines" | "Events" | "Start Dates" | "Important Dates";
+
     const add = (
       dateStr: string | undefined,
       category: Category,
@@ -83,28 +94,42 @@ export default function Calendar() {
       else map[key].push(entry);
     };
 
-    //test this
-    for (const c of wishlist) {
-      const abbr = c.code?.split("-")?.[0] || c.university;
-      add(c.closingDate, "Deadlines", "Applications Close", abbr);
-      add(c.openDayDate, "Events", "Open Day", abbr);
-      add(c.expoDate, "Events", "Expo", abbr);
-      add(c.startDate, "Start Dates", "Term Starts", abbr);
-      add(c.applicationOpenDate, "Important Dates", "Applications Open", abbr);
-      add(c.offerReleaseDate, "Important Dates", "Offer Release", abbr);
+    for (const e of savedevents) {
+      const abbr = e.eventID?.toString() || e.title;
+      
+      add(e.date, e.eventType, e.title, abbr);
+      if (e.endDate){
+        add(e.endDate, "Deadlines", "End: " + e.title, abbr);
+      }
     }
 
-    for (const key of Object.keys(map)) {
-      map[key].sort(
-        (a, b) => a.order - b.order || a.label.localeCompare(b.label),
+    const q = search.trim().toLowerCase();
+    let list = events;
+
+    if (q) {
+      list = list.filter(
+        (c) =>
+          c.title.toLowerCase().includes(q) ||
+          c.description.toLowerCase().includes(q) ||
+          c.eventID.toString().includes(q) ||
+          c.location.toLowerCase().includes(q)
       );
     }
 
-    return map;
-  }, [wishlist]);
+    if (fieldFilter !== "All Event Types")
+      list = list.filter((c) => c.eventType === fieldFilter);
+    if (fieldFilter !== "All Locations")
+      list = list.filter((c) => c.location === fieldFilter);
+    return list;
+
+  }, [
+    savedevents,
+    search,
+    fieldFilter,
+  ]);
 
   useEffect(() => {
-    const keys = Object.keys(eventsMap);
+    const keys = Object.keys(filteredEvents);
     if (keys.length === 0) return;
     const today = new Date();
     const todayYMD = new Date(
@@ -120,7 +145,7 @@ export default function Calendar() {
       future[0] ?? allDates.sort((a, b) => a.getTime() - b.getTime())[0];
     if (target)
       setViewDate(new Date(target.getFullYear(), target.getMonth(), 1));
-  }, [eventsMap]);
+  }, [filteredEvents]);
 
   const goPrev = () =>
     setViewDate(new Date(viewDate.getFullYear(), viewDate.getMonth() - 1, 1));
@@ -128,17 +153,105 @@ export default function Calendar() {
     setViewDate(new Date(viewDate.getFullYear(), viewDate.getMonth() + 1, 1));
 
   const daysOfWeek = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
+  const eventLocations = useMemo(() => events.map((u) => u.location), []);
+  const eventTypes = useMemo(() => events.map((u) => u.eventType), []);
+
+  const goToEvent = (eventid: string) => {
+    if(eventid && eventid in events){
+      navigate("/events/",{state: { eventID: eventid }});
+    }
+  }
 
   return (
     <div className="min-h-screen bg-bg-soft relative overflow-hidden">
+      
       <Navigation />
-
+      
       <div className="absolute left-6 top-[131px] w-[279px] h-[279px] rounded-full bg-[#B3D8FF] opacity-40 pointer-events-none" />
       <div className="absolute left-[42px] top-[835px] w-[662px] h-[662px] rounded-full bg-[#B3D8FF] opacity-40 pointer-events-none" />
       <div className="absolute right-[88px] top-[657px] w-[150px] h-[150px] rounded-full bg-[#B3D8FF] opacity-40 pointer-events-none" />
+      
+      
+      <div className="relative z-10 max-w-[1178px] w-full mx-auto mt-12 lg:mt-[107px] mb-20 px-4 sm:px-6 lg:px-8">
+        
+      <div className="shadow-[0_10px_40px_0_rgba(49,133,252,0.20)] rounded-2xl overflow-hidden">
+          {/* Side Panel For filters */}
+      <div className="absolute left-0 hidden lg:block w-[290px]">
+          <div className="bg-white border border-[#B3D8FF] rounded-lg p-4 shadow-[0_0_14px_0_rgba(49,133,252,0.15)] space-y-6">
+            {/* Filter Header */}
+            <div className="flex items-center gap-4">
+              <svg
+                width="32"
+                height="32"
+                viewBox="0 0 32 32"
+                fill="none"
+                xmlns="http://www.w3.org/2000/svg"
+              >
+                <path
+                  d="M23.5 7H8.5C8.22386 7 8 7.22386 8 7.5V9.78005C8 9.9202 8.05882 10.0539 8.16214 10.1486L13.8379 15.3514C13.9412 15.4461 14 15.5798 14 15.72V25.0979C14 25.4906 14.432 25.73 14.765 25.5219L17.765 23.6469C17.9112 23.5555 18 23.3953 18 23.2229V15.72C18 15.5798 18.0588 15.4461 18.1621 15.3514L23.8379 10.1486C23.9412 10.0539 24 9.9202 24 9.78005V7.5C24 7.22386 23.7761 7 23.5 7Z"
+                  stroke="#6E7491"
+                  strokeWidth="2"
+                />
+              </svg>
+              <h2 className="text-2xl font-bold text-[#1A1A1A]">Filters</h2>
+            </div>
 
-      <div className="relative z-10 max-w-[1153px] w-full mx-auto mt-12 lg:mt-[107px] mb-20 px-4 sm:px-6 lg:px-8">
-        <div className="shadow-[0_10px_40px_0_rgba(49,133,252,0.20)] rounded-2xl overflow-hidden">
+            {/* Search */}
+            <div className="flex items-center gap-2 px-3 py-2 border border-[#777] rounded bg-bg-soft">
+              <Search className="w-5 h-5 text-grey-400" />
+              <input
+                type="text"
+                value={search}
+                onChange={(e) => setSearch(e.target.value)}
+                placeholder="Search..."
+                className="flex-1 bg-transparent text-sm text-primary-blue placeholder:text-primary-blue outline-none"
+              />
+            </div>
+
+            {/* Event Type */}
+            <div className="space-y-2">
+              <label className="block text-sm font-medium text-black">
+                Event Types
+              </label>
+              <div className="relative">
+                <select
+                  value={fieldFilter}
+                  onChange={(e) => setFieldFilter(e.target.value)}
+                  className="w-full px-3 py-2.5 border border-[#777] rounded bg-bg-soft text-sm text-[#5D5D5D] appearance-none cursor-pointer"
+                >
+                  <option>Event Types</option>
+                  {eventTypes.map((opt) => (
+                    <option key={opt}>{opt}</option>
+                  ))}
+                </select>
+                <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-grey-400 pointer-events-none" />
+              </div>
+            </div>
+
+            {/* Event Type */}
+            <div className="space-y-2">
+              <label className="block text-sm font-medium text-black">
+                Filters
+              </label>
+              <div className="relative">
+                <select
+                  value={eventFilter}
+                  onChange={(e) => setEventFilter(e.target.value)}
+                  className="w-full px-3 py-2.5 border border-[#777] rounded bg-bg-soft text-sm text-[#5D5D5D] appearance-none cursor-pointer"
+                >
+                  <option>All Locations</option>
+                  {eventLocations.map((u) => (
+                    <option key={u}>{u}</option>
+                  
+                  ))}
+                  
+                </select>
+                <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-grey-400 pointer-events-none" />
+              </div>
+            </div>
+          </div>
+        </div>
+        <div className="absolute right-0 hidden lg:block ">
           <div className="bg-primary-blue px-4 sm:px-8 pt-6 pb-8">
             <h1 className="text-white text-2xl sm:text-[32px] font-bold leading-normal mb-2">
               My Calendar
@@ -209,7 +322,7 @@ export default function Calendar() {
                 <div key={wIdx} className="grid grid-cols-7">
                   {week.map((day, dIdx) => {
                     const dateKey = day ? isoKey(viewDate, day) : "";
-                    const dayEvents = day ? eventsMap[dateKey] || [] : [];
+                    const dayEvents = day ? filteredEvents[dateKey] || [] : [];
                     return (
                       <div
                         key={dIdx}
@@ -223,27 +336,31 @@ export default function Calendar() {
                             {dayEvents.length > 0 && (
                               <div className="mt-1 space-y-1 pr-1 overflow-hidden">
                                 {dayEvents.map((ev, i) => (
-                                  <div
+                                  <button
                                     key={i}
                                     className="text-[10px] leading-tight px-1.5 py-0.5 rounded truncate"
                                     style={{
                                       backgroundColor: ev.bgColor,
                                       color: ev.color,
                                     }}
+                                    onClick = {() => goToEvent(ev.eventID)}
                                   >
                                     {ev.label}
-                                  </div>
+                                    
+                                  </button>
                                 ))}
                               </div>
                             )}
                           </>
                         )}
+                       
                       </div>
                     );
                   })}
                 </div>
               ))}
             </div>
+          </div>
           </div>
         </div>
       </div>

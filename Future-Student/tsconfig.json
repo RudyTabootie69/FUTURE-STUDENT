@@ -16,6 +16,8 @@
     "esModuleInterop": true,
     "allowSyntheticDefaultImports": true,
     "forceConsistentCasingInFileNames": true,
+    "sourceMap": true,
+    "outDir": "./dist",
 
     /* Linting */
     "strict": false,
@@ -38,6 +40,7 @@
     "shared/**/*",
     "vite.config.ts",
     "vite.config.server.ts"
-  ],
-  "exclude": ["node_modules", "dist"]
+, "server/index.ts"  ],
+  "exclude": ["node_modules", "dist"],
+  
 }

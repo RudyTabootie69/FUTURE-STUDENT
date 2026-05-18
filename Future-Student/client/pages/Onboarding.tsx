@@ -221,6 +221,8 @@ function validateAllTertiary(form: TertiaryRepFormData): TertiaryRepFormErrors {
 // ---------------------------------------------------------------------------
 
 export default function Onboarding() {
+  const [showErr, setShow] = useState(false)
+  const setShowErr = () => setShow(true)
   const navigate = useNavigate();
   const { save } = useProfile();
 
@@ -499,6 +501,60 @@ export default function Onboarding() {
             />
           )}
 
+          {selected === "Representative of a Secondary Institution" && (
+            <div className="space-y-4">
+              <h2 className="text-xl font-bold text-black">Tell us a bit more (Staff)</h2>
+
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div className="sm:col-span-2">
+                  <label className="block text-sm font-medium text-black">First Name</label>
+                  <input className="w-full px-3 py-2 border rounded-lg bg-bg-soft" value={staffform.firstName || ""} onChange={(e)=>setStaffForm({...staffform, firstName:e.target.value})} />
+                </div>
+                <div className="sm:col-span-2">
+                  <label className="block text-sm font-medium text-black">Last Name</label>
+                  <input className="w-full px-3 py-2 border rounded-lg bg-bg-soft" value={staffform.lastName || ""} onChange={(e)=>setStaffForm({...staffform, lastName:e.target.value})} />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-black">Date of birth</label>
+                  <input type="date" className="w-full px-3 py-2 border rounded-lg bg-bg-soft" value={staffform.dob || ""} onChange={(e)=>setStaffForm({...staffform, dob:e.target.value})} />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-black">Sex</label>
+                  <select className="w-full px-3 py-2 border rounded-lg bg-bg-soft" value={staffform.sex || ""} onChange={(e)=>setStaffForm({...staffform, sex:e.target.value as any})}>
+                    <option value="">Select</option>
+                    <option value="male">Male</option>
+                    <option value="female">Female</option>
+                  </select>
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-black">School name</label>
+                  <input className="w-full px-3 py-2 border rounded-lg bg-bg-soft" value={staffform.schoolName || ""} onChange={(e)=>setStaffForm({...staffform, schoolName:e.target.value})} />
+                </div>
+                <div className="sm:col-span-2">
+                  <label className="block text-sm font-medium text-black">Home address</label>
+                  <input className="w-full px-3 py-2 border rounded-lg bg-bg-soft" value={staffform.address || ""} onChange={(e)=>setStaffForm({...staffform, address:e.target.value})} />
+                </div>
+              </div>
+
+              {/* Optional payment */}
+              <div className="mt-6 border-t pt-4">
+                <label className="inline-flex items-center gap-2">
+                  <input type="checkbox" checked={addPayment} onChange={(e)=>setAddPayment(e.target.checked)} />
+                  <span className="text-sm text-[#1A1A1A] font-medium">Add payment details (optional)</span>
+                </label>
+                {addPayment && (
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mt-4">
+                    <div className="sm:col-span-2">
+                      <label className="block text-sm font-medium text-black">Card Number</label>
+                      <input className="w-full px-3 py-2 border rounded-lg bg-bg-soft" inputMode="numeric" autoComplete="cc-number" placeholder="1234 5678 9012 3456" value={cardInput} onChange={(e)=>setCardInput(e.target.value)} />
+                    </div>
+                  </div>
+                )}
+              </div>
+            </div>
+            
+          )}
+
           <button
             onClick={handleSubmit}
             disabled={!userType}
@@ -506,6 +562,13 @@ export default function Onboarding() {
           >
             {buttonLabel}
           </button>
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mt-4 items-center justify-center text-red">
+            <div className="sm:col-span-2 ">
+              <label className="text-xl font-medium text-red">
+                {showErr && <div>There are empty fields, please try again</div>}
+              </label>
+            </div>
+          </div>
         </div>
       </div>
 

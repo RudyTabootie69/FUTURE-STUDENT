@@ -1,56 +1,47 @@
 import { createContext, useContext, useEffect, useMemo, useState } from "react";
-import type { Event } from "@/types/event";
-import { toString } from "@/types/event";
+import type { Event } from "@shared/types/event";
 
-interface eventContextValue {
-  event: Event[];
-  add: (c: Event) => void;
-  remove: (id: string) => void;
-  has: (id: string) => boolean;
-  clear: () => void;
+interface EventContextValue {
+  events: Event[];
+  loading: boolean;
+  fetchEvents: () => Promise<void>;
 }
 
-const eventContext = createContext<eventContextValue | undefined>(undefined);
+const EventContext = createContext<EventContextValue | undefined>(undefined);
 
-const STORAGE_KEY = "eventEvents";
 
-export function eventProvider({ children }: { children: React.ReactNode })
+export function EventProvider({ children }: { children: React.ReactNode })
  {
-  const [event, setevent] = useState<Event[]>([]);
+  const [events, setEvents] = useState([]);
+  const [loading, setLoading] = useState(true);
 
-  // Load from localStorage
-  useEffect(() => {
+
+  const fetchEvents = async () => {
     try {
-      const raw = localStorage.getItem(STORAGE_KEY);
-      if (raw) setevent(JSON.parse(raw));
-    } catch {
-      // ignore
+      const res = await fetch("/backend/events", {
+        credentials: "include",
+      });
+
+      const data = await res.json();
+      setEvents(data);
+    } catch (err) {
+      console.error("Failed to load events", err);
+    } finally {
+      setLoading(false);
     }
+  };
+
+  useEffect(() => {
+    fetchEvents();
   }, []);
 
-  // Persist
-  useEffect(() => {
-    try {
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(event));
-    } catch {
-      // ignore
-    }
-  }, [event]);
 
-  const value = useMemo<eventContextValue>(() => ({
-    event,
-    add: (c: Event) =>
-      setevent((prev) => (prev.find((p) => toString(p) === toString(c)) ? prev : [...prev, c])),
-    remove: (id: string) => setevent((prev) => prev.filter((p) => toString(p) !== id)),
-    has: (id: string) => event.some((p) => toString(p) === id),
-    clear: () => setevent([]),
-  }), [event]);
 
-  return <eventContext.Provider value={value}>{children}</eventContext.Provider>;
+  return <EventContext.Provider value={{events, loading, fetchEvents}}>{children}</EventContext.Provider>;
 }
 
-export function useevent() {
-  const ctx = useContext(eventContext);
+export function useEvents() {
+  const ctx = useContext(EventContext);
   if (!ctx) throw new Error("useevent must be used within eventProvider");
   return ctx;
 }

@@ -1,6 +1,6 @@
 import { createContext, useContext, useEffect, useMemo, useState } from "react";
-import type { Course } from "@/types/course";
-import { toString } from "@/types/course";
+import type { Course } from "@shared/types/course";
+import { toString } from "@shared/types/course";
 
 interface WishlistContextValue {
   wishlist: Course[];
