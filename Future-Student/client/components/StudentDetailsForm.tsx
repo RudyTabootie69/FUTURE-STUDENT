@@ -1,5 +1,5 @@
 import Field, { fieldInputClass } from "./InputField";
-import type { StudentFormData, Gender } from "@/types/user";
+import type { StudentFormData, Gender } from "shared/types/user";
 
 export type StudentFormErrors = Partial<Record<keyof StudentFormData, string>>;
 

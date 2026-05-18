@@ -1,5 +1,5 @@
 import Field, { fieldInputClass } from "./InputField";
-import type { SecondaryRepFormData } from "@/types/user";
+import type { SecondaryRepFormData } from "shared/types/user";
 
 export type SecondaryRepFormErrors = Partial<
   Record<keyof SecondaryRepFormData, string>

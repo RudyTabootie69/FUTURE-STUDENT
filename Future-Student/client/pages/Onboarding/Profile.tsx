@@ -4,6 +4,7 @@ import { useOnboardingProfile } from "@/context/OnboardingProfileContext";
 import { ProfileSectionCard } from "@/components/InputCard";
 import { ProfileInput } from "@/components/ProfileInput";
 import { ProfileSelect } from "@/components/ProfileSelect";
+import {indigenous, firstInFamily} from "shared/types/user";
 
 export default function Profile() {
   const { profile, update } = useOnboardingProfile();
@@ -12,7 +13,7 @@ export default function Profile() {
   const [fieldOfInterest, setFieldOfInterest] = useState("");
   const [location, setLocation] = useState("");
   
-  if(profile.userType == "Student"){
+  if(profile.getUserType() == "Student"){
   return (
       <div className="min-h-screen bg-bg-soft">
         <Navigation />
@@ -22,7 +23,7 @@ export default function Profile() {
           <h1 className="text-white text-3xl font-bold mb-1">
             {profile?.firstName || " " || profile?.lastName || "Your Name"}
           </h1>
-          <p className="text-white text-sm">{profile?.userType || ""}</p>
+          <p className="text-white text-sm">{profile?.getUserType() || ""}</p>
         </div>
 
         {/* Personal Details */}
@@ -75,8 +76,8 @@ export default function Profile() {
 
             <ProfileSelect
               label="Sex"
-              value={profile?.sex || ""}
-              onChange={(value) => update({ sex: value as any })}
+              value={profile?.gender || ""}
+              onChange={(value) => update({ gender: value as any })}
               options={[
                 { label: "Male", value: "male" },
                 { label: "Female", value: "female" },
@@ -99,7 +100,7 @@ export default function Profile() {
             <ProfileSelect
               label="First in family to attend higher education?"
               value={profile?.firstInFamily || ""}
-              onChange={(value) => update({ firstInFamily: value })}
+              onChange={(value) => update({ firstInFamily: value as firstInFamily })}
               options={[
                 { label: "Yes", value: "Yes" },
                 { label: "No", value: "No" },
@@ -110,7 +111,7 @@ export default function Profile() {
             <ProfileSelect
               label="Indigenous or Torres Strait Islander?"
               value={profile?.indigenous || ""}
-              onChange={(value) => update({ indigenous: value })}
+              onChange={(value) => update({ indigenous: value as indigenous })}
               options={[
                 { label: "Yes", value: "Yes" },
                 { label: "No", value: "No" },
@@ -127,15 +128,6 @@ export default function Profile() {
           </div>
         </ProfileSectionCard>
 
-        {/* Payment Summary */}
-        {profile?.payment && (
-          <div className="mt-6 p-4 border rounded-lg bg-bg-soft">
-            <div className="text-sm text-[#1A1A1A]">Payment method on file</div>
-            <div className="text-sm text-[#777]">
-              {profile.payment.brand} •••• {profile.payment.last4}
-            </div>
-          </div>
-        )}
 
         <ProfileSectionCard title="Your Profile Preferences">
           <div className="space-y-6">
@@ -214,7 +206,7 @@ export default function Profile() {
       </div>
     );
   }
-  else if(profile.userType == "Parent"){
+  else if(profile.getUserType() == "Parent"){
   return (
       <div className="min-h-screen bg-bg-soft">
         <Navigation />
@@ -224,7 +216,7 @@ export default function Profile() {
           <h1 className="text-white text-3xl font-bold mb-1">
             {profile?.firstName || " " || profile?.lastName || "Your Name"}
           </h1>
-          <p className="text-white text-sm">{profile?.userType || ""}</p>
+          <p className="text-white text-sm">{profile?.getUserType() || ""}</p>
         </div>
 
         {/* Personal Details */}
@@ -252,8 +244,8 @@ export default function Profile() {
 
             <ProfileSelect
               label="Sex"
-              value={profile?.sex || ""}
-              onChange={(value) => update({ sex: value as any })}
+              value={profile?.gender || ""}
+              onChange={(value) => update({ gender: value as any })}
               options={[
                 { label: "Male", value: "male" },
                 { label: "Female", value: "female" },
@@ -362,7 +354,7 @@ export default function Profile() {
       </div>
     );
   }
-  else if(profile.userType == "School Staff Member"){
+  else if(profile.getUserType() == "School Staff Member"){
   return (
       <div className="min-h-screen bg-bg-soft">
         <Navigation />
@@ -372,7 +364,7 @@ export default function Profile() {
           <h1 className="text-white text-3xl font-bold mb-1">
             {profile?.firstName || " " || profile?.lastName || "Your Name"}
           </h1>
-          <p className="text-white text-sm">{profile?.userType || ""}</p>
+          <p className="text-white text-sm">{profile?.getUserType() || ""}</p>
         </div>
 
         {/* Personal Details */}
@@ -401,8 +393,8 @@ export default function Profile() {
 
             <ProfileSelect
               label="Sex"
-              value={profile?.sex || ""}
-              onChange={(value) => update({ sex: value as any })}
+              value={profile?.gender || ""}
+              onChange={(value) => update({ gender: value as any })}
               options={[
                 { label: "Male", value: "male" },
                 { label: "Female", value: "female" },

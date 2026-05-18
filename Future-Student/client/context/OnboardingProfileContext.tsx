@@ -1,61 +1,41 @@
 import { createContext, useContext, useEffect, useMemo, useState } from "react";
-import { useAuth } from "@/context/AuthContext";
-import type { User } from "@shared/types/user";;
+import type { Student } from "shared/types/user";
 
 interface OnboardingProfileContextValue {
-  profile: User | null;
+  profile: Student | null;
+  save: (p: Student) => void;
+  update: (p: Partial<Student>) => void;
+  clear: () => void;
 }
 
+const STORAGE_KEY = "user.profile";
 const OnboardingProfileContext = createContext<OnboardingProfileContextValue | undefined>(undefined);
 
-
-export const OnboardingProfileProvider = ({ children }: { children: React.ReactNode }) => {
-  const [profile, setOnboardingProfile] = useState<User | null>(null);
-  const { token } = useAuth();
-  const { isAuthenticated } = useAuth();
+export function OnboardingProfileProvider({ children }: { children: React.ReactNode }) {
+  const [profile, setOnboardingProfile] = useState<Student | null>(null);
 
   useEffect(() => {
-    if (!isAuthenticated) {
-      setOnboardingProfile(null);
-      return;
-    }
-
-    const fetchUser = async () => {
-      try {
-        const res = await fetch("/backend/users/autologin", {
-          credentials: "include",
-        });
-
-        const data = await res.json();
-        setOnboardingProfile(data);
-      } catch (err) {
-        console.error(err);
-        setOnboardingProfile(null);
-      }
-    };
-    fetchUser();
-
-  }, [isAuthenticated]);
-
-  const refreshProfile = async () => {
-    if (!isAuthenticated) return;
-
     try {
-      const res = await fetch("/backend/users/refresh", {
-        credentials: "include",
-      });
+      const raw = localStorage.getItem(STORAGE_KEY);
+      if (raw) setOnboardingProfile(JSON.parse(raw));
+    } catch {}
+  }, []);
 
-      if (!res.ok) throw new Error("Failed");
+  useEffect(() => {
+    try {
+      if (profile) localStorage.setItem(STORAGE_KEY, JSON.stringify(profile));
+      else localStorage.removeItem(STORAGE_KEY);
+    } catch {}
+  }, [profile]);
 
-      const data = await res.json();
-      setOnboardingProfile(data);
-    } catch (err) {
-      console.error(err);
-      setOnboardingProfile(null);
-    }
-  }
+  const value = useMemo<OnboardingProfileContextValue>(() => ({
+    profile,
+    save: (p) => setOnboardingProfile(p),
+    update: (p) => setOnboardingProfile((prev) => ({ ...(prev ?? {} as Student), ...p } as Student)),
+    clear: () => setOnboardingProfile(null),
+  }), [profile]);
 
-  return <OnboardingProfileContext.Provider value={{profile, ...refreshProfile}}> {children} </OnboardingProfileContext.Provider>;
+  return <OnboardingProfileContext.Provider value={value}>{children}</OnboardingProfileContext.Provider>;
 }
 
 export function useOnboardingProfile() {

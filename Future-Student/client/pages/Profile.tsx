@@ -4,6 +4,7 @@ import { useProfile } from "@/context/ProfileContext";
 import { ProfileSectionCard } from "@/components/InputCard";
 import { ProfileInput } from "@/components/ProfileInput";
 import { ProfileSelect } from "@/components/ProfileSelect";
+import {indigenous, firstInFamily} from "shared/types/user";
 
 export default function Profile() {
   const { profile, update } = useProfile();
@@ -12,7 +13,7 @@ export default function Profile() {
   const [fieldOfInterest, setFieldOfInterest] = useState("");
   const [location, setLocation] = useState("");
   
-  if(profile.userType == "Student"){
+  if(profile.getUserType() == "Student"){
   return (
       <div className="min-h-screen bg-bg-soft">
         <Navigation />
@@ -22,7 +23,7 @@ export default function Profile() {
           <h1 className="text-white text-3xl font-bold mb-1">
             {profile?.firstName || " " || profile?.lastName || "Your Name"}
           </h1>
-          <p className="text-white text-sm">{profile?.userType || ""}</p>
+          <p className="text-white text-sm">{profile?.getUserType() || ""}</p>
         </div>
 
         {/* Personal Details */}
@@ -214,7 +215,7 @@ export default function Profile() {
       </div>
     );
   }
-  else if(profile.userType == "Parent"){
+  else if(profile.getUserType() == "Parent"){
   return (
       <div className="min-h-screen bg-bg-soft">
         <Navigation />
@@ -224,7 +225,7 @@ export default function Profile() {
           <h1 className="text-white text-3xl font-bold mb-1">
             {profile?.firstName || " " || profile?.lastName || "Your Name"}
           </h1>
-          <p className="text-white text-sm">{profile?.userType || ""}</p>
+          <p className="text-white text-sm">{profile?.getUserType() || ""}</p>
         </div>
 
         {/* Personal Details */}
@@ -362,7 +363,7 @@ export default function Profile() {
       </div>
     );
   }
-  else if(profile.userType == "School Staff Member"){
+  else if(profile.getUserType() == "School Staff Member"){
   return (
       <div className="min-h-screen bg-bg-soft">
         <Navigation />
@@ -372,7 +373,7 @@ export default function Profile() {
           <h1 className="text-white text-3xl font-bold mb-1">
             {profile?.firstName || " " || profile?.lastName || "Your Name"}
           </h1>
-          <p className="text-white text-sm">{profile?.userType || ""}</p>
+          <p className="text-white text-sm">{profile?.getUserType() || ""}</p>
         </div>
 
         {/* Personal Details */}

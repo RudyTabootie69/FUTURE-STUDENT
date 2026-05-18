@@ -2,7 +2,7 @@ import Field, { fieldInputClass } from "./InputField";
 import type {
   TertiaryRepFormData,
   TertiaryInstitutionType,
-} from "@/types/user";
+} from "shared/types/user";
 
 export type TertiaryRepFormErrors = Partial<
   Record<keyof TertiaryRepFormData, string>

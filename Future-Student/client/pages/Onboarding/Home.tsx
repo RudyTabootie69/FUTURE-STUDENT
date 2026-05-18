@@ -8,10 +8,10 @@ import { ApplicationJourney } from "@/sections/ApplicationJourney";
 import { StatsGrid } from "@/sections/StatsGrid";
 import { QuickActions } from "@/sections/QuickActions";
 
-import { actionCards } from "./data/home-data";
+import { actionCards } from "../data/home-data";
 import { getUpcomingDeadlines } from "@/lib/utils";
 
-import type { JourneyStep } from "@/types/types";
+import type { JourneyStep } from "shared/types/types";
 
 function getStepStatus(
   tasks: { completed: boolean }[],

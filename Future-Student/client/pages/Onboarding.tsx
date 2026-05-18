@@ -10,7 +10,7 @@ import {
   defaultParentFormData,
   defaultSecondaryRepFormData,
   defaultTertiaryRepFormData,
-} from "@/types/user";
+} from "shared/types/user";
 import type {
   StudentFormData,
   ParentFormData,
@@ -19,7 +19,7 @@ import type {
   SecondaryRepFormData,
   TertiaryRepFormData,
   TertiaryInstitutionType,
-} from "@/types/user";
+} from "shared/types/user";
 import UserTypeSelector from "@/components/UserTypeSelector";
 import StudentDetailsForm from "@/components/StudentDetailsForm";
 import ParentDetailsForm from "@/components/ParentDetailsForm";
@@ -222,7 +222,7 @@ function validateAllTertiary(form: TertiaryRepFormData): TertiaryRepFormErrors {
 
 export default function Onboarding() {
   const navigate = useNavigate();
-  const { save } = useProfile();
+  const {save} = useOnboardingProfile();
 
   const [userType, setUserType] = useState("");
 

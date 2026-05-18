@@ -1,5 +1,5 @@
 import Field, { fieldInputClass } from "./InputField";
-import type { ParentFormData, LinkedChild } from "@/types/user";
+import type { ParentFormData, LinkedChild } from "shared/types/user";
 
 export type ParentFormErrors = Partial<
   Record<keyof Omit<ParentFormData, "children">, string> & {

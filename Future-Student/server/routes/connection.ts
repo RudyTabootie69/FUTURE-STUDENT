@@ -1,6 +1,6 @@
 import { json } from "stream/consumers";
 import { any } from "zod/v4";
-import { Student, Parent, Staff, User } from "@/types/user";
+import { Student, Parent, SecondaryRep, TertiaryRep, User } from "shared/types/user";
 
 const express = require('express');
 const mysql = require('mysql');
