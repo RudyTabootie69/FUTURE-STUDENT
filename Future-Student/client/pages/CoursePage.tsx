@@ -4,7 +4,7 @@ import Navigation from "@/components/Navigation";
 import { Course } from "@shared/types/course";
 import { toString } from "@shared/types/course";
 import { useWishlist } from "@/context/WishlistContext";
-import { useLocation } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 
 type State = {
   course: Course;
@@ -14,12 +14,19 @@ type State = {
 export default function CoursePage() {
   const location = useLocation();
   const state = location.state as State | null
+  const navigate = useNavigate();
+  const testing = true;
+  let course: Course;
 
-  if (!state.course) {
-  return <p>No course provided</p>;
+  if(testing){
+    course = Course.default
+  }{  
+    if (!state.course) {
+      navigate("*");
+    }
+    
+    course = state.course
   }
-  
-  const course: Course = state.course
 
   return(
     <div>

@@ -8,6 +8,16 @@ export class Event {
   date: string;
   endDate?: string;
   eventType: Category;
+
+  static default = Object.assign(new Event(), {
+    eventID: 1234,
+    title: "The testing Event",
+    description: "This is an event for everyone to come test events",
+    location: "Wollongong",
+    date: "30-12-2025",
+    endDate: "01-01-2026",
+    eventType: "Open Day",
+  });
 }
 
 export function toString(e: Event): string {
