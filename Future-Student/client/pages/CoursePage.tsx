@@ -20,7 +20,7 @@ export default function CoursePage() {
 
   if(testing){
     course = Course.default
-  }{  
+  }else{  
     if (!state.course) {
       navigate("*");
     }

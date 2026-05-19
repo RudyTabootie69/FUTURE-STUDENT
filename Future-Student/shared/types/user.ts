@@ -43,6 +43,8 @@ export class User {
     this.gender = "";
     this.address = address;
   }
+
+  static default = Object.assign(new User(0, "John", "Doe", "Johndoe1234", "johndoe@outlook.com", "10-10-2009", "42 Wallaby Way Sydney"));
 }
 
 // ---------------------------------------------------------------------------

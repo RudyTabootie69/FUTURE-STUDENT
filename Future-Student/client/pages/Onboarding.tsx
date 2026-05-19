@@ -2,24 +2,22 @@ import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useProfile } from "@/context/ProfileContext";
 import {
+  Gender,
   Student,
   Parent,
+  LinkedChild,
   SecondaryRep,
   TertiaryRep,
-  defaultStudentFormData,
-  defaultParentFormData,
-  defaultSecondaryRepFormData,
-  defaultTertiaryRepFormData,
-} from "shared/types/user";
-import type {
   StudentFormData,
+  defaultStudentFormData,
   ParentFormData,
-  LinkedChild,
-  Gender,
+  defaultParentFormData,
   SecondaryRepFormData,
+  defaultSecondaryRepFormData,
   TertiaryRepFormData,
+  defaultTertiaryRepFormData,
   TertiaryInstitutionType,
-} from "shared/types/user";
+} from "@shared/types/user";
 import UserTypeSelector from "@/components/UserTypeSelector";
 import StudentDetailsForm from "@/components/StudentDetailsForm";
 import ParentDetailsForm from "@/components/ParentDetailsForm";

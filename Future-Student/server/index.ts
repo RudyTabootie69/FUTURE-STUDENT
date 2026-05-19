@@ -1,5 +1,5 @@
 
-import { User } from "../shared/types/user.ts";
+import { User, Student, Parent, SecondaryRep, TertiaryRep } from "../shared/types/user.ts";
 import "dotenv/config";
 import express from "express";
 import cors from "cors";
@@ -37,12 +37,8 @@ export function createServer() {
       next();
     });
 
-    //server.use(timeout("10s"));
+    server.use(timeout("10s"));
 
-    server.use((req, res, next) => {
-      console.log(req.method, req.url);
-      next();
-    });
     // If we're using Amazon EC2 these settings should not need to change, except for DB_PASSWORD
     const conn= mysql.createPool({
       connectionLimit: 10,
@@ -98,7 +94,7 @@ export function createServer() {
     server.post('/users/login', async (req, res) => {
       const { username, password, userType} = req.body;
 
-      let user = new User(-1, "John", "Doe", "TestAccount", "test@test.com");
+      let user = User.default;
 
       try {
             const [rows] = await conn.query('select hashSalt, passwordHash from User where username = ?', username)
@@ -123,7 +119,7 @@ export function createServer() {
           try {
             const [rows] = await conn.query('SELECT User.id, User.firstName, User.lastName, User.userName, User.email, User.dob, User.address,  Student.school, Student.nesaNumber, Student.usi, Student.entryYear, Student.firstInFamily, Student.indigenousStatus, Student.culturalBackground FROM User INNER JOIN User.id = Student.id AND User.username = ?', username)
             const result = rows[0];
-            user = new User(result.id, result.firstName, result.lastName, result.userName, result.email);
+            user = new Student(result.id, result.firstName, result.lastName, result.userName, result.email);
             user.address = result.address;
             user.schoolName = result.school;
             user.nesaNumber = result.nesaNumber;
