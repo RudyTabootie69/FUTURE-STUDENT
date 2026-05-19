@@ -1,6 +1,7 @@
 import Navigation from "@/components/Navigation";
 import { useLocation, useNavigate } from "react-router-dom";
 import type { Course } from "@shared/types/course";
+import CoursePage from "./pages/CoursePage";
 
 type State = {
   course?: Course;
