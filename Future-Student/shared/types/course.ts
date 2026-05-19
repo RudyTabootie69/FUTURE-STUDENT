@@ -20,11 +20,11 @@ export class Course {
   static default = Object.assign(new Course(), {
     uacID: 1111,
     uniID: 22222,
-    title: "Bachelor of Testing Courses",
-    description: "This is a degree that focuses on testing pages that would use the Course data type.",
+    title: "Bachelor of Computer Science",
+    description: "An intensive program covering software architecture, cloud networks, DevOps pipelines, and full-stack microservices design.",
     university: "University of Wollongong",
-    location: "Wollongong",
-    code: "testtest1234",
+    location: "Wollongong Campus",
+    code: "UOW-CS-2026",
     startDate: "01-01-2000",
     closingDate: "05-01-2000",
     applicationOpenDate: "30-01-1999",
@@ -32,9 +32,9 @@ export class Course {
     offerReleaseDate: "04-01-2000",
     expoDate: "02-02-2000",
     logoUrl: "N/A",
-    atar: 99.8, // approximate ATAR requirement
+    atar: 75.0, // approximate ATAR requirement
     duration: 3,
-    field: "Testing", // category of study
+    field: "Software Engineering", // category of study
   });
 }
 

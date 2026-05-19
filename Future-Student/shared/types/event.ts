@@ -4,17 +4,21 @@ export class Event {
   eventID: number;
   title: string;
   description?: string;
+  oragniser: string;
   location?: string;
   date: string;
+  time: string;
   endDate?: string;
   eventType: Category;
 
   static default = Object.assign(new Event(), {
     eventID: 1234,
-    title: "The testing Event",
-    description: "This is an event for everyone to come test events",
-    location: "Wollongong",
-    date: "30-12-2025",
+    title: "Engineering & IT Career Expo 2026",
+    organiser: "University of Wollongong",
+    description: "Connect with leading industry partners, explore graduate opportunities, and network with infrastructure and software engineering professionals. Bring your current resume.",
+    location: "Main Hall, Building 11",
+    date: "28-5-2026",
+    time: "10:00 AM - 2:00 PM",
     endDate: "01-01-2026",
     eventType: "Open Day",
   });

@@ -5,7 +5,7 @@ import { useWishlist } from "@/context/WishlistContext";
 import { useLocation, useNavigate } from "react-router-dom";
 
 type State = {
-  course?: Course;
+  course: Course;
 };
 
 export default function CoursePage() {
@@ -24,19 +24,6 @@ export default function CoursePage() {
     
     course = state.course
   }
-  const mockCourse: Course = {
-    title: "Bachelor of Computer Science",
-    university: "University of Wollongong",
-    code: "UOW-CS-2026",
-    location: "Wollongong Campus",
-    field: "Software Engineering",
-    startDate: "Autumn Session 2026",
-    closingDate: "31 January 2026",
-    atar: 75.0,
-    description: "An intensive program covering software architecture, cloud networks, DevOps pipelines, and full-stack microservices design."
-  };
-
-  const course = state?.course || mockCourse;
 
   return (
     <div className="min-h-screen bg-bg-soft">
