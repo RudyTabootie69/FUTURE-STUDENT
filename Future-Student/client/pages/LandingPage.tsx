@@ -26,7 +26,7 @@ export default function LandingPage() {
     <div className="min-h-screen bg-bg-soft">
       <LandingHero
         onGetStarted={() => setOpenSignUp(true)}
-        onWatchHowItWorks={() => setOpenSignIn(true)}
+        onWatchHowItWorks={() => navigate("/onboarding")}
       />
 
       <LandingFeatures />

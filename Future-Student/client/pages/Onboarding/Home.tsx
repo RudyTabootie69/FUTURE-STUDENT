@@ -1,4 +1,4 @@
-import { useMemo } from "react";
+import { useMemo, useState } from "react";
 import Navigation from "@/components/Navigation";
 import Footer from "@/components/Footer";
 import { useWishlist } from "@/context/WishlistContext";
@@ -25,6 +25,7 @@ function getStepStatus(
 }
 
 export default function Home() {
+  const [openSignUp, setOpenSignUp] = useState(false);
   const { wishlist } = useWishlist();
 
   const upcomingDeadlines = useMemo(() => {
