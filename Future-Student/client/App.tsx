@@ -32,7 +32,7 @@ import ContactUs from "./pages/ContactUs";
 import EventPage from "./pages/EventPage";
 import CoursePage from "./pages/CoursePage";
 
-/* This is the starting page, initialise from here */
+
 
 const queryClient = new QueryClient();
 
@@ -66,7 +66,7 @@ const App = () => (
                       <Route path="/contact" element={<ContactUs />} />
                       <Route path="/course" element={<CoursePage />} />
                       <Route path="/event" element={<EventPage />} />
-                      {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
+                     
                       <Route path="*" element={<NotFound />} />
                       </Routes>
                     </TagProvider>
