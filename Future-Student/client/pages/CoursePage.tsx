@@ -1,7 +1,6 @@
 import Navigation from "@/components/Navigation";
 import { useLocation, useNavigate } from "react-router-dom";
 import type { Course } from "@shared/types/course";
-import CoursePage from "./pages/CoursePage";
 
 type State = {
   course?: Course;
@@ -12,24 +11,19 @@ export default function CoursePage() {
   const navigate = useNavigate();
   const state = location.state as State | null;
 
-  if (!state?.course) {
-    return (
-      <div className="min-h-screen bg-bg-soft">
-        <Navigation />
-        <div className="max-w-[1440px] mx-auto px-6 lg:px-10 py-10">
-          <p className="text-lg text-gray-700">No course provided.</p>
-          <button
-            onClick={() => navigate("/course-finder")}
-            className="mt-4 px-4 py-2 rounded-md bg-primary-blue text-white"
-          >
-            Back to Course Finder
-          </button>
-        </div>
-      </div>
-    );
-  }
+  const mockCourse: Course = {
+    title: "Bachelor of Computer Science",
+    university: "University of Wollongong",
+    code: "UOW-CS-2026",
+    location: "Wollongong Campus",
+    field: "Software Engineering",
+    startDate: "Autumn Session 2026",
+    closingDate: "31 January 2026",
+    atar: 75.0,
+    description: "An intensive program covering software architecture, cloud networks, DevOps pipelines, and full-stack microservices design."
+  };
 
-  const course = state.course;
+  const course = state?.course || mockCourse;
 
   return (
     <div className="min-h-screen bg-bg-soft">
@@ -48,6 +42,7 @@ export default function CoursePage() {
       <div className="max-w-[1440px] mx-auto px-6 lg:px-10 py-8">
         <div className="bg-white border border-[#E9E8FC] rounded-2xl p-6 shadow-sm">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            
             <div>
               <p className="text-sm text-gray-500 mb-1">University</p>
               <p className="text-lg font-medium text-[#27273F]">
