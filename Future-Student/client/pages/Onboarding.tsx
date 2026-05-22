@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { useProfile } from "@/context/ProfileContext";
+import { useOnboardingProfile } from "@/context/OnboardingProfileContext";
 import {
   Gender,
   Student,
@@ -426,7 +426,7 @@ export default function Onboarding() {
       save(rep);
     }
 
-    navigate("/home");
+    navigate("/onboarding/home");
   }
 
   const buttonLabel = isStudent

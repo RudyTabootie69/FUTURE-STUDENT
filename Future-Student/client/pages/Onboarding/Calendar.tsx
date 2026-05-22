@@ -13,7 +13,7 @@ import { useNavigate } from "react-router-dom";
   //Create function that returns events from MySQL server
   //Call server side function on calendar open
 
-export default function Calendar() {
+export default function OnboardingCalendar() {
   const events =  useEvent().events;
   const [search, setSearch] = useState<string>("");
   const [fieldFilter, setFieldFilter] = useState<string>("All Fields");

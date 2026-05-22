@@ -21,10 +21,6 @@ export class User {
   gender: Gender;
   address: string;
 
-  public getUserType(): string {
-    return "Undefined";
-  }
-
   constructor(
     id: number,
     firstName: string,
@@ -60,10 +56,6 @@ export class Student extends User {
   indigenous?: indigenous;
   culturalBackground?: string;
 
-  public override getUserType(): string {
-    return "Student";
-  }
-
   constructor(
     id: number,
     firstName: string,
@@ -91,10 +83,6 @@ export class SecondaryRep extends User {
   schoolAddress: string;
   nesaSchoolCode?: string;
   role: string;
-
-  public override getUserType(): string {
-    return "SecondaryRep";
-  }
 
   constructor(
     id: number,
@@ -152,10 +140,6 @@ export class TertiaryRep extends User {
   institutionAddress: string;
   role: string;
   department?: string;
-
-  public override getUserType(): string {
-    return "TertiaryRep";
-  }
 
   constructor(
     id: number,
@@ -216,10 +200,6 @@ export interface LinkedChild {
 export class Parent extends User {
   children: LinkedChild[];
   linkedStudentIds: number[]; // populated after invite-code auth flow
-
-  public override getUserType(): string {
-    return "Parent";
-  }
 
   constructor(
     id: number,
@@ -294,3 +274,33 @@ export const defaultStudentFormData: StudentFormData = {
   indigenous: "prefer_not_to_say",
   culturalBackground: "",
 };
+
+export function isStudent(user: User): user is Student {
+  return user instanceof Student
+}
+
+export function isParent(user: User): user is Parent {
+  return user instanceof Parent
+}
+export function isSecStaff(user: User): user is SecondaryRep {
+  return user instanceof SecondaryRep
+}
+export function isTertStaff(user: User): user is TertiaryRep {
+  return user instanceof TertiaryRep
+}
+
+export function getUserType(user: User): string {
+  if(user instanceof Student){
+    return "Student"
+  }
+  if(user instanceof Parent){
+    return "Parent"
+  }
+  if(user instanceof SecondaryRep){
+    return "Secondary Representative"
+  }
+  if(user instanceof TertiaryRep){
+    return "Tertiary Representative"
+  }
+  return "Undefined"
+}

@@ -7,7 +7,7 @@ import { useWishlist } from "@/context/WishlistContext";
 import { useNavigate } from "react-router-dom";
 import {useTags} from "@/context/TagContext"
 
-export default function CourseFinder() {
+export default function OnboardingCourseFinder() {
   const navigate = useNavigate();
   const tags = useTags();
   const coursetags = tags.courseTags;
@@ -77,7 +77,6 @@ export default function CourseFinder() {
   ]; 
   //The functionality here needs to be replaced with searching and saving universities
   //Make iterable loadedUniversities and loadedDegrees
-  /*
   const degrees = [
     {
       title: "Bachelor of Computer Science",
@@ -142,7 +141,6 @@ export default function CourseFinder() {
       field: "Arts & Design",
     },
   ];
-  */
 
   const sem1 = { start: "26-FEB-2026", close: "31-JAN-2026" };
   const sem2 = { start: "22-JUL-2026", close: "30-JUN-2026" };
@@ -205,7 +203,7 @@ export default function CourseFinder() {
   const { add, has } = useWishlist();
 
   // Filtering + sorting pipeline
-  /*
+
   const filteredCourses = useMemo(() => {
     const q = search.trim().toLowerCase();
     let list = courses.filter(
@@ -241,7 +239,7 @@ export default function CourseFinder() {
     atarMax,
     sortBy,
   ]);
-  */
+  
 
   const goToCourse = (course: Course) => {
     if(course){

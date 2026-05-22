@@ -1,18 +1,24 @@
 import { createContext, useContext, useEffect, useMemo, useState } from "react";
-import type { Student } from "shared/types/user";
+import type { User } from "@shared/types/user";
 
 interface OnboardingProfileContextValue {
-  profile: Student | null;
-  save: (p: Student) => void;
-  update: (p: Partial<Student>) => void;
+  onboardingprofile: User | null;
+  save: (p: User) => void;
+  update: (p: Partial<User>) => void;
   clear: () => void;
+  onboardingprogress: number;
+  increment: (n: number) => void;
+  decrement: (n: number) => void;
+  setProgress: (n: number) => void;
 }
 
-const STORAGE_KEY = "user.profile";
+
+const STORAGE_KEY = "user.onboardingprofile";
 const OnboardingProfileContext = createContext<OnboardingProfileContextValue | undefined>(undefined);
 
 export function OnboardingProfileProvider({ children }: { children: React.ReactNode }) {
-  const [profile, setOnboardingProfile] = useState<Student | null>(null);
+  const [onboardingprofile, setOnboardingProfile] = useState<User | null>(null);
+  const [onboardingprogress, changeProgress] = useState(0);  
 
   useEffect(() => {
     try {
@@ -21,19 +27,24 @@ export function OnboardingProfileProvider({ children }: { children: React.ReactN
     } catch {}
   }, []);
 
-  useEffect(() => {
-    try {
-      if (profile) localStorage.setItem(STORAGE_KEY, JSON.stringify(profile));
-      else localStorage.removeItem(STORAGE_KEY);
-    } catch {}
-  }, [profile]);
-
   const value = useMemo<OnboardingProfileContextValue>(() => ({
-    profile,
+    onboardingprofile,
     save: (p) => setOnboardingProfile(p),
-    update: (p) => setOnboardingProfile((prev) => ({ ...(prev ?? {} as Student), ...p } as Student)),
+    update: (p) =>
+      setOnboardingProfile((prev) => {
+        if (!prev) return prev
+        
+        return {
+          ...prev,
+          ...p,
+        }
+      }),
     clear: () => setOnboardingProfile(null),
-  }), [profile]);
+    onboardingprogress,
+    increment: () => changeProgress(onboardingprogress + 1),
+    decrement: () => changeProgress(onboardingprogress - 1),
+    setProgress: (n) => changeProgress(n)
+  }), [onboardingprofile]);
 
   return <OnboardingProfileContext.Provider value={value}>{children}</OnboardingProfileContext.Provider>;
 }

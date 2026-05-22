@@ -2,7 +2,7 @@ import Navigation from "@/components/Navigation";
 import { useWishlist } from "@/context/WishlistContext";
 import { toString } from "@shared/types/course";
 
-export default function Wishlist() {
+export default function OnboardingWishlist() {
   const { wishlist, remove } = useWishlist();
 
   return (
