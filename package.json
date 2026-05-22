@@ -16,8 +16,8 @@
     "mysql2": "^3.22.3",
     "node": "^22.22.3",
     "nodemailer": "^8.0.7",
-    "react": "^19.2.6",
-    "react-dom": "^19.2.6",
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0",
     "semver": "^7.8.0",
     "sqlalchemy": "^10.1.1",
     "tsc": "^2.0.4"

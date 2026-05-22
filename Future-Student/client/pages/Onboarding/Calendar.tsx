@@ -1,12 +1,21 @@
 import { useEffect, useMemo, useState } from "react";
 import { ChevronLeft, ChevronRight, Search, ChevronDown } from "lucide-react";
-import Navigation from "@/components/Navigation";
+import OnboardingNavigation from "@/components/OnboardingNavigation";
 import { useSavedEvents } from "@/context/SavedEventContext";
 import { useEvent } from "@/context/EventContext";
 import type { Event } from "@shared/types/event";
 import { buildMonthMatrix, isoKey, monthLabel } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { useNavigate } from "react-router-dom";
+import { useOnboardingProfile } from "@/context/OnboardingProfileContext";
+import { onboardingsteps, calendarsteps } from "../data/onboardingsteps";
+import {
+  useFloating,
+  offset,
+  flip,
+  shift,
+  autoUpdate
+} from '@floating-ui/react';
 
   //How to load into this
   //On server start connect to local MySQL database
@@ -21,6 +30,28 @@ export default function OnboardingCalendar() {
     useState<string>("All Events");
   const [viewDate, setViewDate] = useState(new Date(2026, 3, 26));
   const navigate = useNavigate();
+  const { onboardingprogress, increment, decrement, setProgress } = useOnboardingProfile();
+
+  const currentStep = onboardingsteps[onboardingprogress];
+  const [target, setTarget] = useState<HTMLElement | null>(null);
+  
+  const { refs, floatingStyles, update } = useFloating({
+    open: !!target,
+    placement: currentStep.placement || "bottom",
+    middleware: [offset(5), flip(), shift()],
+    whileElementsMounted: autoUpdate,
+  });
+
+  useEffect(() => {
+    const step = onboardingsteps[onboardingprogress];
+    const el = document.querySelector(step.target) as HTMLElement | null;
+
+    refs.setReference(el);
+    setTarget(el);
+    requestAnimationFrame(() => {
+      update();
+    });
+  }, [onboardingprogress, onboardingsteps, refs]);
 
   const weeks = useMemo(() => buildMonthMatrix(viewDate), [viewDate]);
 
@@ -162,10 +193,45 @@ export default function OnboardingCalendar() {
     }
   }
 
+  function handleNextClick() {
+      switch (onboardingprogress) {
+
+        case 5:
+          increment();
+          navigate("/onboarding/home")
+          break;
+        default:
+          console.log("Unknown action: " + onboardingprogress);
+          setProgress(5)
+      }
+      return;
+  };
+
+  function handlePrevClick() {
+      switch (onboardingprogress) {
+
+        case 5:
+          decrement();
+          navigate("/onboarding/home")
+          break;
+        
+        default:
+          console.log("Unknown action: " + onboardingprogress);
+          setProgress(5)
+      }
+      return;
+  };
+
+  useEffect(() => {
+    if (!calendarsteps.includes(onboardingprogress)) {
+      setProgress(5);
+    }
+  }, [calendarsteps, onboardingprogress, setProgress]);
+  
   return (
     <div className="min-h-screen bg-bg-soft relative overflow-hidden">
       
-      <Navigation />
+      <OnboardingNavigation />
       
       <div className="absolute left-6 top-[131px] w-[279px] h-[279px] rounded-full bg-[#B3D8FF] opacity-40 pointer-events-none" />
       <div className="absolute left-[42px] top-[835px] w-[662px] h-[662px] rounded-full bg-[#B3D8FF] opacity-40 pointer-events-none" />
@@ -251,7 +317,7 @@ export default function OnboardingCalendar() {
             </div>
           </div>
         </div>
-        <div className="absolute right-0 hidden lg:block ">
+        <div className="absolute right-0 hidden lg:block " id = "calendar">
           <div className="bg-primary-blue px-4 sm:px-8 pt-6 pb-8">
             <h1 className="text-white text-2xl sm:text-[32px] font-bold leading-normal mb-2">
               My Calendar
@@ -364,6 +430,46 @@ export default function OnboardingCalendar() {
           </div>
         </div>
       </div>
+      <div
+        ref={refs.setFloating}
+        style={floatingStyles}
+        className="z-50 w-72 rounded-xl bg-white p-4 text-black shadow-xl"
+
+      >
+        <h2 className="text-lg font-bold">
+          {currentStep.title}
+        </h2>
+
+        <p className="mt-2 text-sm text-[#777]">
+          {currentStep.description}
+        </p>
+
+        <div className="mt-4 flex justify-between">
+          <button
+            onClick={handlePrevClick}
+            disabled={onboardingprogress === 0}
+            className="rounded bg-primary-blue text-white px-3 py-1"
+          >
+            Back
+          </button>
+          
+          {onboardingprogress < onboardingsteps.length - 1 ? (
+            <button
+              onClick={handleNextClick}
+              className="rounded bg-primary-blue text-white px-3 py-1"
+            >
+              Next
+            </button>
+          ) : (
+            <button
+              onClick={handleNextClick}
+              className="rounded bg-green-500 px-3 py-1"
+            >
+              Finish
+            </button>
+          )}
+        </div>
+    </div>
     </div>
   );
 }

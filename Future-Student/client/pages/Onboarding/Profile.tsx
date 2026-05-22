@@ -1,25 +1,89 @@
-import { useState } from "react";
-import Navigation from "@/components/Navigation";
+import { useState, useEffect } from "react";
+import Navigation from "@/components/OnboardingNavigation";
 import { useOnboardingProfile } from "@/context/OnboardingProfileContext";
 import { ProfileSectionCard } from "@/components/InputCard";
 import { ProfileInput } from "@/components/ProfileInput";
 import { ProfileSelect } from "@/components/ProfileSelect";
-import {User, Student, Parent, SecondaryRep, TertiaryRep, isStudent, isParent, isSecStaff, isTertStaff, indigenous, firstInFamily, getUserType} from "shared/types/user";
+import { useNavigate } from "react-router-dom";
+import {User, Student, Parent, SecondaryRep, TertiaryRep, isStudent, isParent, isSecStaff, isTertStaff, indigenous, firstInFamily, getUserType} from "@shared/types/user";
+import { onboardingsteps, profilesteps } from "../data/onboardingsteps";
+import {
+  useFloating,
+  offset,
+  flip,
+  shift,
+  autoUpdate
+} from '@floating-ui/react';
 
 export default function OnboardingProfile() {
-  const { onboardingprofile, update } = useOnboardingProfile();
+  const navigate = useNavigate();
+  const { onboardingprofile, update, onboardingprogress, increment, decrement, setProgress } = useOnboardingProfile();
   const [atar, setAtar] = useState("");
   const [hscSubject, setHscSubject] = useState("");
   const [fieldOfInterest, setFieldOfInterest] = useState("");
   const [location, setLocation] = useState("");
+
+
+  const currentStep = onboardingsteps[onboardingprogress];
+  const [target, setTarget] = useState<HTMLElement | null>(null);
   
+  const { refs, floatingStyles } = useFloating({
+    open: !!target,
+    placement: currentStep.placement || "bottom",
+    middleware: [offset(5), flip(), shift()],
+    whileElementsMounted: autoUpdate,
+  });
+
+  useEffect(() => {
+    const step = onboardingsteps[onboardingprogress];
+    const el = document.querySelector(step.target) as HTMLElement | null;
+
+    refs.setReference(el);
+    setTarget(el);
+  }, [onboardingprogress, onboardingsteps, refs]);
+
+  useEffect(() => {
+    if (!profilesteps.includes(onboardingprogress)) {
+      setProgress(10);
+    }
+  }, [profilesteps, onboardingprogress, setProgress]);
+
+  function handleNextClick() {
+      switch (onboardingprogress) {
+
+        case 10:
+          increment();
+          navigate("/onboarding/home")
+          break;
+        default:
+          console.log("Unknown action: " + onboardingprogress);
+          setProgress(10)
+      }
+      return;
+  };
+
+  function handlePrevClick() {
+      switch (onboardingprogress) {
+
+        case 7:
+          decrement();
+          navigate("/onboarding/home")
+          break;
+        
+        default:
+          console.log("Unknown action: " + onboardingprogress);
+          setProgress(7)
+      }
+      return;
+  };
+
   if(isStudent(onboardingprofile)){
   return (
-      <div className="min-h-screen bg-bg-soft">
+      <div className="min-h-screen bg-bg-soft" >
         <Navigation />
 
         {/* Header */}
-        <div className="w-full h-[140px] bg-primary-blue flex flex-col justify-center px-6 lg:px-80">
+        <div className="w-full h-[140px] bg-primary-blue flex flex-col justify-center px-6 lg:px-80" id = "profile">
           <h1 className="text-white text-3xl font-bold mb-1">
             {onboardingprofile?.firstName || " " || onboardingprofile?.lastName || "Your Name"}
           </h1>
@@ -27,7 +91,7 @@ export default function OnboardingProfile() {
         </div>
 
         {/* Personal Details */}
-        <ProfileSectionCard title="Personal Details">
+        <ProfileSectionCard title="Personal Details" >
           <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
             <ProfileInput
               className="sm:col-span-2"
@@ -128,7 +192,6 @@ export default function OnboardingProfile() {
           </div>
         </ProfileSectionCard>
 
-
         <ProfileSectionCard title="Your Profile Preferences">
           <div className="space-y-6">
             <ProfileInput
@@ -203,7 +266,46 @@ export default function OnboardingProfile() {
             </div>
           </div>
         </ProfileSectionCard>
+        <div
+          ref={refs.setFloating}
+          style={floatingStyles}
+          className="z-50 w-72 rounded-xl bg-white p-4 text-black shadow-xl" >
+            <h2 className="text-lg font-bold">
+            {currentStep.title}
+          </h2>
+
+          <p className="mt-2 text-sm text-[#777]">
+            {currentStep.description}
+          </p>
+
+          <div className="mt-4 flex justify-between">
+            <button
+              onClick={handlePrevClick}
+              disabled={onboardingprogress === 0}
+              className="rounded bg-primary-blue text-white px-3 py-1"
+            >
+              Back
+            </button>
+            
+            {onboardingprogress < onboardingsteps.length - 1 ? (
+              <button
+                onClick={handleNextClick}
+                className="rounded bg-primary-blue text-white px-3 py-1"
+              >
+                Next
+              </button>
+            ) : (
+              <button
+                onClick={handleNextClick}
+                className="rounded bg-green-500 px-3 py-1"
+              >
+                Finish
+              </button>
+            )}
+          </div>
+        </div>
       </div>
+      
     );
   }
   else if(isParent(onboardingprofile)){
@@ -212,7 +314,7 @@ export default function OnboardingProfile() {
         <Navigation />
 
         {/* Header */}
-        <div className="w-full h-[140px] bg-primary-blue flex flex-col justify-center px-6 lg:px-80">
+        <div className="w-full h-[140px] bg-primary-blue flex flex-col justify-center px-6 lg:px-80" id = "profile">
           <h1 className="text-white text-3xl font-bold mb-1">
             {onboardingprofile?.firstName || " " || onboardingprofile?.lastName || "Your Name"}
           </h1>
@@ -220,8 +322,9 @@ export default function OnboardingProfile() {
         </div>
 
         {/* Personal Details */}
+        <div id = "profile">
         <ProfileSectionCard title="Personal Details">
-          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2" >
             <ProfileInput
               className="sm:col-span-2"
               label="Full Name"
@@ -260,6 +363,7 @@ export default function OnboardingProfile() {
             />
           </div>
         </ProfileSectionCard>
+        </div>
         {/* Payment Summary */}
         {/*
         {onboardingprofile?.payment && (
@@ -346,6 +450,44 @@ export default function OnboardingProfile() {
             </div>
           </div>
         </ProfileSectionCard>
+                <div
+        ref={refs.setFloating}
+        style={floatingStyles}
+        className="z-50 w-72 rounded-xl bg-white p-4 text-black shadow-xl" >
+          <h2 className="text-lg font-bold">
+            {currentStep.title}
+          </h2>
+
+          <p className="mt-2 text-sm text-[#777]">
+            {currentStep.description}
+          </p>
+
+          <div className="mt-4 flex justify-between">
+            <button
+              onClick={handlePrevClick}
+              disabled={onboardingprogress === 0}
+              className="rounded bg-primary-blue text-white px-3 py-1"
+            >
+              Back
+            </button>
+            
+            {onboardingprogress < onboardingsteps.length - 1 ? (
+              <button
+                onClick={handleNextClick}
+                className="rounded bg-primary-blue text-white px-3 py-1"
+              >
+                Next
+              </button>
+            ) : (
+              <button
+                onClick={handleNextClick}
+                className="rounded bg-green-500 px-3 py-1"
+              >
+                Finish
+              </button>
+            )}
+          </div>
+        </div>
       </div>
     );
   }
@@ -355,7 +497,7 @@ export default function OnboardingProfile() {
         <Navigation />
 
         {/* Header */}
-        <div className="w-full h-[140px] bg-primary-blue flex flex-col justify-center px-6 lg:px-80">
+        <div className="w-full h-[140px] bg-primary-blue flex flex-col justify-center px-6 lg:px-80" id = "profile">
           <h1 className="text-white text-3xl font-bold mb-1">
             {onboardingprofile?.firstName || " " || onboardingprofile?.lastName || "Your Name"}
           </h1>
@@ -363,8 +505,9 @@ export default function OnboardingProfile() {
         </div>
 
         {/* Personal Details */}
+        <div id = "profile">
         <ProfileSectionCard title="Personal Details">
-          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2" id = "profile">
             <ProfileInput
               className="sm:col-span-2"
               label="Full Name"
@@ -410,7 +553,7 @@ export default function OnboardingProfile() {
             />
           </div>
         </ProfileSectionCard>
-
+        </div>
         {/* Payment Summary */}
         {/*
         {onboardingprofile?.payment && (
@@ -422,7 +565,7 @@ export default function OnboardingProfile() {
           </div>
         )}
         */}
-        
+
         <ProfileSectionCard title="Your Profile Preferences">
           <div className="space-y-6">
             <ProfileInput
@@ -497,6 +640,44 @@ export default function OnboardingProfile() {
             </div>
           </div>
         </ProfileSectionCard>
+        <div
+        ref={refs.setFloating}
+        style={floatingStyles}
+        className="z-50 w-72 rounded-xl bg-white p-4 text-black shadow-xl" >
+          <h2 className="text-lg font-bold">
+            {currentStep.title}
+          </h2>
+
+          <p className="mt-2 text-sm text-[#777]">
+            {currentStep.description}
+          </p>
+
+          <div className="mt-4 flex justify-between">
+            <button
+              onClick={handlePrevClick}
+              disabled={onboardingprogress === 0}
+              className="rounded bg-primary-blue text-white px-3 py-1"
+            >
+              Back
+            </button>
+            
+            {onboardingprogress < onboardingsteps.length - 1 ? (
+              <button
+                onClick={handleNextClick}
+                className="rounded bg-primary-blue text-white px-3 py-1"
+              >
+                Next
+              </button>
+            ) : (
+              <button
+                onClick={handleNextClick}
+                className="rounded bg-green-500 px-3 py-1"
+              >
+                Finish
+              </button>
+            )}
+          </div>
+        </div>
       </div>
     );
   }

@@ -9,11 +9,9 @@ export default function Navigation() {
   const navItems = [
     { label: "Home", path: "/home", id:"nav-profile" },
     { label: "Course Finder", path: "/course-finder", id:"nav-course-finder"  },
-    { label: "My Wishlist", path: "/wishlist", id:"nav-profile" },
-    { label: "Calendar", path: "/calendar", id:"nav-profile" },
+    { label: "My Wishlist", path: "/wishlist", id:"nav-wishlist" },
+    { label: "Calendar", path: "/calendar", id:"nav-calendar" },
     { label: "Profile", path: "/profile", id:"nav-profile" },
-    { label: "Event", path: "/event", id:"nav-profile" },
-    { label: "Course", path: "/course", id:"nav-profile" },
   ];
 
   return (

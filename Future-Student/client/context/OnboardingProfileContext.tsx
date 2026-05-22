@@ -7,13 +7,14 @@ interface OnboardingProfileContextValue {
   update: (p: Partial<User>) => void;
   clear: () => void;
   onboardingprogress: number;
-  increment: (n: number) => void;
-  decrement: (n: number) => void;
+  increment: () => void;
+  decrement: () => void;
   setProgress: (n: number) => void;
 }
 
+const STORAGE_KEY1 = "user.onboardingprofile";
 
-const STORAGE_KEY = "user.onboardingprofile";
+const STORAGE_KEY2 = "user.onboardingprogress";
 const OnboardingProfileContext = createContext<OnboardingProfileContextValue | undefined>(undefined);
 
 export function OnboardingProfileProvider({ children }: { children: React.ReactNode }) {
@@ -22,10 +23,40 @@ export function OnboardingProfileProvider({ children }: { children: React.ReactN
 
   useEffect(() => {
     try {
-      const raw = localStorage.getItem(STORAGE_KEY);
+      const raw = localStorage.getItem(STORAGE_KEY1);
       if (raw) setOnboardingProfile(JSON.parse(raw));
     } catch {}
   }, []);
+
+  useEffect(() => {
+      try {
+        localStorage.setItem(STORAGE_KEY1, JSON.stringify(onboardingprofile));
+      } catch {
+      }
+    }, [onboardingprofile]);
+  
+  
+  useEffect(() => {
+    try {
+      const raw = localStorage.getItem(STORAGE_KEY2);
+      if (raw) changeProgress(JSON.parse(raw));
+      if(!onboardingprogress){
+        changeProgress(0);
+      }
+    } catch {}
+  }, []);
+
+  useEffect(() => {
+      try {
+        localStorage.setItem(STORAGE_KEY2, JSON.stringify(onboardingprofile));
+      } catch {
+      }
+  }, [onboardingprogress]);
+
+  const setNProgress = (n) => {
+    if (n === onboardingprogress) return; 
+    changeProgress(onboardingprogress);
+  };
 
   const value = useMemo<OnboardingProfileContextValue>(() => ({
     onboardingprofile,
@@ -41,10 +72,10 @@ export function OnboardingProfileProvider({ children }: { children: React.ReactN
       }),
     clear: () => setOnboardingProfile(null),
     onboardingprogress,
-    increment: () => changeProgress(onboardingprogress + 1),
-    decrement: () => changeProgress(onboardingprogress - 1),
-    setProgress: (n) => changeProgress(n)
-  }), [onboardingprofile]);
+    setProgress: setNProgress,
+    increment: () => changeProgress(prev => prev + 1),
+    decrement: () => changeProgress(prev => prev - 1),
+  }), [onboardingprofile, onboardingprogress]);
 
   return <OnboardingProfileContext.Provider value={value}>{children}</OnboardingProfileContext.Provider>;
 }

@@ -5,7 +5,7 @@ import { gsap } from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 
 import { SectionWrapper } from "@/components/SectionWrapper";
-import type { JourneyStep, JourneyTask } from "@/types/types";
+import type { JourneyStep, JourneyTask } from "@shared/types/types";
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -96,7 +96,7 @@ export function ApplicationJourney({
         ref={sectionRef}
         className="relative overflow-hidden rounded-[32px] border border-[#B3D8FF] bg-white px-6 py-10 lg:px-12 lg:py-14"
       >
-        <div className="mb-12 flex flex-col gap-6 lg:flex-row lg:items-end lg:justify-between">
+        <div className="mb-12 flex flex-col gap-6 lg:flex-row lg:items-end lg:justify-between" id = "application-journey">
           <div>
             <p className="mb-3 text-sm font-bold uppercase tracking-[0.2em] text-primary-blue">
               Application Progress

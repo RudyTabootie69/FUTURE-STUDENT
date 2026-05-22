@@ -7,13 +7,11 @@ export default function OnboardingNavigation() {
   const { logout } = useAuth();
 
   const navItems = [
-    { label: "Home", path: "/home", id:"nav-profile" },
-    { label: "Course Finder", path: "/course-finder", id:"nav-course-finder"  },
-    { label: "My Wishlist", path: "/wishlist", id:"nav-profile" },
-    { label: "Calendar", path: "/calendar", id:"nav-profile" },
-    { label: "Profile", path: "/profile", id:"nav-profile" },
-    { label: "Event", path: "/event", id:"nav-profile" },
-    { label: "Course", path: "/course", id:"nav-profile" },
+    { label: "Home", path: "/onboarding/home", id:"nav-home" },
+    { label: "Course Finder", path: "/onboarding/course-finder", id:"nav-course-finder"  },
+    { label: "My Wishlist", path: "/onboarding/wishlist", id:"nav-wishlist" },
+    { label: "Calendar", path: "/onboarding/calendar", id:"nav-calendar" },
+    { label: "Profile", path: "/onboarding/profile", id:"nav-profile" },
   ];
 
   return (

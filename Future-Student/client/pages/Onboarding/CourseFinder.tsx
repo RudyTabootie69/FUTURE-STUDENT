@@ -1,13 +1,23 @@
-import { useMemo, useState } from "react";
+import { useMemo, useState, useEffect } from "react";
 import { Search, ChevronDown } from "lucide-react";
-import Navigation from "@/components/Navigation";
+import OnboardingNavigation from "@/components/OnboardingNavigation";
 import type { Course } from "@shared/types/course";
 import { toString } from "@shared/types/course";
 import { useWishlist } from "@/context/WishlistContext";
 import { useNavigate } from "react-router-dom";
 import {useTags} from "@/context/TagContext"
+import { useOnboardingProfile } from "@/context/OnboardingProfileContext";
+import { onboardingsteps, coursesteps } from "../data/onboardingsteps";
+import {
+  useFloating,
+  offset,
+  flip,
+  shift,
+  autoUpdate
+} from '@floating-ui/react';
 
 export default function OnboardingCourseFinder() {
+  const { onboardingprogress, increment, decrement, setProgress } = useOnboardingProfile();
   const navigate = useNavigate();
   const tags = useTags();
   const coursetags = tags.courseTags;
@@ -19,7 +29,28 @@ export default function OnboardingCourseFinder() {
   const [atarMin, setAtarMin] = useState<number>(30);
   const [atarMax, setAtarMax] = useState<number>(99.95);
   const [sortBy, setSortBy] = useState<"none" | "uni" | "course">("none");
+
+  const currentStep = onboardingsteps[onboardingprogress];
+  const [target, setTarget] = useState<HTMLElement | null>(null);
   
+  const { refs, floatingStyles, update } = useFloating({
+    open: !!target,
+    placement: currentStep.placement || "bottom",
+    middleware: [offset(5), flip(), shift()],
+    whileElementsMounted: autoUpdate,
+  });
+
+  useEffect(() => {
+    const step = onboardingsteps[onboardingprogress];
+    const el = document.querySelector(step.target) as HTMLElement | null;
+
+    refs.setReference(el);
+    setTarget(el);
+    requestAnimationFrame(() => {
+      update();
+    });
+  }, [onboardingprogress, onboardingsteps, refs]);
+
   const courses = []
   const universities = [
     {
@@ -247,12 +278,55 @@ export default function OnboardingCourseFinder() {
     }
   }
 
+  function handleNextClick() {
+      switch (onboardingprogress) {
+
+        case 2:
+          increment();
+          break;
+        case 3:
+          increment();
+          navigate("/onboarding/home")
+          break;
+        default:
+          console.log("Unknown action: " + onboardingprogress);
+          setProgress(3)
+      }
+      return;
+  };
+
+  function handlePrevClick() {
+      switch (onboardingprogress) {
+
+        case 2:
+          decrement();
+          navigate("/onboarding/home")
+          break;
+        
+        case 3:
+          decrement();
+          break;
+        
+        default:
+          console.log("Unknown action: " + onboardingprogress);
+          setProgress(0)
+      }
+      return;
+  };
+
+  useEffect(() => {
+    if (!coursesteps.includes(onboardingprogress)) {
+      setProgress(3);
+    }
+  }, [coursesteps, onboardingprogress, setProgress]);
+
+
   return (
     <div className="min-h-screen bg-bg-soft">
-      <Navigation />
+      <OnboardingNavigation />
 
       {/* Header */}
-      <div className="w-full h-[140px] bg-primary-blue flex items-center justify-start px-6 lg:px-36">
+      <div className="w-full h-[140px] bg-primary-blue flex items-center justify-start px-6 lg:px-36" id= "course-finder">
         <div>
           <h1 className="text-white text-3xl font-bold mb-2">
             Find Your Perfect Course
@@ -467,6 +541,46 @@ export default function OnboardingCourseFinder() {
           </div>
         </div>
       </div>
+            <div
+              ref={refs.setFloating}
+              style={floatingStyles}
+              className="z-50 w-72 rounded-xl bg-white p-4 text-black shadow-xl"
+      
+            >
+              <h2 className="text-lg font-bold">
+                {currentStep.title}
+              </h2>
+      
+              <p className="mt-2 text-sm text-[#777]">
+                {currentStep.description}
+              </p>
+      
+              <div className="mt-4 flex justify-between">
+                <button
+                  onClick={handlePrevClick}
+                  disabled={onboardingprogress === 0}
+                  className="rounded bg-primary-blue text-white px-3 py-1"
+                >
+                  Back
+                </button>
+                
+                {onboardingprogress < onboardingsteps.length - 1 ? (
+                  <button
+                    onClick={handleNextClick}
+                    className="rounded bg-primary-blue text-white px-3 py-1"
+                  >
+                    Next
+                  </button>
+                ) : (
+                  <button
+                    onClick={handleNextClick}
+                    className="rounded bg-green-500 px-3 py-1"
+                  >
+                    Finish
+                  </button>
+                )}
+              </div>
+          </div>
     </div>
   );
 }
