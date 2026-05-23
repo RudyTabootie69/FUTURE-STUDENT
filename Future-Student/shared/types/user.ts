@@ -304,3 +304,7 @@ export function getUserType(user: User): string {
   }
   return "Undefined"
 }
+
+export function toString(user: User): string {
+  return `${user.firstName}__${user.lastName}__${user.id}`;
+}
