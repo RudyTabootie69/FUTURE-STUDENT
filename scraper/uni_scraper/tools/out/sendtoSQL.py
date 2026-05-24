@@ -10,8 +10,6 @@ database = "futurestudentdb"
 
 
 unis = []
-uniacronyms = []
-unititles = []
 courses = []
 courseVariants = []
 courseOfferings = []
@@ -21,6 +19,7 @@ modesofattendance = []
 atarStats = []
 data = []
 events = []
+campuses = []
 courseID, uniAcronym, courseTitle = "", "", ""
 offeringID, durationID, modecounter = 0, 0, 0 
 
@@ -38,6 +37,33 @@ class Uni:
         self.criscosId = criscosId
         self.teqsaId = teqsaId
         self.rtoId = rtoId
+    
+    def __eq__(self, other):
+        if not isinstance(other, Uni):
+            return NotImplemented
+        return (
+            self.uniAcronym == other.uniAcronym or
+            self.uniTitle == other.uniTitle
+        )
+
+    def __hash__(self):
+        return hash((self.acronym, self.campuscode))
+
+class Campus:
+    def __init__(self, uniAcronym, campusname):
+        self.uniAcronym = uniAcronym
+        self.campusname = campusname
+
+    def __eq__(self, other):
+        if not isinstance(other, Campus):
+            return NotImplemented
+        return (
+            self.uniAcronym == other.uniAcronym and
+            self.campusname == other.campusname
+        )
+
+    def __hash__(self):
+        return hash((self.acronym, self.campuscode))
 
 class Course:
     def __init__(self, uniAcronym, courseCode, courseTitle, header, careerOptions, studyDetails, practicalDetails, feeURL, courseurl):
@@ -52,11 +78,22 @@ class Course:
         self.courseurl = courseurl
 
 class CourseVariant:
-    def __init__(self, courseID, variantID, campus, feeType):
+    def __init__(self, courseID, variantID, uniAcronym, campus, feeType):
         self.courseID = courseID
         self.variantID = variantID
+        self.uniAcronym = uniAcronym
         self.campus = campus
         self.feeType = feeType
+    
+    def __eq__(self, other):
+        if not isinstance(other, Uni):
+            return NotImplemented
+        return (
+            self.variantID == other.variantID
+        )
+
+    def __hash__(self):
+        return hash((self.variantID))
 
 class CourseOffering:
     def __init__(self, variantID, offeringID, enrolOpen, enrolClose):
@@ -143,20 +180,24 @@ with open('uac_details_html_removed.jl', 'r') as file:
         if data["details_json"]["course"]["studentProfileLink"] is not None:
             print(data["details_json"]["course"]["studentProfileLink"])
 
-        if newAcronym not in uniacronyms and newName not in unititles and newAcronym is not None:
-            newuni = Uni(newAcronym, newName, newcriscosId, newteqsaId, newrtoId)
+        newuni = Uni(newAcronym, newName, newcriscosId, newteqsaId, newrtoId)
+        if newuni not in unis and newAcronym is not None:
             unis.append(newuni)
-            uniacronyms.append(newuni.uniAcronym)
-            unititles.append(newuni.uniTitle)
 
         courses.append(Course(newAcronym, newCourseCode, newCourseTitle, newHeader, newCareerOptions, newstudyDetails, newpracticalDetails, newfeeDetails, newCourseUrl))
         newcoursevariants = data["details_json"]["courseList"]
         
         for newcoursevariant in newcoursevariants:
-            newcampus = newcoursevariant["campusCode"]
+            newcampuscode = newcoursevariant["campusCode"]
             newFeeType = newcoursevariant["feeType"]
             newcoursevariantId = newcoursevariant["courseCode"]
-            courseVariants.append(CourseVariant(newCourseCode, newcoursevariantId, newcampus, newFeeType))
+            newcampus = Campus(newAcronym, newcampuscode)
+            if newcampus not in campuses:
+                campuses.append(newcampus)
+
+            newcoursevariantinst = CourseVariant(newCourseCode, newcoursevariantId, newAcronym, newcampuscode, newFeeType)    
+            if newcoursevariantinst not in courseVariants:
+                courseVariants.append(newcoursevariantinst)
             
             newofferings = newcoursevariant["offerings"]
             for newoffering in newofferings:
@@ -221,11 +262,14 @@ metadata = MetaData()
 for uni in unis:
     statement = conn.execute(table('University', Column('acronym'), Column('name'), Column('criscos'), Column('teqsa'), Column('rto')).insert().values({ 'acronym': uni.uniAcronym, 'name': uni.uniTitle, 'criscos': uni.criscosId, 'teqsa': uni.teqsaId, 'rto': uni.rtoId }))
 
+for campus in campuses:
+    statement = conn.execute(table('Campus', Column('uni'), Column('campus')).insert().values({ 'uni': campus.uniAcronym, 'campus': campus.campusname}))
+
 for course in courses:
     statement = conn.execute(table('Course', Column('courseID'), Column('uniAcronym'), Column('title'), Column('header'), Column('careerOptions'), Column('studyDetails'), Column('pracDetails'), Column('feeurl'), Column('courseurl')).insert().values({'courseID': course.courseCode, 'uniAcronym': course.uniAcronym, 'title': course.courseTitle, 'header':course.header, 'careerOptions':course.careerOptions, 'studyDetails': course.studyDetails, 'pracDetails': course.practicalDetails, 'feeurl': course.feeURL, 'courseurl':course.courseurl}))
 
 for coursevariant in courseVariants:
-    statement = conn.execute(table('CourseVariant', Column('courseID'), Column('variantID'), Column('campus'), Column('feeType')).insert().values({ 'courseID': coursevariant.courseID, 'variantID': coursevariant.variantID, 'campus': coursevariant.campus, 'feeType': coursevariant.feeType }))
+    statement = conn.execute(table('CourseVariant', Column('courseID'), Column('variantID'), Column('uni'), Column('campus'), Column('feeType')).insert().values({ 'courseID': coursevariant.courseID, 'variantID': coursevariant.variantID, 'uni': coursevariant.uniAcronym, 'campus': coursevariant.campus, 'feeType': coursevariant.feeType }))
 
 for courseOffering in courseOfferings:
     statement = conn.execute(table('CourseOffering', Column('variantID'), Column('offeringID'), Column('startDate'), Column('lastDate')).insert().values({ 'variantID': coursevariant.variantID, 'offeringID': courseOffering.offeringID, 'startDate': courseOffering.enrolOpen, 'lastDate': courseOffering.enrolClose }))

@@ -114,19 +114,35 @@ server.post('/users/:login', (req, res) => {
       }
       break;
 
-    case "Staff":
+    case "SecStaff":
       try {
         conn.query('SELECT Users.id, Users.firstName, Users.lastName, Users.userName, Users.email, Users.dob, Users.address, SchoolStaff.school, FROM Users INNER JOIN Users.id = SchoolStaff.id AND Users.username = ?', username, (err, result) => {
 
 
           /* Edit to remove password later */
-          user = new Staff(result.first[0], result.first[1], result.first[2], result.first[3], result.first[4], result.first[5], result.first[6], result.first[7]);
+          user = new SecondaryRep(result.first[0], result.first[1], result.first[2], result.first[3], result.first[4], result.first[5], result.first[6], result.first[7]);
           console.log('Log in success (Staff)');
           res.send(user);
         });
     }catch (error) {
       res.status(500).send('Login failed'); // Handle any unexpected errors
     }
+    
+    break;
+    case "TertStaff":
+      try {
+        conn.query('SELECT Users.id, Users.firstName, Users.lastName, Users.userName, Users.email, Users.dob, Users.address, SchoolStaff.school, FROM Users INNER JOIN Users.id = SchoolStaff.id AND Users.username = ?', username, (err, result) => {
+
+
+          /* Edit to remove password later */
+          user = new TertiaryRep(result.first[0], result.first[1], result.first[2], result.first[3], result.first[4], result.first[5], result.first[6], result.first[7]);
+          console.log('Log in success (Staff)');
+          res.send(user);
+        });
+    }catch (error) {
+      res.status(500).send('Login failed'); // Handle any unexpected errors
+    }
+    
     break;
 
     case "Parent":

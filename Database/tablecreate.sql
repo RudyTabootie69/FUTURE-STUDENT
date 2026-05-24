@@ -1,7 +1,8 @@
 /*You will want to run this locally on your pc running mySQL*/
 DROP DATABASE IF EXISTS futurestudentdb;
 CREATE USER IF NOT EXISTS 'future-student'@'localhost';
-GRANT CREATE, ALTER, DROP, INSERT, UPDATE, DELETE, SELECT, REFERENCES, RELOAD on *.* TO 'future-student'@'localhost' WITH GRANT OPTION;
+ALTER USER 'future-student'@'localhost' IDENTIFIED BY 'fsdbpw';
+GRANT CREATE, ALTER, DROP, INSERT, UPDATE, DELETE, SELECT, REFERENCES, LOCK TABLES, RELOAD on *.* TO 'future-student'@'localhost' WITH GRANT OPTION;
 CREATE DATABASE IF NOT EXISTS futurestudentdb;
 USE futurestudentdb;
 
@@ -11,6 +12,13 @@ CREATE TABLE IF NOT EXISTS University(
     criscos varchar(255),
     teqsa varchar(255),
     rto varchar(255)
+);
+
+CREATE TABLE IF NOT EXISTS Campus(
+    uni varchar(255),
+    campus varchar(255),
+    FOREIGN KEY (uni) REFERENCES University(acronym),
+    CONSTRAINT U_Campus UNIQUE (uni, campus)
 );
 
 CREATE TABLE IF NOT EXISTS School(
@@ -40,16 +48,7 @@ CREATE TABLE IF NOT EXISTS Student(
     studentPathStagePage int,
     usi varchar (255),
     entryYear int,
-    
-
     FOREIGN KEY (stuID) REFERENCES User(id),
-    FOREIGN KEY (school) REFERENCES School(name)
-);
-
-CREATE TABLE IF NOT EXISTS Staff(
-    staffID INT PRIMARY KEY,
-    school varchar(255),
-    FOREIGN KEY (staffID) REFERENCES User(id),
     FOREIGN KEY (school) REFERENCES School(name)
 );
 
@@ -60,10 +59,20 @@ CREATE TABLE IF NOT EXISTS Parent(
     FOREIGN KEY (childID) REFERENCES Student(stuID)
 );
 
-CREATE TABLE IF NOT EXISTS UniAdmin(
-    id INT PRIMARY KEY,
+CREATE TABLE IF NOT EXISTS SecondaryRep(
+    secID INT PRIMARY KEY,
+    school varchar(255),
+    FOREIGN KEY (secID) REFERENCES User(id),
+    FOREIGN KEY (school) REFERENCES School(name)
+);
+
+CREATE TABLE IF NOT EXISTS TertiaryRep(
+    tertID INT PRIMARY KEY,
     uni varchar(255),
-    FOREIGN KEY (uni) REFERENCES University(acronym)
+    campus varchar(255),
+    FOREIGN KEY (tertID) REFERENCES User(id),
+    FOREIGN KEY (uni) REFERENCES University(acronym),
+    FOREIGN KEY (uni, campus) REFERENCES Campus(uni, campus)
 );
 
 CREATE TABLE IF NOT EXISTS Course(
@@ -83,9 +92,11 @@ CREATE TABLE IF NOT EXISTS Course(
 CREATE TABLE IF NOT EXISTS CourseVariant(
     courseID varchar(255),
     variantID varchar(255) PRIMARY KEY, 
+    uni varchar(255),
     campus varchar(255),
     feeType varchar(255),
-    FOREIGN KEY (courseID) REFERENCES Course(courseID)
+    FOREIGN KEY (courseID) REFERENCES Course(courseID),
+	FOREIGN KEY (uni, campus) REFERENCES Campus(uni, campus)
 );
 
 #
@@ -94,7 +105,7 @@ CREATE TABLE IF NOT EXISTS CourseOffering(
     startDate date,
     lastDate date,
     FOREIGN KEY (variantID) REFERENCES CourseVariant(variantID),
-    CONSTRAINT PK_REQUIREMENTS PRIMARY KEY (variantID, startDate)
+    CONSTRAINT PK_REQUIREMENTS PRIMARY KEY (variantID, startDate, lastDate)
 );
 
 CREATE TABLE IF NOT EXISTS ModeOfAttendance(
@@ -157,6 +168,14 @@ CREATE TABLE IF NOT EXISTS EventTag(
     CONSTRAINT PK_APPLICATION PRIMARY KEY (eventID, tagID),
     FOREIGN KEY (eventID) REFERENCES Event(eventID),
     FOREIGN KEY (tagID) REFERENCES Tag(tagID)
+);
+
+CREATE TABLE IF NOT EXISTS StudentTag(
+    eventID INT,
+    studentID INT,
+    CONSTRAINT PK_APPLICATION PRIMARY KEY (eventID, studentID),
+    FOREIGN KEY (eventID) REFERENCES Event(eventID),
+    FOREIGN KEY (studentID) REFERENCES Student(stuID)
 );
 
 /*CREATE TABLE IF NOT EXISTS Pathway(
