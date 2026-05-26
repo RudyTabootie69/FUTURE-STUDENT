@@ -2,6 +2,7 @@ import { createContext, Dispatch, SetStateAction, useContext, useEffect, useMemo
 import type { Course } from "@shared/types/course";
 import { toString } from "@shared/types/course";
 import {useAuth} from "@/context/AuthContext"
+import { requestdelay } from "@/pages/data/connection-data";
 
 interface CourseContextValue {
   courses: Course[];
@@ -27,7 +28,7 @@ export function CourseProvider({ children }: { children: React.ReactNode }) {
 
     const timeout = setTimeout(() => {
       fetchCourses(search);
-    }, 500);
+    }, requestdelay);
 
     return () => clearTimeout(timeout);
   }, [search]);
@@ -38,7 +39,7 @@ export function CourseProvider({ children }: { children: React.ReactNode }) {
       setError(null);
 
       const res = await fetch(
-        `/eventSearch=${encodeURIComponent(search)}`, {
+        `/courseSearch=${encodeURIComponent(search)}`, {
         credentials: "include",
       });
 

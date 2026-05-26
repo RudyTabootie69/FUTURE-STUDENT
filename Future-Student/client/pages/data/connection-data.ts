@@ -1,0 +1,1 @@
+export const requestdelay: number = 1000;
