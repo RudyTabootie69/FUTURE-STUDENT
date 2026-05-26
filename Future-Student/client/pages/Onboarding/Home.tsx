@@ -297,7 +297,7 @@ export default function OnboardingHome() {
           <DialogHeader>
             <DialogTitle>Create Account</DialogTitle>
             <DialogDescription>
-              Join Future Student. It only takes a minute.
+              Join Future Student today!
             </DialogDescription>
           </DialogHeader>
           <form

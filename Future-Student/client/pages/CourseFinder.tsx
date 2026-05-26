@@ -1,18 +1,25 @@
-import { useMemo, useState } from "react";
+import { useMemo, useState, useEffect } from "react";
 import { Search, ChevronDown } from "lucide-react";
 import Navigation from "@/components/Navigation";
 import type { Course } from "@shared/types/course";
 import { toString } from "@shared/types/course";
 import { useWishlist } from "@/context/WishlistContext";
+import { useAuth } from "@/context/AuthContext";
 import { useNavigate } from "react-router-dom";
+import { useCourseFinder } from "@/context/CourseContext";
 import {useTags} from "@/context/TagContext"
 
 export default function CourseFinder() {
   const navigate = useNavigate();
+  const {checkAuth} = useAuth();
+  useEffect(() => {
+    checkAuth();
+  }, [checkAuth]);
+  
+  const { search, setSearch, courses } = useCourseFinder();
   const tags = useTags();
   const coursetags = tags.courseTags;
   // Filters & sort
-  const [search, setSearch] = useState<string>("");
   const [fieldFilter, setFieldFilter] = useState<string>("All Fields");
   const [universityFilter, setUniversityFilter] =
     useState<string>("All Universities");
@@ -20,7 +27,6 @@ export default function CourseFinder() {
   const [atarMax, setAtarMax] = useState<number>(99.95);
   const [sortBy, setSortBy] = useState<"none" | "uni" | "course">("none");
   
-  const courses = []
   const universities = [
     {
       name: "University of Wollongong",
@@ -398,7 +404,7 @@ export default function CourseFinder() {
             <div className="h-[632px] overflow-x-auto overflow-y-auto">
               <table className="w-full">
                 <tbody className="divide-y divide-[#E9E8FC]">
-                  {filteredCourses.map((course, index) => (
+                  {courses.map((course, index) => (
                     <tr
                       key={toString(course) + index}
                       className="hover:bg-gray-50 transition-colors"

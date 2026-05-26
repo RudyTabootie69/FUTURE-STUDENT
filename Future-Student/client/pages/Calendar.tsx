@@ -6,6 +6,7 @@ import type { Event } from "@shared/types/event";
 import { useEvent } from "@/context/EventContext";
 import { buildMonthMatrix, isoKey, monthLabel } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
+import { useAuth } from "@/context/AuthContext";
 import { useNavigate } from "react-router-dom";
 
   //How to load into this

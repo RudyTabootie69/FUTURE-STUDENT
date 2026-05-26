@@ -15,7 +15,7 @@ interface CourseContextValue {
 const CourseContext = createContext<CourseContextValue | undefined>(undefined);
 
 export function CourseProvider({ children }: { children: React.ReactNode }) {
-  const [search, setSearch] = useState("");
+  const [search, setSearch] = useState<string>("");
   const [courses, setCourses] = useState<Course[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -61,7 +61,7 @@ export function CourseProvider({ children }: { children: React.ReactNode }) {
   return <CourseContext.Provider value={{courses, loading, search, error, setSearch}}>{children}</CourseContext.Provider>;
 }
 
-export function useCourse() {
+export function useCourseFinder() {
   const ctx = useContext(CourseContext);
   if (!ctx) throw new Error("useCourse must be used within CourseProvider");
   return ctx;

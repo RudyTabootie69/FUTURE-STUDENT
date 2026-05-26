@@ -31,7 +31,7 @@ const conn= mysql.createPool({
 });
 
 // Create a new user
-server.post('/users/:register', (req, res) => {
+server.post('/users/register', (req, res) => {
     const { username, password} = req.body;
 
     const saltRounds = 10;
@@ -72,7 +72,7 @@ server.post('/users/:register', (req, res) => {
 
 
 // Check user for log in
-server.post('/users/:login', (req, res) => {
+server.post('/users/login', (req, res) => {
   const { username, password, userType, stayLogged} = req.body;
 
   let user = new User(-1, "John", "Doe", "123456789", "TestAccount", "test@test.com", "Northfields Ave");
@@ -178,14 +178,14 @@ server.post('/users/:login', (req, res) => {
   }
 });
 
-server.post('/users/:logout', (req, res) => {
+server.post('/users/logout', (req, res) => {
   res.clearCookie('token', {
     httpOnly: true,
     secure: false,
   }).send({ success: true });
 });
 
-server.post('/users/:auth', (req, res, next) => {
+server.post('/users/auth', (req, res, next) => {
     const token = req.cookies.token;
     if (!token) {
       return res.status(401).send({ message: 'Unauthorized access' });
@@ -217,7 +217,7 @@ server.get('/users', (req, res) => {
 });
 
 // Get user by ID
-server.get('/users/:id', (req, res) => {
+server.get('/users/id', (req, res) => {
   const userId = req.params.id;
   conn.query('SELECT * FROM users WHERE id = ?', userId, (err, rows) => {
     if (err) throw err;
@@ -234,7 +234,7 @@ server.get('/events', (req, res) => {
 });
 
  // Get event by ID
-server.get('/events/:id', (req, res) => {
+server.get('/events/id', (req, res) => {
   const eventId = req.params.id;
   conn.query('SELECT * FROM Event WHERE eventID = ?', eventId, (err, rows) => {
     if (err) throw err;
@@ -251,7 +251,7 @@ server.get('/eventtags', (req, res) => {
 });
 
  // Get event tag by ID
-server.get('/eventtags/:id', (req, res) => {
+server.get('/eventtags/id', (req, res) => {
   const {eventId, tagId } = req.body;
   conn.query('SELECT * FROM Event WHERE eventID = ? AND tagID = ?',  [eventId, tagId], (err, rows) => {
     if (err) throw err;
@@ -260,7 +260,7 @@ server.get('/eventtags/:id', (req, res) => {
 });
 
 // Get specific user info
-server.get('/users/info/:id', (req, res) => {
+server.get('/users/info/id', (req, res) => {
   const userId = req.params.id;
   conn.query('SELECT getUserInfo(?)', [userId], (err, rows) => {
     if (err) throw err;

@@ -1,7 +1,5 @@
 import Navigation from "@/components/Navigation";
 import { Course } from "@shared/types/course";
-import { toString } from "@shared/types/course";
-import { useWishlist } from "@/context/WishlistContext";
 import { useLocation, useNavigate } from "react-router-dom";
 
 type State = {
@@ -9,8 +7,8 @@ type State = {
 };
 
 export default function CoursePage() {
-  const location = useLocation();
   const navigate = useNavigate();
+  const location = useLocation();
   const state = location.state as State | null;
   const testing = true;
   let course: Course;

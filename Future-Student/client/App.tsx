@@ -29,6 +29,7 @@ import OnboardingCourseFinder from "./pages/Onboarding/CourseFinder";
 import OnboardingWishlist from "./pages/Onboarding/Wishlist";
 import OnboardingProfile from "./pages/Onboarding/Profile";
 import AboutUs from "./pages/AboutUs";
+import PrivacyPolicy from "./pages/PrivacyPolicy";
 import ContactUs from "./pages/ContactUs";
 import EventPage from "./pages/EventPage";
 import CoursePage from "./pages/CoursePage";
@@ -65,6 +66,7 @@ const App = () => (
                           <Route path="/wishlist" element={<Wishlist />} />
                           <Route path="/profile" element={<Profile />} />
                           <Route path="/about" element={<AboutUs />} />
+                          <Route path="/privacypolicy" element={<PrivacyPolicy />} />
                           <Route path="/contact" element={<ContactUs />} />
                           <Route path="/course" element={<CoursePage />} />
                           <Route path="/event" element={<EventPage />} />

@@ -1,10 +1,11 @@
 import { createContext, useContext, useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-
+import {User, getUserType} from "@shared/types/user"
 interface AuthContextValue {
   token: any
   isAuthenticated: boolean;
-  register: (firstname: string, lastname: string, username: string, password: string) => Promise<void>;
+  checkAuth: () => void;
+  register: (user: User,firstname: string, lastname: string, username: string, password: string) => Promise<void>;
   login: (username: string, password: string) => Promise<void>;
   logout: () => Promise<void>;
 }
@@ -19,6 +20,7 @@ export const AuthProvider = ({ children }) => {
 
   const [token, setToken] = useState(localStorage.getItem("site") || "");
   const [isAuthenticated, setIsAuthenticated] = useState<boolean>(false);
+  const [authLoading, setAuthLoading] = useState(true);
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -29,18 +31,22 @@ export const AuthProvider = ({ children }) => {
       .then((res) => {
         setIsAuthenticated(res.ok);
       })
-      .catch(() => setIsAuthenticated(false));
+      .catch(() => {setIsAuthenticated(false);})
+      .finally(() => {
+      setAuthLoading(false);
+      })
   }, []);
 
-  const register = async (firstName, lastName, userName, passWord) => {
-    try {
+  const register = async (user: User, userName, passWord) => {
+
+      try {
       const response = await fetch("/backend/users/register", {
         method: "POST",
         headers: {
           'Content-Type': 'application/json'
         },
         body: 
-          JSON.stringify({"firstname":  firstName, "lastname": lastName, "username": userName, "password": passWord}), 
+          JSON.stringify({"firstname":  user.firstName, "lastname": user.lastName, "username": userName, "password": passWord, "usertype": getUserType(user)}), 
       });
       if (!response.ok) {
           const res = await response.json();
@@ -94,7 +100,13 @@ export const AuthProvider = ({ children }) => {
     });
   };
 
-  return <AuthContext.Provider value={{token, isAuthenticated, register, login, logout}}>{children}</AuthContext.Provider>;
+  const checkAuth = () => {
+    if (!isAuthenticated && !authLoading){
+      navigate("/")
+    }
+  }
+
+  return <AuthContext.Provider value={{token, isAuthenticated, checkAuth, register, login, logout}}>{children}</AuthContext.Provider>;
 }
 
 export function useAuth() {

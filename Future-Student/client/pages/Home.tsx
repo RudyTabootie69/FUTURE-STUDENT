@@ -2,12 +2,12 @@ import { useMemo } from "react";
 import Navigation from "@/components/Navigation";
 import Footer from "@/components/Footer";
 import { useWishlist } from "@/context/WishlistContext";
-
+import { useAuth } from "@/context/AuthContext";
 import { Hero } from "@/sections/Hero";
 import { ApplicationJourney } from "@/sections/ApplicationJourney";
 import { StatsGrid } from "@/sections/StatsGrid";
 import { QuickActions } from "@/sections/QuickActions";
-
+import { useNavigate } from "react-router-dom";
 import { actionCards } from "./data/home-data";
 import { getUpcomingDeadlines } from "@/lib/utils";
 
@@ -25,6 +25,11 @@ function getStepStatus(
 }
 
 export default function Home() {
+  const navigate = useNavigate();
+    const isAuthenticated = useAuth();
+      if(!isAuthenticated){
+        navigate("/")
+      }
   const { wishlist } = useWishlist();
 
   const upcomingDeadlines = useMemo(() => {
