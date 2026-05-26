@@ -5,7 +5,7 @@ interface AuthContextValue {
   token: any
   isAuthenticated: boolean;
   checkAuth: () => void;
-  register: (user: User,firstname: string, lastname: string, username: string, password: string) => Promise<void>;
+  register: (user: User, username: string, password: string) => Promise<void>;
   login: (username: string, password: string) => Promise<void>;
   logout: () => Promise<void>;
 }

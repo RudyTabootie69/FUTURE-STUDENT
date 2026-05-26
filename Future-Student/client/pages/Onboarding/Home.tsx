@@ -1,7 +1,7 @@
 import { useMemo, useState, useEffect } from "react";
 import OnboardingNavigation from "@/components/OnboardingNavigation";
 import { useNavigate } from "react-router-dom";
-import Footer from "@/components/Footer";
+import OnboardingFooter from "@/components/OnboardingFooter";
 import { useAuth } from "@/context/AuthContext";
 import { useWishlist } from "@/context/WishlistContext";
 import {
@@ -45,7 +45,7 @@ function getStepStatus(
 
 export default function OnboardingHome() {
   const navigate = useNavigate();
-  const { onboardingprogress, increment, decrement, setProgress } = useOnboardingProfile();
+  const {onboardingprofile, onboardingprogress, increment, decrement, setProgress } = useOnboardingProfile();
   const [firstname, setFirstname] = useState<string>("");
   const [lastname, setLastname] = useState<string>("");
   const [username, setUsername] = useState<string>("");
@@ -290,7 +290,7 @@ export default function OnboardingHome() {
 
       <QuickActions cards={actionCards} />
 
-      <Footer />
+      <OnboardingFooter />
       
       <Dialog open={openSignUp} onOpenChange={setOpenSignUp}>
         <DialogContent className="sm:max-w-md">
@@ -304,7 +304,7 @@ export default function OnboardingHome() {
             className="space-y-3"
             onSubmit={(e) => {
               e.preventDefault();
-              register(firstname, lastname, username, password);
+              register(onboardingprofile, username, password);
               setOpenSignUp(false);
             }}
           >
