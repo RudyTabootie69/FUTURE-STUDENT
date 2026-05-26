@@ -5,7 +5,7 @@ import {
   Gender,
   Student,
   Parent,
-  LinkedChild,
+  LinkedSupervisor,
   SecondaryRep,
   TertiaryRep,
   StudentFormData,
@@ -49,7 +49,7 @@ const REQUIRED_STUDENT_FIELDS: (keyof StudentFormData)[] = [
   "address",
 ];
 
-const REQUIRED_PARENT_FIELDS: (keyof Omit<ParentFormData, "children">)[] = [
+const REQUIRED_PARENT_FIELDS: (keyof ParentFormData)[] = [
   "firstName",
   "lastName",
   "email",
@@ -99,6 +99,7 @@ function validateStudentField(
 ): string {
   if (REQUIRED_STUDENT_FIELDS.includes(field) && !value)
     return "This field is required.";
+  
   if (field === "dob" && value) {
     const age =
       new Date().getFullYear() - new Date(value as string).getFullYear();
@@ -114,11 +115,22 @@ function validateStudentField(
 }
 
 function validateAllStudent(form: StudentFormData): StudentFormErrors {
-  return Object.fromEntries(
-    (Object.keys(form) as (keyof StudentFormData)[])
-      .map((f) => [f, validateStudentField(f, form[f])])
+  const topLevel = Object.fromEntries(
+    (Object.keys(form) as (keyof Omit<StudentFormData, "supervisors">)[])
+      .map((f) => [f, validateStudentField(f, form[f as keyof typeof form])])
       .filter(([, e]) => e),
   );
+  return { ...topLevel};
+}
+
+function hasSupervisorErrors(errors: StudentFormErrors): boolean {
+  const topLevel = Object.entries(errors)
+    .filter(([k]) => k !== "supervisors")
+    .some(([, v]) => !!v);
+  const supervisorErrors = (errors.supervisors ?? []).some((c) =>
+    Object.values(c ?? {}).some(Boolean),
+  );
+  return topLevel || supervisorErrors;
 }
 
 // ---------------------------------------------------------------------------
@@ -126,7 +138,7 @@ function validateAllStudent(form: StudentFormData): StudentFormErrors {
 // ---------------------------------------------------------------------------
 
 function validateParentField(
-  field: keyof Omit<ParentFormData, "children">,
+  field: keyof ParentFormData,
   value: unknown,
 ): string {
   if (REQUIRED_PARENT_FIELDS.includes(field) && !value)
@@ -138,28 +150,14 @@ function validateParentField(
   return "";
 }
 
-function validateAllParent(form: ParentFormData): ParentFormErrors {
-  const topLevel = Object.fromEntries(
-    (Object.keys(form) as (keyof Omit<ParentFormData, "children">)[])
-      .map((f) => [f, validateParentField(f, form[f as keyof typeof form])])
+function validateAllParent(
+  form: ParentFormData,
+): ParentFormErrors {
+  return Object.fromEntries(
+    (Object.keys(form) as (keyof ParentFormData)[])
+      .map((f) => [f, validateParentField(f, form[f])])
       .filter(([, e]) => e),
   );
-  const children = form.children.map((child) => ({
-    firstName: child.firstName ? "" : "This field is required.",
-    lastName: child.lastName ? "" : "This field is required.",
-    schoolName: child.schoolName ? "" : "This field is required.",
-  }));
-  return { ...topLevel, children };
-}
-
-function hasParentErrors(errors: ParentFormErrors): boolean {
-  const topLevel = Object.entries(errors)
-    .filter(([k]) => k !== "children")
-    .some(([, v]) => !!v);
-  const childErrors = (errors.children ?? []).some((c) =>
-    Object.values(c ?? {}).some(Boolean),
-  );
-  return topLevel || childErrors;
 }
 
 // ---------------------------------------------------------------------------
@@ -257,7 +255,7 @@ export default function Onboarding() {
   function handleStudentChange(updates: Partial<StudentFormData>) {
     setStudentForm((prev) => ({ ...prev, ...updates }));
   }
-  function handleStudentBlur(field: keyof StudentFormData) {
+  function handleStudentBlur(field: keyof Omit<StudentFormData, "supervisors">) {
     setStudentErrors((prev) => ({
       ...prev,
       [field]: validateStudentField(field, studentForm[field]),
@@ -268,7 +266,7 @@ export default function Onboarding() {
   function handleParentChange(updates: Partial<ParentFormData>) {
     setParentForm((prev) => ({ ...prev, ...updates }));
   }
-  function handleParentBlur(field: keyof Omit<ParentFormData, "children">) {
+  function handleParentBlur(field: keyof ParentFormData) {
     setParentErrors((prev) => ({
       ...prev,
       [field]: validateParentField(
@@ -277,38 +275,40 @@ export default function Onboarding() {
       ),
     }));
   }
-  function handleChildChange(index: number, updates: Partial<LinkedChild>) {
-    setParentForm((prev) => {
-      const children = [...prev.children];
-      children[index] = { ...children[index], ...updates };
-      return { ...prev, children };
+
+  function handleSupervisorChange(index: number, updates: Partial<LinkedSupervisor>) {
+    setStudentForm((prev) => {
+      const supervisors = [...prev.supervisors];
+      supervisors[index] = { ...supervisors[index], ...updates };
+      return { ...prev, supervisors };
     });
   }
-  function handleChildBlur(index: number, field: keyof LinkedChild) {
-    const error = parentForm.children[index][field]
+
+  function handleSupervisorBlur(index: number, field: keyof LinkedSupervisor) {
+    const error = studentForm.supervisors[index][field]
       ? ""
       : "This field is required.";
-    setParentErrors((prev) => {
-      const children = [
-        ...(prev.children ?? parentForm.children.map(() => ({}))),
+    setStudentErrors((prev) => {
+      const supervisors = [
+        ...(prev.supervisors ?? studentForm.supervisors.map(() => ({}))),
       ];
-      children[index] = { ...children[index], [field]: error };
-      return { ...prev, children };
+      supervisors[index] = { ...supervisors[index], [field]: error };
+      return { ...prev, supervisors };
     });
   }
-  function handleAddChild() {
-    setParentForm((prev) => ({
+  function handleAddSupervisor() {
+    setStudentForm((prev) => ({
       ...prev,
-      children: [
-        ...prev.children,
-        { firstName: "", lastName: "", schoolName: "" },
+      supervisors: [
+        ...prev.supervisors,
+        { id: Number(), supfirstName: "", suplastName: ""},
       ],
     }));
   }
-  function handleRemoveChild(index: number) {
-    setParentForm((prev) => ({
+  function handleRemoveSupervisor(index: number) {
+    setStudentForm((prev) => ({
       ...prev,
-      children: prev.children.filter((_, i) => i !== index),
+      supervisors: prev.supervisors.filter((_, i) => i !== index),
     }));
   }
 
@@ -340,7 +340,7 @@ export default function Onboarding() {
 
     if (isStudent) {
       const errors = validateAllStudent(studentForm);
-      if (Object.keys(errors).length > 0) {
+      if (hasSupervisorErrors(errors) || Object.keys(errors).length > 0) {
         setStudentErrors(errors);
         return;
       }
@@ -355,6 +355,7 @@ export default function Onboarding() {
         studentForm.nesaNumber,
         studentForm.entryYear,
         studentForm.schoolName,
+        studentForm.supervisors,
       );
       student.gender = studentForm.gender as Gender;
       student.uacId = studentForm.uacId || undefined;
@@ -365,10 +366,6 @@ export default function Onboarding() {
       save(student);
     } else if (isParent) {
       const errors = validateAllParent(parentForm);
-      if (hasParentErrors(errors)) {
-        setParentErrors(errors);
-        return;
-      }
       const parent = new Parent(
         Date.now(),
         parentForm.firstName,
@@ -377,7 +374,6 @@ export default function Onboarding() {
         parentForm.email,
         "",
         parentForm.address,
-        parentForm.children,
       );
       parent.phone = parentForm.phone;
       save(parent);
@@ -463,6 +459,10 @@ export default function Onboarding() {
               errors={studentErrors}
               onChange={handleStudentChange}
               onBlur={handleStudentBlur}
+              onSupervisorChange={handleSupervisorChange}
+              onSupervisorBlur={handleSupervisorBlur}
+              onAddSupervisor={handleAddSupervisor}
+              onRemoveSupervisor={handleRemoveSupervisor}
             />
           )}
 
@@ -472,10 +472,6 @@ export default function Onboarding() {
               errors={parentErrors}
               onChange={handleParentChange}
               onBlur={handleParentBlur}
-              onChildChange={handleChildChange}
-              onChildBlur={handleChildBlur}
-              onAddChild={handleAddChild}
-              onRemoveChild={handleRemoveChild}
             />
           )}
 

@@ -1,5 +1,5 @@
 
-import { User, Student, Parent, SecondaryRep, TertiaryRep, LinkedChild } from "../shared/types/user.ts";
+import { User, Student, Parent, SecondaryRep, TertiaryRep } from "../shared/types/user.ts";
 import "dotenv/config";
 import express from "express";
 import cors from "cors";

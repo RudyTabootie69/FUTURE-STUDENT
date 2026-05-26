@@ -1,13 +1,22 @@
+import { number } from "zod/v4";
 import Field, { fieldInputClass } from "./InputField";
-import type { StudentFormData, Gender } from "shared/types/user";
+import type { StudentFormData, Gender, LinkedSupervisor } from "shared/types/user";
 
-export type StudentFormErrors = Partial<Record<keyof StudentFormData, string>>;
+export type StudentFormErrors = Partial<
+  Record<keyof Omit<StudentFormData, "supervisors">, string> & {
+    supervisors: Partial<Record<keyof LinkedSupervisor, string>>[];
+  }
+>;
 
 interface StudentDetailsFormProps {
   form: StudentFormData;
   errors: StudentFormErrors;
   onChange: (updates: Partial<StudentFormData>) => void;
   onBlur: (field: keyof StudentFormData) => void;
+  onSupervisorChange: (index: number, updates: Partial<LinkedSupervisor>) => void;
+  onSupervisorBlur: (index: number, field: keyof LinkedSupervisor) => void;
+  onAddSupervisor: () => void;
+  onRemoveSupervisor: (index: number) => void;
 }
 
 // Consistent hint rendered beneath optional field labels
@@ -35,9 +44,17 @@ export default function StudentDetailsForm({
   errors,
   onChange,
   onBlur,
+  onSupervisorChange,
+  onSupervisorBlur,
+  onAddSupervisor,
+  onRemoveSupervisor,
 }: StudentDetailsFormProps) {
   const blur = (field: keyof StudentFormData) => ({
     onBlur: () => onBlur(field),
+  });
+
+  const supervisorBlur = (index: number, field: keyof LinkedSupervisor) => ({
+    onBlur: () => onSupervisorBlur(index, field),
   });
 
   return (
@@ -258,6 +275,92 @@ export default function StudentDetailsForm({
             {...blur("culturalBackground")}
           />
         </Field>
+      </div>
+
+
+      {/* Supervisors */}
+      <div className="space-y-4">
+        <div className="flex items-center justify-between">
+          <div>
+            <h3 className="text-base font-semibold text-black">
+              Your Parents / Guardians / Supervisors
+            </h3>
+            <p className="text-xs text-grey-300 mt-0.5">
+              Put in the Future Student ID of your supervisors so they can track your Application Journey
+            </p>
+          </div>
+        </div>
+
+        {form.supervisors.map((supervisor, index) => (
+          <div
+            key={index}
+            className="relative grid grid-cols-1 sm:grid-cols-2 gap-4 p-4 border rounded-lg bg-bg-soft"
+          >
+            <p className="sm:col-span-2 text-xs font-semibold text-grey-400 uppercase tracking-wide">
+              Supervisor {index + 1}
+            </p>
+
+            <Field
+              label="Future Student ID"
+              error={errors.supervisors?.[index]?.id}
+            >
+              <input
+                type = "text"
+                className={fieldInputClass}
+                value={supervisor.id}
+                onChange={(e) =>{
+                  const filterNonNumbers = e.target.value.replace(/\D/g, "");
+                  onSupervisorChange(index, { id: Number(filterNonNumbers)})}
+                }
+                {...supervisorBlur(index, "id")}
+              />
+            </Field>
+
+            <Field
+              label="First name"
+              error={errors.supervisors?.[index]?.supfirstName}
+            >
+              <input
+                className={fieldInputClass}
+                value={supervisor.supfirstName}
+                onChange={(e) =>
+                  onSupervisorChange(index, { supfirstName: e.target.value })
+                }
+                {...supervisorBlur(index, "supfirstName")}
+              />
+            </Field>
+
+            <Field label="Last name" error={errors.supervisors?.[index]?.suplastName}>
+              <input
+                className={fieldInputClass}
+                value={supervisor.suplastName}
+                onChange={(e) =>
+                  onSupervisorChange(index, { suplastName: e.target.value })
+                }
+                {...supervisorBlur(index, "suplastName")}
+              />
+            </Field>
+
+
+            {form.supervisors.length > 0 && (
+              <button
+                type="button"
+                onClick={() => onRemoveSupervisor(index)}
+                className="absolute top-3 right-3 text-xs text-red-400 hover:text-red-600 transition-colors"
+              >
+                Remove
+              </button>
+            )}
+          </div>
+        ))}
+
+        <button
+          type="button"
+          onClick={onAddSupervisor}
+          className="w-full py-2 border border-dashed border-grey-300 rounded-lg text-sm text-grey-400 hover:border-primary-blue hover:text-primary-blue transition-colors"
+        >
+          + Add a supervisor
+        </button>
       </div>
     </div>
   );
