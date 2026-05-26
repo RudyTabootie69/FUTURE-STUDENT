@@ -116,7 +116,7 @@ export default function LandingPage() {
             className="space-y-3"
             onSubmit={(e) => {
               e.preventDefault();
-              register(firstname, lastname, username, password);
+              navigate("/registration", {state: {username,password}}),
               setOpenSignUp(false);
             }}
           >

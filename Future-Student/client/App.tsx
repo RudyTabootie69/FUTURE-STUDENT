@@ -33,6 +33,7 @@ import PrivacyPolicy from "./pages/PrivacyPolicy";
 import ContactUs from "./pages/ContactUs";
 import EventPage from "./pages/EventPage";
 import CoursePage from "./pages/CoursePage";
+import Registration from "./pages/Registration";
 
 
 
@@ -54,6 +55,7 @@ const App = () => (
                       <TagProvider>
                         <Routes>
                           <Route path="/" element={<LandingPage />} />
+                          <Route path="/registration" element={<Registration />} />
                           <Route path="/onboarding" element={<Onboarding />} />
                           <Route path="/onboarding/home" element={<OnboardingHome />} />
                           <Route path="/onboarding/course-finder" element={<OnboardingCourseFinder />} />
