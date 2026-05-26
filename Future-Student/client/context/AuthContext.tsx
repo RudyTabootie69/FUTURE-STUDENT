@@ -57,12 +57,13 @@ export const AuthProvider = ({ children }) => {
       if (res.data) {
         setToken(res.token);
         localStorage.setItem("token", res.token);
-        navigate("/onboarding", { replace: true });
+        navigate("/home");
         return;
       }
       throw new Error(res.message);
     } catch (err) {
       console.error(err);
+      navigate("/");
     }
   };
 
