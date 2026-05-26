@@ -235,7 +235,7 @@ export const defaultParentFormData: ParentFormData = {
   email: "",
   phone: "",
   address: "",
-  children: [{ firstName: "", lastName: "", schoolName: "" }],
+  children: [{firstName: "", lastName: "", schoolName: "" }],
 };
 
 // ---------------------------------------------------------------------------

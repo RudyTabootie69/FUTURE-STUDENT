@@ -1,5 +1,5 @@
 
-import { User, Student, Parent, SecondaryRep, TertiaryRep } from "../shared/types/user.ts";
+import { User, Student, Parent, SecondaryRep, TertiaryRep, LinkedChild } from "../shared/types/user.ts";
 import "dotenv/config";
 import express from "express";
 import cors from "cors";
@@ -11,6 +11,14 @@ import cookieParser from 'cookie-parser';
 import dotenv from 'dotenv';
 import path from 'path';
 import { fileURLToPath } from 'url';
+import { RowDataPacket } from "mysql2/promise";
+
+type ChildRow = RowDataPacket & {
+  id: number;
+  firstName: string;
+  lastName: string;
+  school: string
+};
 
 export function createServer() {
 
@@ -117,56 +125,57 @@ export function createServer() {
       switch(userType){
         case "Student":
           try {
-            const [rows] = await conn.query('SELECT User.id, User.firstName, User.lastName, User.userName, User.email, User.dob, User.address,  Student.school, Student.nesaNumber, Student.usi, Student.entryYear, Student.firstInFamily, Student.indigenousStatus, Student.culturalBackground FROM User INNER JOIN User.id = Student.id AND User.username = ?', username)
+            const [rows] = await conn.query('SELECT User.id, User.firstName, User.lastName, User.userName, User.email, User.dob, User.address,  Student.school, Student.nesaNumber, Student.usi, Student.entryYear, Student.firstInFamily, Student.indigenousStatus, Student.culturalBackground FROM User INNER JOIN Student ON User.id = Student.id WHERE User.username = ?', username)
             const result = rows[0];
-            user = new Student(result.id, result.firstName, result.lastName, result.userName, result.email);
-            user.address = result.address;
-            user.schoolName = result.school;
-            user.nesaNumber = result.nesaNumber;
+            user = new Student(result.id, result.firstName, result.lastName, result.userName, result.email, result.dob, result.address, result.nesaNumber, result.entryYear, result.school);
             user.usi = result.usi;
-            user.entryYear = result.entryYear;
             user.firstInFamily = result.firstInFamily;
             user.indigenous = result.indigenousStatus;
             user.culturalBackground = result.culturalBackground;
-            user.userType = "Student";
             console.log('Log in success (Student)');
             return res.send(user);
           }catch (error) {
             return res.status(500).send('Login failed'); // Handle any unexpected errors
           }
           break;
-
-        case "Staff":
+        
+        case "Parent":
           try {
-            const [rows] = await conn.query('SELECT User.id, User.firstName, User.lastName, User.userName, User.email, User.dob, User.address, SchoolStaff.school, FROM User INNER JOIN User.id = SchoolStaff.id AND User.username = ?', username);
+              const [rows] = await conn.query('SELECT User.id, User.firstName, User.lastName, User.userName, User.email, User.dob, User.address FROM User WHERE User.username = ?', username)
+              const result = rows[0];
+              user = new Parent(result.id, result.firstName, result.lastName, result.userName, result.email, result.dob, result.address);
+              console.log('Log in success (Parent)');
+              return res.send(user);
+          }catch (error) {
+            return res.status(500).send('Login failed'); // Handle any unexpected errors
+          }
+          break;
+
+        case "SecondaryRep":
+          try {
+            const [rows] = await conn.query('SELECT User.id, User.firstName, User.lastName, User.userName, User.email, User.dob, User.address, SecondaryRep.school, School.location, SecondaryRep.role FROM User INNER JOIN SecondaryRep ON User.id = SecondaryRep.id INNER JOIN School ON SecondaryRep.school = School.name WHERE User.username = ?', username);
             const result = rows[0];
-            user = new User(result.id, result.firstName, result.lastName, result.userName, result.email);
-            user.dob = result.dob;
-            user.address = result.address;
+            user = new SecondaryRep(result.id, result.firstName, result.lastName, result.userName, result.email, result.dob, result.address, result.school, result.location, result.role);
+            console.log('Log in success (Secondary Staff)');
+            return res.send(user);
+
+          }catch (error) {
+          return res.status(500).send('Login failed'); // Handle any unexpected errors
+        }
+        case "TertiaryRep":
+          try {
+            const [rows] = await conn.query('SELECT User.id, User.firstName, User.lastName, User.userName, User.email, User.dob, User.address, TertiaryRep.uni, TertiaryRep.role, TertiaryRep.campus, Institution.institutionType FROM User INNER JOIN TertiaryRep ON User.id = TertiaryRep.id INNER JOIN Institution ON Institution.acronym = TertiaryRep.uni WHERE User.username = ?', username);
+            const result = rows[0];
+            user = new TertiaryRep(result.id, result.firstName, result.lastName, result.userName, result.email, result.dob, result.address, result.uni, result.institutionType, result.campus, result.role);
             user.schoolName = result.schoolName
-            user.userType = "School Staff Member"
-            console.log('Log in success (Staff)');
+            console.log('Log in success (Tertiary Staff)');
             return res.send(user);
 
           }catch (error) {
           return res.status(500).send('Login failed'); // Handle any unexpected errors
         }
 
-        case "Parent":
-          try {
-            const [rows] = await conn.query('SELECT User.id, User.firstName, User.lastName, User.userName, User.email, User.dob, User.address, SchoolStaff.school, FROM User INNER JOIN User.id = Parent.id AND User.username = ?', username)
-              
-              const result = rows[0];
-              user = new User(result.id, result.firstName, result.lastName, result.userName, result.email);
-              user.dob = result.dob;
-              user.address = result.address;
-              user.schoolName = result.schoolName
-              user.userType = "Parent"
-              console.log('Log in success (Parent)');
-          }catch (error) {
-            return res.status(500).send('Login failed'); // Handle any unexpected errors
-          }
-          break;
+  
       
         
         default:

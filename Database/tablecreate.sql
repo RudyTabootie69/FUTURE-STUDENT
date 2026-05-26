@@ -6,8 +6,9 @@ GRANT CREATE, ALTER, DROP, INSERT, UPDATE, DELETE, SELECT, REFERENCES, LOCK TABL
 CREATE DATABASE IF NOT EXISTS futurestudentdb;
 USE futurestudentdb;
 
-CREATE TABLE IF NOT EXISTS University(
+CREATE TABLE IF NOT EXISTS Institution(
     acronym varchar(255) PRIMARY KEY,
+    institutionType varchar(255),
     name varchar(255),
     criscos varchar(255),
     teqsa varchar(255),
@@ -17,7 +18,7 @@ CREATE TABLE IF NOT EXISTS University(
 CREATE TABLE IF NOT EXISTS Campus(
     uni varchar(255),
     campus varchar(255),
-    FOREIGN KEY (uni) REFERENCES University(acronym),
+    FOREIGN KEY (uni) REFERENCES Institution(acronym),
     CONSTRAINT U_Campus UNIQUE (uni, campus)
 );
 
@@ -62,6 +63,7 @@ CREATE TABLE IF NOT EXISTS Parent(
 CREATE TABLE IF NOT EXISTS SecondaryRep(
     secID INT PRIMARY KEY,
     school varchar(255),
+    role varchar(255),
     FOREIGN KEY (secID) REFERENCES User(id),
     FOREIGN KEY (school) REFERENCES School(name)
 );
@@ -70,8 +72,9 @@ CREATE TABLE IF NOT EXISTS TertiaryRep(
     tertID INT PRIMARY KEY,
     uni varchar(255),
     campus varchar(255),
+    role varchar(255),
     FOREIGN KEY (tertID) REFERENCES User(id),
-    FOREIGN KEY (uni) REFERENCES University(acronym),
+    FOREIGN KEY (uni) REFERENCES Institution(acronym),
     FOREIGN KEY (uni, campus) REFERENCES Campus(uni, campus)
 );
 
@@ -85,7 +88,7 @@ CREATE TABLE IF NOT EXISTS Course(
     pracDetails TEXT(8192),
     feeurl TEXT(255),
     courseurl TEXT(2048),
-    FOREIGN KEY (uniAcronym) REFERENCES University(acronym),
+    FOREIGN KEY (uniAcronym) REFERENCES Institution(acronym),
     CONSTRAINT U_Course UNIQUE (courseID, title, uniAcronym)
 );
 

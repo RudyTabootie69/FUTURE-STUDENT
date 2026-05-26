@@ -29,6 +29,6 @@
     "tsx": "^4.22.0"
   },
   "scripts": {
-    "dev": "nodemon --watch server --exec tsx server/index.ts"
+    "dev": "nodemon --watch server --exec tsx server/routes/co.ts"
   }
 }

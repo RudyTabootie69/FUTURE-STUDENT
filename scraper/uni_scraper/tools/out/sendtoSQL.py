@@ -9,17 +9,17 @@ port = 3306
 database = "futurestudentdb"
 
 
-unis = []
-courses = []
-courseVariants = []
-courseOfferings = []
-coursetags = []
-durations = []
-modesofattendance = []
-atarStats = []
+unis = set()
+courses = set()
+courseVariants = set()
+courseOfferings = set()
+coursetags = set()
+durations = set()
+modesofattendance = set()
+atarStats = set()
 data = []
-events = []
-campuses = []
+events = set()
+campuses = set()
 courseID, uniAcronym, courseTitle = "", "", ""
 offeringID, durationID, modecounter = 0, 0, 0 
 
@@ -42,12 +42,11 @@ class Uni:
         if not isinstance(other, Uni):
             return NotImplemented
         return (
-            self.uniAcronym == other.uniAcronym or
-            self.uniTitle == other.uniTitle
+            self.uniAcronym == other.uniAcronym
         )
 
     def __hash__(self):
-        return hash((self.acronym, self.campuscode))
+        return hash((self.uniAcronym))
 
 class Campus:
     def __init__(self, uniAcronym, campusname):
@@ -63,7 +62,7 @@ class Campus:
         )
 
     def __hash__(self):
-        return hash((self.acronym, self.campuscode))
+        return hash((self.uniAcronym, self.campusname))
 
 class Course:
     def __init__(self, uniAcronym, courseCode, courseTitle, header, careerOptions, studyDetails, practicalDetails, feeURL, courseurl):
@@ -86,7 +85,7 @@ class CourseVariant:
         self.feeType = feeType
     
     def __eq__(self, other):
-        if not isinstance(other, Uni):
+        if not isinstance(other, CourseVariant):
             return NotImplemented
         return (
             self.variantID == other.variantID
@@ -96,29 +95,54 @@ class CourseVariant:
         return hash((self.variantID))
 
 class CourseOffering:
-    def __init__(self, variantID, offeringID, enrolOpen, enrolClose):
+    def __init__(self, variantID, enrolOpen, enrolClose):
         self.variantID = variantID
-        self.offeringID = offeringID
         self.enrolOpen = enrolOpen
         self.enrolClose = enrolClose
+    
+    def __eq__(self, other):
+        if not isinstance(other, CourseOffering):
+            return NotImplemented
+        return (
+            self.variantID == other.variantID and
+            self.enrolOpen == other.enrolOpen and
+            self.enrolClose == other.enrolClose
+        )
 
-class CourseTag:
-    def __init__(self, courseID, tagtext):
-        self.courseID = courseID
-        self.tagtext = tagtext
+    def __hash__(self):
+        return hash((self.variantID, self.enrolOpen, self.enrolClose))
 
 class Duration:
-    def __init__(self, variantID, durationID, duration):
+    def __init__(self, variantID, duration):
         self.variantID = variantID
-        self.durationID = durationID
         self.duration = duration
+    
+    def __eq__(self, other):
+        if not isinstance(other, Duration):
+            return NotImplemented
+        return (
+            self.variantID == other.variantID and
+            self.duration == other.duration
+        )
+
+    def __hash__(self):
+        return hash((self.variantID, self.duration))
 
 class modeOfAttendance:
-    def __init__(self, variantID, modeID, mode):
+    def __init__(self, variantID, mode):
         self.variantID = variantID
-        self.modeID = modeID
         self.mode = mode
+    def __eq__(self, other):
+        if not isinstance(other, modeOfAttendance):
+            return NotImplemented
+        return (
+            self.variantID == other.variantID and
+            self.mode == other.mode
+        )
 
+    def __hash__(self):
+        return hash((self.variantID, self.mode))
+    
 class courseAtarRequirement:
     def __init__ (self, variantID, atarProfileCode, minAtar, medianAtar, lowestRank, medianRank):
         self.variantID = variantID
@@ -127,6 +151,21 @@ class courseAtarRequirement:
         self.medianAtar = medianAtar
         self.lowestRank = lowestRank
         self.medianRank = medianRank
+    def __eq__(self, other):
+        if not isinstance(other, courseAtarRequirement):
+            return NotImplemented
+        return (
+            self.variantID == other.variantID and
+            self.atarProfileCode == other.atarProfileCode
+        )
+
+    def __hash__(self):
+        return hash((self.variantID, self.atarProfileCode))
+    
+class CourseTag:
+    def __init__(self, courseID, tagtext):
+        self.courseID = courseID
+        self.tagtext = tagtext
 
 with open('uac_details_html_removed.jl', 'r') as file:
     for line in file:
@@ -160,8 +199,6 @@ with open('uac_details_html_removed.jl', 'r') as file:
         if newfeeDetails is not None:
             if "href=" in newfeeDetails:
                 newfeeDetails = newfeeDetails.split("href=\"")[1].split("\"")[0]
-            elif "N/A" not in newfeeDetails:
-                print(newfeeDetails)
         newfeeDetails = checkNone(newfeeDetails)
 
         try:
@@ -173,48 +210,37 @@ with open('uac_details_html_removed.jl', 'r') as file:
             newtags = data["details_json"]["contentJson"]["keywords"].split(",")
 
             for newtag in newtags:
-                newcoursetag = CourseTag(newCourseCode, newtag)
-                if newcoursetag not in coursetags:
-                    coursetags.append(newcoursetag)
+                coursetags.add(CourseTag(newCourseCode, newtag))
 
         if data["details_json"]["course"]["studentProfileLink"] is not None:
             print(data["details_json"]["course"]["studentProfileLink"])
 
-        newuni = Uni(newAcronym, newName, newcriscosId, newteqsaId, newrtoId)
-        if newuni not in unis and newAcronym is not None:
-            unis.append(newuni)
+        if newAcronym is not None:
+            unis.add(Uni(newAcronym, newName, newcriscosId, newteqsaId, newrtoId))
 
-        courses.append(Course(newAcronym, newCourseCode, newCourseTitle, newHeader, newCareerOptions, newstudyDetails, newpracticalDetails, newfeeDetails, newCourseUrl))
+        courses.add(Course(newAcronym, newCourseCode, newCourseTitle, newHeader, newCareerOptions, newstudyDetails, newpracticalDetails, newfeeDetails, newCourseUrl))
         newcoursevariants = data["details_json"]["courseList"]
         
         for newcoursevariant in newcoursevariants:
             newcampuscode = newcoursevariant["campusCode"]
             newFeeType = newcoursevariant["feeType"]
             newcoursevariantId = newcoursevariant["courseCode"]
-            newcampus = Campus(newAcronym, newcampuscode)
-            if newcampus not in campuses:
-                campuses.append(newcampus)
-
-            newcoursevariantinst = CourseVariant(newCourseCode, newcoursevariantId, newAcronym, newcampuscode, newFeeType)    
-            if newcoursevariantinst not in courseVariants:
-                courseVariants.append(newcoursevariantinst)
+            campuses.add(Campus(newAcronym, newcampuscode))
+            courseVariants.add(CourseVariant(newCourseCode, newcoursevariantId, newAcronym, newcampuscode, newFeeType))
             
             newofferings = newcoursevariant["offerings"]
             for newoffering in newofferings:
                 newenrolopen = newoffering["startDate"]
                 newenrolclose = newoffering["finalClosing"]
-                courseOfferings.append(CourseOffering(newcoursevariantId, offeringID, newenrolopen, newenrolclose)) 
-                offeringID = offeringID + 1
+                courseOfferings.add(CourseOffering(newcoursevariantId, newenrolopen, newenrolclose)) 
 
             newdurations = newcoursevariant["duration"]
             for newduration in newdurations:
-                durations.append(Duration(newcoursevariantId, durationID, newduration))
-                durationID = durationID + 1
+                durations.add(Duration(newcoursevariantId, newduration))
 
             newmodesofattendances = newcoursevariant["modeOfAttendance"]
             for newmodeofattendance in newmodesofattendances:
-                modesofattendance.append(modeOfAttendance(newcoursevariantId, modecounter, newmodeofattendance))
-                modecounter = modecounter + 1
+                modesofattendance.add(modeOfAttendance(newcoursevariantId, newmodeofattendance))
             
             if newcoursevariant["studentProfile"] is not None:
                 for studentProfile in newcoursevariant["studentProfile"]["StudentProfiles"]:
@@ -236,7 +262,7 @@ with open('uac_details_html_removed.jl', 'r') as file:
                         newMedianAtar = atarProfile["medianAtar"]
                         newlsr = atarProfile["lsr"]
                         newmsr = atarProfile["msr"]
-                        atarStats.append(courseAtarRequirement(newcoursevariantId, newAtarCode, newMinAtar, newMedianAtar, newlsr, newmsr )) 
+                        atarStats.add(courseAtarRequirement(newcoursevariantId, newAtarCode, newMinAtar, newMedianAtar, newlsr, newmsr )) 
 
 def get_connection():
     engine = create_engine(
@@ -260,7 +286,7 @@ if __name__ == "__main__":
 metadata = MetaData()
 
 for uni in unis:
-    statement = conn.execute(table('University', Column('acronym'), Column('name'), Column('criscos'), Column('teqsa'), Column('rto')).insert().values({ 'acronym': uni.uniAcronym, 'name': uni.uniTitle, 'criscos': uni.criscosId, 'teqsa': uni.teqsaId, 'rto': uni.rtoId }))
+    statement = conn.execute(table('Institution', Column('acronym'), Column('institutionType'), Column('name'), Column('criscos'), Column('teqsa'), Column('rto')).insert().values({ 'acronym': uni.uniAcronym, 'institutionType': 'University', 'name': uni.uniTitle, 'criscos': uni.criscosId, 'teqsa': uni.teqsaId, 'rto': uni.rtoId }))
 
 for campus in campuses:
     statement = conn.execute(table('Campus', Column('uni'), Column('campus')).insert().values({ 'uni': campus.uniAcronym, 'campus': campus.campusname}))
@@ -272,8 +298,10 @@ for coursevariant in courseVariants:
     statement = conn.execute(table('CourseVariant', Column('courseID'), Column('variantID'), Column('uni'), Column('campus'), Column('feeType')).insert().values({ 'courseID': coursevariant.courseID, 'variantID': coursevariant.variantID, 'uni': coursevariant.uniAcronym, 'campus': coursevariant.campus, 'feeType': coursevariant.feeType }))
 
 for courseOffering in courseOfferings:
-    statement = conn.execute(table('CourseOffering', Column('variantID'), Column('offeringID'), Column('startDate'), Column('lastDate')).insert().values({ 'variantID': coursevariant.variantID, 'offeringID': courseOffering.offeringID, 'startDate': courseOffering.enrolOpen, 'lastDate': courseOffering.enrolClose }))
-
+    try:
+        statement = conn.execute(table('CourseOffering', Column('variantID'), Column('startDate'), Column('lastDate')).insert().values({ 'variantID': coursevariant.variantID, 'startDate': courseOffering.enrolOpen, 'lastDate': courseOffering.enrolClose }))
+    except:
+        print("error")
 counter = 1
 for coursetag in coursetags:
     conn.execute(table('Tag', Column('tagID'), Column('title')).insert().values({ 'tagID': counter, 'title': coursetag.tagtext}))
@@ -281,10 +309,10 @@ for coursetag in coursetags:
     counter = counter + 1
 
 for duration in durations:
-    conn.execute(table('Duration', Column('variantID'), Column('durationID'), Column('duration')).insert().values({ 'variantID': duration.variantID, 'durationID': duration.durationID, 'duration': duration.duration}))
+    conn.execute(table('Duration', Column('variantID'), Column('duration')).insert().values({ 'variantID': duration.variantID, 'duration': duration.duration}))
 
 for modeofattendance in modesofattendance:
-    conn.execute(table('ModeOfAttendance', Column('variantID'), Column('modeID'), Column('mode')).insert().values({ 'variantID': modeofattendance.variantID, 'modeID': modeofattendance.modeID ,'mode': modeofattendance.mode}))
+    conn.execute(table('ModeOfAttendance', Column('variantID'), Column('mode')).insert().values({ 'variantID': modeofattendance.variantID,'mode': modeofattendance.mode}))
 
 for event in events:
     conn.execute(table())
