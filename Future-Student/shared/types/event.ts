@@ -1,4 +1,4 @@
-type Category = "Events" | "Start Dates" | "Important Dates";
+type Category = "Events" | "Start Dates" | "End Dates" |  "Enrolment" | "Important Dates";
 
 export class Event {
   eventID: number;
