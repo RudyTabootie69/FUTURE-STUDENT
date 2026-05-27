@@ -1,0 +1,15 @@
+[Unit]
+Description=Run UAC Scrapy course scraper
+Wants=network-online.target
+After=network-online.target
+
+[Service]
+Type=oneshot
+WorkingDirectory=/opt/futurestudent/scraper/uni_scraper
+ExecStart=/opt/futurestudent/scraper/.venv/bin/scrapy crawl uac_full_pipeline -O uac_full_pipeline_latest.jl
+ExecStartPost=/opt/futurestudent/scraper/.venv/bin/python tools/flatten_uac.py
+User=futurestudent
+Group=futurestudent
+
+StandardOutput=append:/var/log/uac-scraper.log
+StandardError=append:/var/log/uac-scraper-error.log

@@ -19,6 +19,7 @@ modesofattendance = set()
 atarStats = set()
 data = []
 events = set()
+eventcounter = 1
 campuses = set()
 courseID, uniAcronym, courseTitle = "", "", ""
 offeringID, durationID, modecounter = 0, 0, 0 
@@ -128,6 +129,29 @@ class Duration:
     def __hash__(self):
         return hash((self.variantID, self.duration))
 
+
+class Event:
+    def __init__(self, eventID, title, description, organiser, location, date, endDate, time, eventType):
+        self.eventID = eventID
+        self.title = title
+        self.description = description
+        self.organiser = organiser
+        self.location = location
+        self.date = date
+        self.endDate = endDate
+        self.time = time
+        self.eventType = eventType
+    def __eq__(self, other):
+        if not isinstance(other, Event):
+            return NotImplemented
+        return (
+            self.eventID == other.eventID and
+            self.title == other.title
+        )
+
+    def __hash__(self):
+        return hash((self.eventID, self.title))
+    
 class modeOfAttendance:
     def __init__(self, variantID, mode):
         self.variantID = variantID
@@ -233,11 +257,11 @@ with open('uac_details_html_removed.jl', 'r') as file:
                 newenrolopen = newoffering["startDate"]
                 newenrolclose = newoffering["finalClosing"]
                 courseOfferings.add(CourseOffering(newcoursevariantId, newenrolopen, newenrolclose)) 
-
+                events.add(Event(eventcounter, "Enrolment Opening for Course: " + newcoursevariantId + ", " + newCourseTitle  , "This is the time for enrolling for the course " + newcoursevariantId + ": " + newCourseTitle + ". For the best chance of success you should enrol as soon as possible.", newAcronym, newcampuscode, newenrolopen, newenrolclose, "12:00:00", "Enrolment" ))
+                eventcounter = eventcounter + 1
             newdurations = newcoursevariant["duration"]
             for newduration in newdurations:
                 durations.add(Duration(newcoursevariantId, newduration))
-
             newmodesofattendances = newcoursevariant["modeOfAttendance"]
             for newmodeofattendance in newmodesofattendances:
                 modesofattendance.add(modeOfAttendance(newcoursevariantId, newmodeofattendance))
@@ -310,10 +334,9 @@ for coursetag in coursetags:
 
 for duration in durations:
     conn.execute(table('Duration', Column('variantID'), Column('duration')).insert().values({ 'variantID': duration.variantID, 'duration': duration.duration}))
-
 for modeofattendance in modesofattendance:
     conn.execute(table('ModeOfAttendance', Column('variantID'), Column('mode')).insert().values({ 'variantID': modeofattendance.variantID,'mode': modeofattendance.mode}))
 
 for event in events:
-    conn.execute(table())
+    conn.execute(table('Event', Column('eventID'), Column('title'), Column('description'), Column('organiser'), Column('location'), Column('date'), Column('endDate'), Column('time'), Column('eventType')).insert().values({ 'eventID': event.eventID,'title': event.title, 'description': event.description, 'organiser': event.organiser,  'location': event.location, 'date': event.date, 'endDate': event.endDate, 'time': event.time, 'eventType': event.eventType }))
 conn.commit()

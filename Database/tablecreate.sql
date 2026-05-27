@@ -148,8 +148,13 @@ CREATE TABLE IF NOT EXISTS Application(
 CREATE TABLE IF NOT EXISTS Event(
     eventID INT AUTO_INCREMENT PRIMARY KEY,
     title varchar (255),
-    description varchar (255),
-    date date
+    description TEXT(8192),
+	organiser varchar(255),
+	location varchar (255),
+	date date,
+    endDate date,
+	time varchar (255),
+	eventType varchar (255)
 );
 
 CREATE TABLE IF NOT EXISTS Tag(
