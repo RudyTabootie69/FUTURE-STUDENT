@@ -54,7 +54,7 @@ export interface LinkedSupervisor {
 }
 
 export class Student extends User {
-  nesaNumber: string;
+  nesaNumber: number;
   uacId?: string;
   usi?: string;
   entryYear: number;
@@ -72,7 +72,7 @@ export class Student extends User {
     email: string,
     dob: string,
     address: string,
-    nesaNumber: string,
+    nesaNumber: number,
     entryYear: number,
     schoolName: string,
     supervisors: LinkedSupervisor[] = [],
@@ -244,7 +244,7 @@ export const defaultParentFormData: ParentFormData = {
 export interface StudentFormData {
   firstName: string;
   lastName: string;
-  nesaNumber: string;
+  nesaNumber: number;
   uacId: string;
   usi: string;
   entryYear: number;
@@ -261,7 +261,7 @@ export interface StudentFormData {
 export const defaultStudentFormData: StudentFormData = {
   firstName: "",
   lastName: "",
-  nesaNumber: "",
+  nesaNumber: null,
   uacId: "",
   usi: "",
   entryYear: new Date().getFullYear() + 1,

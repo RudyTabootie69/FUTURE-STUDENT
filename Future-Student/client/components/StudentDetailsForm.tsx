@@ -95,7 +95,10 @@ export default function StudentDetailsForm({
             inputMode="numeric"
             placeholder="e.g. 1234567890"
             value={form.nesaNumber}
-            onChange={(e) => onChange({ nesaNumber: e.target.value })}
+            onChange={(e) =>{
+                  const filterNonNumbers = e.target.value.replace(/\D/g, "");
+                  onChange({nesaNumber: Number(filterNonNumbers)})}
+                }
             {...blur("nesaNumber")}
           />
         </Field>
@@ -143,7 +146,10 @@ export default function StudentDetailsForm({
             type="number"
             className={fieldInputClass}
             value={form.entryYear}
-            onChange={(e) => onChange({ entryYear: Number(e.target.value) })}
+            onChange={(e) => {
+                  const filterNonNumbers = e.target.value.replace(/\D/g, "");
+                  onChange({entryYear: Number(filterNonNumbers)})}
+                }
             {...blur("entryYear")}
           />
         </Field>
