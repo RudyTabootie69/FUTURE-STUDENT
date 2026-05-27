@@ -18,7 +18,7 @@ export default function OnboardingNavigation() {
     <nav className="w-full bg-bg-soft shadow-[0_2px_10px_0_rgba(49,133,252,0.10)]">
       <div className="w-full flex items-center justify-between px-6 py-2">
         <img
-          src="https://api.builder.io/api/v1/image/assets/TEMP/4ce197ac521043188bace792d233ddbb851baa51?width=240"
+          src="/logos/widelogo.png"
           alt="Logo"
           className="h-[74px] w-[120px] rounded-2xl object-cover"
         />

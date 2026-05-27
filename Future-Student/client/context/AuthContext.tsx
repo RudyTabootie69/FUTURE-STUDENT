@@ -4,7 +4,7 @@ import {User, getUserType} from "@shared/types/user"
 interface AuthContextValue {
   token: any
   isAuthenticated: boolean;
-  checkAuth: () => void;
+  authLoading: boolean;
   register: (user: User, username: string, password: string) => Promise<void>;
   login: (username: string, password: string) => Promise<void>;
   logout: () => Promise<void>;
@@ -101,13 +101,7 @@ export const AuthProvider = ({ children }) => {
     });
   };
 
-  const checkAuth = () => {
-    if (!isAuthenticated && !authLoading){
-      navigate("/")
-    }
-  }
-
-  return <AuthContext.Provider value={{token, isAuthenticated, checkAuth, register, login, logout}}>{children}</AuthContext.Provider>;
+  return <AuthContext.Provider value={{token, isAuthenticated, authLoading, register, login, logout}}>{children}</AuthContext.Provider>;
 }
 
 export function useAuth() {

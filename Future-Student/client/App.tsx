@@ -34,7 +34,8 @@ import ContactUs from "./pages/ContactUs";
 import EventPage from "./pages/EventPage";
 import CoursePage from "./pages/CoursePage";
 import Registration from "./pages/Registration";
-
+import ProtectedRoute from "./components/ProtectedRoute";
+import LogIn from "./pages/LogInPage";
 
 
 const queryClient = new QueryClient();
@@ -54,24 +55,27 @@ const App = () => (
                     <StudentTrackerProvider>
                       <TagProvider>
                         <Routes>
+                          <Route element={<ProtectedRoute />}>
+                            <Route path="/home" element={<Home />} />
+                            <Route path="/calendar" element={<Calendar />} />
+                            <Route path="/course-finder" element={<CourseFinder />} />
+                            <Route path="/wishlist" element={<Wishlist />} />
+                            <Route path="/profile" element={<Profile />} />
+                            <Route path="/course" element={<CoursePage />} />
+                            <Route path="/event" element={<EventPage />} />
+                          </Route>
                           <Route path="/" element={<LandingPage />} />
                           <Route path="/registration" element={<Registration />} />
+                          <Route path="/login" element={<LogIn />} />
                           <Route path="/onboarding" element={<Onboarding />} />
                           <Route path="/onboarding/home" element={<OnboardingHome />} />
                           <Route path="/onboarding/course-finder" element={<OnboardingCourseFinder />} />
                           <Route path="/onboarding/calendar" element={<OnboardingCalendar />} />
                           <Route path="/onboarding/wishlist" element={<OnboardingWishlist />} />
                           <Route path="/onboarding/profile" element={<OnboardingProfile />} />
-                          <Route path="/home" element={<Home />} />
-                          <Route path="/calendar" element={<Calendar />} />
-                          <Route path="/course-finder" element={<CourseFinder />} />
-                          <Route path="/wishlist" element={<Wishlist />} />
-                          <Route path="/profile" element={<Profile />} />
                           <Route path="/about" element={<AboutUs />} />
                           <Route path="/privacypolicy" element={<PrivacyPolicy />} />
                           <Route path="/contact" element={<ContactUs />} />
-                          <Route path="/course" element={<CoursePage />} />
-                          <Route path="/event" element={<EventPage />} />
                         
                           <Route path="*" element={<NotFound />} />
                         </Routes>

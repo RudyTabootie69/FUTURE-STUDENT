@@ -9,6 +9,7 @@ import { Button } from "@/components/ui/button";
 import { useNavigate } from "react-router-dom";
 import { useOnboardingProfile } from "@/context/OnboardingProfileContext";
 import { onboardingsteps, calendarsteps } from "../data/onboardingsteps";
+import { Category } from "@shared/types/event";
 import {
   useFloating,
   offset,
@@ -102,7 +103,6 @@ export default function OnboardingCalendar() {
   const filteredEvents = useMemo(() => {
     const map: 
     Record<string,{ label: string; color: string; bgColor: string; order: number }[]> = {};
-    type Category = "Deadlines" | "Events" | "Start Dates" | "Important Dates";
 
     const add = (
       dateStr: string | undefined,
@@ -130,7 +130,7 @@ export default function OnboardingCalendar() {
       
       add(e.date, e.eventType, e.title, abbr);
       if (e.endDate){
-        add(e.endDate, "Deadlines", "End: " + e.title, abbr);
+        add(e.endDate, "End Dates", "End: " + e.title, abbr);
       }
     }
 

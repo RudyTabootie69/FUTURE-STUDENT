@@ -506,7 +506,7 @@ export default function Onboarding() {
       {/* Right — branding */}
       <div className="hidden lg:flex lg:w-1/2 bg-primary-blue items-center justify-center p-12">
         <img
-          src="https://api.builder.io/api/v1/image/assets/TEMP/b25a9f25196a07957d83ef28a0feaea98b4bfb78?width=1000"
+          src="/logos/brandinglogo.png"
           alt="Future Student"
           className="w-full max-w-[500px] h-auto rounded-2xl"
         />

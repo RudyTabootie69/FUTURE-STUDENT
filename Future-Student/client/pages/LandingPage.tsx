@@ -12,8 +12,6 @@ import {
 import { LandingFeatures } from "@/sections/LandingFeatureCards";
 
 export default function LandingPage() {
-  const [firstname, setFirstname] = useState<string>("");
-  const [lastname, setLastname] = useState<string>("");
   const [username, setUsername] = useState<string>("");
   const [password, setPassword] = useState<string>("");
   const [openSignIn, setOpenSignIn] = useState(false);
