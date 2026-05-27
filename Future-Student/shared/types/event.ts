@@ -1,10 +1,10 @@
-type Category = "Events" | "Start Dates" | "End Dates" |  "Enrolment" | "Important Dates";
+export type Category = "Events" | "Start Dates" | "End Dates" |  "Enrolment" | "Important Dates";
 
 export class Event {
   eventID: number;
   title: string;
   description?: string;
-  oragniser: string;
+  organiser: string;
   location?: string;
   date: string;
   time: string;

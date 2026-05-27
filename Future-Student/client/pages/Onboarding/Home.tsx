@@ -309,24 +309,6 @@ export default function OnboardingHome() {
             }}
           >
             <div className="space-y-1">
-              <label className="text-sm font-medium">First Name</label>
-              <input
-                type="text"
-                className="w-full px-3 py-2 border rounded-md bg-white"
-                placeholder="Your first name"
-                onChange={(e) => setFirstname(e.target.value)}
-              />
-            </div>
-            <div className="space-y-1">
-              <label className="text-sm font-medium">Last Name</label>
-              <input
-                type="text"
-                className="w-full px-3 py-2 border rounded-md bg-white"
-                placeholder="Your last name"
-                onChange={(e) => setLastname(e.target.value)}
-              />
-            </div>
-            <div className="space-y-1">
               <label className="text-sm font-medium">Username</label>
               <input
                 type="text"

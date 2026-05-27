@@ -425,8 +425,6 @@ export default function Registration() {
       rep.department = tertiaryForm.department || undefined;
       register(rep, username, password);
     }
-
-    navigate("/onboarding/home");
   }
 
   const buttonLabel = isStudent

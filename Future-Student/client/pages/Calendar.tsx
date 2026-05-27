@@ -8,7 +8,7 @@ import { buildMonthMatrix, isoKey, monthLabel } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/context/AuthContext";
 import { useNavigate } from "react-router-dom";
-
+import type { Category } from "@shared/types/event";
   //How to load into this
   //On server start connect to local MySQL database
   //Create function that returns events from MySQL server
@@ -72,7 +72,6 @@ export default function Calendar() {
   const filteredEvents = useMemo(() => {
     const map: 
     Record<string,{ label: string; color: string; bgColor: string; order: number }[]> = {};
-    type Category = "Deadlines" | "Events" | "Start Dates" | "Important Dates";
 
     const add = (
       dateStr: string | undefined,
@@ -100,7 +99,7 @@ export default function Calendar() {
       
       add(e.date, e.eventType, e.title, abbr);
       if (e.endDate){
-        add(e.endDate, "Deadlines", "End: " + e.title, abbr);
+        add(e.endDate, "End Dates", "End: " + e.title, abbr);
       }
     }
 
