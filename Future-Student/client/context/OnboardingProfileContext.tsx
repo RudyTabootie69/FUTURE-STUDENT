@@ -1,10 +1,10 @@
 import { createContext, useContext, useEffect, useMemo, useState } from "react";
-import type { User } from "@shared/types/user";
+import { Student, Parent, SecondaryRep, TertiaryRep, Profile, isStudent, isParent, isSecStaff, isTertStaff } from "@shared/types/user";
 
 interface OnboardingProfileContextValue {
-  onboardingprofile: User | null;
-  save: (p: User) => void;
-  update: (p: Partial<User>) => void;
+  onboardingprofile: Profile;
+  save: (p: Profile) => void;
+  update: (p: Partial<Profile>) => void;
   clear: () => void;
   onboardingprogress: number;
   increment: () => void;
@@ -13,12 +13,12 @@ interface OnboardingProfileContextValue {
 }
 
 const STORAGE_KEY1 = "user.onboardingprofile";
-
 const STORAGE_KEY2 = "user.onboardingprogress";
+
 const OnboardingProfileContext = createContext<OnboardingProfileContextValue | undefined>(undefined);
 
 export function OnboardingProfileProvider({ children }: { children: React.ReactNode }) {
-  const [onboardingprofile, setOnboardingProfile] = useState<User | null>(null);
+  const [onboardingprofile, setOnboardingProfile] = useState<Profile | null>(null);
   const [onboardingprogress, changeProgress] = useState(0);  
 
   useEffect(() => {
@@ -65,10 +65,21 @@ export function OnboardingProfileProvider({ children }: { children: React.ReactN
       setOnboardingProfile((prev) => {
         if (!prev) return prev
         
-        return {
-          ...prev,
-          ...p,
+        // Use a type guard to handle the update based on current state
+        if (isStudent(prev)) {
+          return { ...prev, ...p } as Student;
         }
+        if (isParent(prev)) {
+          return { ...prev, ...p } as Parent;
+        }
+        if (isSecStaff(prev)) {
+          return { ...prev, ...p } as SecondaryRep;
+        }
+        if (isTertStaff(prev)) {
+          return { ...prev, ...p } as TertiaryRep;
+        }
+        const finalCheck: never = prev;
+        return finalCheck;
       }),
     clear: () => setOnboardingProfile(null),
     onboardingprogress,

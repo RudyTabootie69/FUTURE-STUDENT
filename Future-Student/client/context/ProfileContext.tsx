@@ -1,16 +1,19 @@
 import { createContext, useContext, useEffect, useMemo, useState } from "react";
 import { useAuth } from "@/context/AuthContext";
-import type { User } from "@shared/types/user";;
+import { Student, Parent, SecondaryRep, TertiaryRep, Profile, isStudent, isParent, isSecStaff, isTertStaff } from "@shared/types/user";
+
 
 interface ProfileContextValue {
-  profile: User | null;
+  profile: Profile;
+  save: (p: Profile) => void;
+  update: (p: Partial<Profile>) => void;
 }
 
 const ProfileContext = createContext<ProfileContextValue | undefined>(undefined);
 
 
 export const ProfileProvider = ({ children }: { children: React.ReactNode }) => {
-  const [profile, setProfile] = useState<User | null>(null);
+  const [profile, setProfile] = useState<Profile | null>(null);
   const { token } = useAuth();
   const { isAuthenticated } = useAuth();
 
@@ -55,7 +58,33 @@ export const ProfileProvider = ({ children }: { children: React.ReactNode }) => 
     }
   }
 
-  return <ProfileContext.Provider value={{profile, ...refreshProfile}}> {children} </ProfileContext.Provider>;
+    const value = useMemo<ProfileContextValue>(() => ({
+      profile,
+      save: (p) => setProfile(p),
+      update: (p) =>
+        setProfile((prev) => {
+          if (!prev) return prev
+          
+          // Use a type guard to handle the update based on current state
+          if (isStudent(prev)) {
+            return { ...prev, ...p } as Student;
+          }
+          if (isParent(prev)) {
+            return { ...prev, ...p } as Parent;
+          }
+          if (isSecStaff(prev)) {
+            return { ...prev, ...p } as SecondaryRep;
+          }
+          if (isTertStaff(prev)) {
+            return { ...prev, ...p } as TertiaryRep;
+          }
+          const finalCheck: never = prev;
+          return finalCheck;
+        }),
+      clear: () => setProfile(null),
+    }), [profile]);
+
+  return <ProfileContext.Provider value={value}> {children} </ProfileContext.Provider>;
 }
 
 export function useProfile() {

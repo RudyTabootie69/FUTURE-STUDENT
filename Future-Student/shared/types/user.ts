@@ -20,7 +20,7 @@ export class User {
   dob: string; // YYYY-MM-DD
   gender: Gender;
   address: string;
-
+  userType = "Undefined";
   constructor(
     id: number,
     firstName: string,
@@ -54,7 +54,7 @@ export interface LinkedSupervisor {
 }
 
 export class Student extends User {
-  nesaNumber: number;
+  nesaNumber: string;
   uacId?: string;
   usi?: string;
   entryYear: number;
@@ -64,6 +64,7 @@ export class Student extends User {
   culturalBackground?: string;
   supervisors: LinkedSupervisor[];
   supervisorIds: number[];
+  userType = "Student" as const
   constructor(
     id: number,
     firstName: string,
@@ -72,7 +73,7 @@ export class Student extends User {
     email: string,
     dob: string,
     address: string,
-    nesaNumber: number,
+    nesaNumber: string,
     entryYear: number,
     schoolName: string,
     supervisors: LinkedSupervisor[] = [],
@@ -94,7 +95,7 @@ export class SecondaryRep extends User {
   schoolAddress: string;
   nesaSchoolCode?: string;
   role: string;
-
+  userType = "Secondary Representative" as const
   constructor(
     id: number,
     firstName: string,
@@ -151,7 +152,7 @@ export class TertiaryRep extends User {
   institutionAddress: string;
   role: string;
   department?: string;
-
+  userType = "Tertiary Representative";
   constructor(
     id: number,
     firstName: string,
@@ -203,7 +204,7 @@ export const defaultTertiaryRepFormData: TertiaryRepFormData = {
 // ---------------------------------------------------------------------------
 
 export class Parent extends User {
-
+  userType = "Parent" as const;
   constructor(
     id: number,
     firstName: string,
@@ -244,7 +245,7 @@ export const defaultParentFormData: ParentFormData = {
 export interface StudentFormData {
   firstName: string;
   lastName: string;
-  nesaNumber: number;
+  nesaNumber: string;
   uacId: string;
   usi: string;
   entryYear: number;
@@ -261,7 +262,7 @@ export interface StudentFormData {
 export const defaultStudentFormData: StudentFormData = {
   firstName: "",
   lastName: "",
-  nesaNumber: null,
+  nesaNumber: "",
   uacId: "",
   usi: "",
   entryYear: new Date().getFullYear() + 1,
@@ -275,18 +276,22 @@ export const defaultStudentFormData: StudentFormData = {
   supervisors: [],
 };
 
-export function isStudent(user: User): user is Student {
-  return user instanceof Student
+export type Profile  = Student | Parent | SecondaryRep | TertiaryRep;
+
+export function isStudent(profile : Profile): profile is Student {
+  return profile.userType === "Student"
 }
 
-export function isParent(user: User): user is Parent {
-  return user instanceof Parent
+export function isParent(profile: Profile): profile is Parent {
+  return profile.userType === "Parent"
 }
-export function isSecStaff(user: User): user is SecondaryRep {
-  return user instanceof SecondaryRep
+
+export function isSecStaff(profile: Profile): profile is SecondaryRep {
+  return profile.userType === "Secondary Representative"
 }
-export function isTertStaff(user: User): user is TertiaryRep {
-  return user instanceof TertiaryRep
+
+export function isTertStaff(profile: Profile): profile is TertiaryRep {
+  return profile.userType === "Tertiary Representative"
 }
 
 export function getUserType(user: User): string {

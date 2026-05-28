@@ -1,11 +1,11 @@
 import { createContext, useContext, useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import {User, getUserType} from "@shared/types/user"
+import {Profile, User, getUserType} from "@shared/types/user"
 interface AuthContextValue {
   token: any
   isAuthenticated: boolean;
   authLoading: boolean;
-  register: (user: User, username: string, password: string) => Promise<void>;
+  register: (user: Profile, username: string, password: string) => Promise<void>;
   login: (username: string, password: string) => Promise<void>;
   logout: () => Promise<void>;
 }
@@ -37,7 +37,7 @@ export const AuthProvider = ({ children }) => {
       })
   }, []);
 
-  const register = async (user: User, userName, passWord) => {
+  const register = async (user: Profile, userName, passWord) => {
 
       try {
       const response = await fetch("/backend/users/register", {
@@ -46,7 +46,7 @@ export const AuthProvider = ({ children }) => {
           'Content-Type': 'application/json'
         },
         body: 
-          JSON.stringify({"firstname":  user.firstName, "lastname": user.lastName, "username": userName, "password": passWord, "usertype": getUserType(user)}), 
+          JSON.stringify({"user": user, "username": userName, "password": passWord}), 
       });
       if (!response.ok) {
           const res = await response.json();
@@ -57,7 +57,7 @@ export const AuthProvider = ({ children }) => {
       if (res.data) {
         setToken(res.token);
         localStorage.setItem("token", res.token);
-        navigate("/home");
+        navigate("/login");
         return;
       }
       throw new Error(res.message);
@@ -88,6 +88,7 @@ export const AuthProvider = ({ children }) => {
       throw new Error(res.message);
     } catch (err) {
       console.error(err);
+      navigate("/");
     }
   };
   

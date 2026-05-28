@@ -43,31 +43,31 @@ class Uni:
         if not isinstance(other, Uni):
             return NotImplemented
         return (
-            self.uniAcronym == other.uniAcronym
+            self.uniTitle == other.uniTitle
         )
 
     def __hash__(self):
-        return hash((self.uniAcronym))
+        return hash((self.uniTitle))
 
 class Campus:
-    def __init__(self, uniAcronym, campusname):
-        self.uniAcronym = uniAcronym
+    def __init__(self, uniName, campusname):
+        self.uniName = uniName
         self.campusname = campusname
 
     def __eq__(self, other):
         if not isinstance(other, Campus):
             return NotImplemented
         return (
-            self.uniAcronym == other.uniAcronym and
+            self.uniName == other.uniName and
             self.campusname == other.campusname
         )
 
     def __hash__(self):
-        return hash((self.uniAcronym, self.campusname))
+        return hash((self.uniName, self.campusname))
 
 class Course:
-    def __init__(self, uniAcronym, courseCode, courseTitle, header, careerOptions, studyDetails, practicalDetails, feeURL, courseurl):
-        self.uniAcronym = uniAcronym
+    def __init__(self, uniName, courseCode, courseTitle, header, careerOptions, studyDetails, practicalDetails, feeURL, courseurl):
+        self.uniName = uniName
         self.courseCode = courseCode
         self.courseTitle = courseTitle
         self.header = header
@@ -78,10 +78,10 @@ class Course:
         self.courseurl = courseurl
 
 class CourseVariant:
-    def __init__(self, courseID, variantID, uniAcronym, campus, feeType):
+    def __init__(self, courseID, variantID, uniName, campus, feeType):
         self.courseID = courseID
         self.variantID = variantID
-        self.uniAcronym = uniAcronym
+        self.uniName = uniName
         self.campus = campus
         self.feeType = feeType
     
@@ -242,22 +242,22 @@ with open('uac_details_html_removed.jl', 'r') as file:
         if newAcronym is not None:
             unis.add(Uni(newAcronym, newName, newcriscosId, newteqsaId, newrtoId))
 
-        courses.add(Course(newAcronym, newCourseCode, newCourseTitle, newHeader, newCareerOptions, newstudyDetails, newpracticalDetails, newfeeDetails, newCourseUrl))
+        courses.add(Course(newName, newCourseCode, newCourseTitle, newHeader, newCareerOptions, newstudyDetails, newpracticalDetails, newfeeDetails, newCourseUrl))
         newcoursevariants = data["details_json"]["courseList"]
         
         for newcoursevariant in newcoursevariants:
             newcampuscode = newcoursevariant["campusCode"]
             newFeeType = newcoursevariant["feeType"]
             newcoursevariantId = newcoursevariant["courseCode"]
-            campuses.add(Campus(newAcronym, newcampuscode))
-            courseVariants.add(CourseVariant(newCourseCode, newcoursevariantId, newAcronym, newcampuscode, newFeeType))
+            campuses.add(Campus(newName, newcampuscode))
+            courseVariants.add(CourseVariant(newCourseCode, newcoursevariantId, newName, newcampuscode, newFeeType))
             
             newofferings = newcoursevariant["offerings"]
             for newoffering in newofferings:
                 newenrolopen = newoffering["startDate"]
                 newenrolclose = newoffering["finalClosing"]
                 courseOfferings.add(CourseOffering(newcoursevariantId, newenrolopen, newenrolclose)) 
-                events.add(Event(eventcounter, "Enrolment Opening for Course: " + newcoursevariantId + ", " + newCourseTitle  , "This is the time for enrolling for the course " + newcoursevariantId + ": " + newCourseTitle + ". For the best chance of success you should enrol as soon as possible.", newAcronym, newcampuscode, newenrolopen, newenrolclose, "12:00:00", "Enrolment" ))
+                events.add(Event(eventcounter, "Enrolment Opening for Course: " + newcoursevariantId + ", " + newCourseTitle  , "This is the time for enrolling for the course " + newcoursevariantId + ": " + newCourseTitle + ". For the best chance of success you should enrol as soon as possible.", newName, newcampuscode, newenrolopen, newenrolclose, "12:00:00", "Enrolment" ))
                 eventcounter = eventcounter + 1
             newdurations = newcoursevariant["duration"]
             for newduration in newdurations:
@@ -313,13 +313,13 @@ for uni in unis:
     statement = conn.execute(table('Institution', Column('acronym'), Column('institutionType'), Column('name'), Column('criscos'), Column('teqsa'), Column('rto')).insert().values({ 'acronym': uni.uniAcronym, 'institutionType': 'University', 'name': uni.uniTitle, 'criscos': uni.criscosId, 'teqsa': uni.teqsaId, 'rto': uni.rtoId }))
 
 for campus in campuses:
-    statement = conn.execute(table('Campus', Column('uni'), Column('campus')).insert().values({ 'uni': campus.uniAcronym, 'campus': campus.campusname}))
+    statement = conn.execute(table('Campus', Column('uni'), Column('campus')).insert().values({ 'uni': campus.uniName, 'campus': campus.campusname}))
 
 for course in courses:
-    statement = conn.execute(table('Course', Column('courseID'), Column('uniAcronym'), Column('title'), Column('header'), Column('careerOptions'), Column('studyDetails'), Column('pracDetails'), Column('feeurl'), Column('courseurl')).insert().values({'courseID': course.courseCode, 'uniAcronym': course.uniAcronym, 'title': course.courseTitle, 'header':course.header, 'careerOptions':course.careerOptions, 'studyDetails': course.studyDetails, 'pracDetails': course.practicalDetails, 'feeurl': course.feeURL, 'courseurl':course.courseurl}))
+    statement = conn.execute(table('Course', Column('courseID'), Column('uniName'), Column('title'), Column('header'), Column('careerOptions'), Column('studyDetails'), Column('pracDetails'), Column('feeurl'), Column('courseurl')).insert().values({'courseID': course.courseCode, 'uniName': course.uniName, 'title': course.courseTitle, 'header':course.header, 'careerOptions':course.careerOptions, 'studyDetails': course.studyDetails, 'pracDetails': course.practicalDetails, 'feeurl': course.feeURL, 'courseurl':course.courseurl}))
 
 for coursevariant in courseVariants:
-    statement = conn.execute(table('CourseVariant', Column('courseID'), Column('variantID'), Column('uni'), Column('campus'), Column('feeType')).insert().values({ 'courseID': coursevariant.courseID, 'variantID': coursevariant.variantID, 'uni': coursevariant.uniAcronym, 'campus': coursevariant.campus, 'feeType': coursevariant.feeType }))
+    statement = conn.execute(table('CourseVariant', Column('courseID'), Column('variantID'), Column('uni'), Column('campus'), Column('feeType')).insert().values({ 'courseID': coursevariant.courseID, 'variantID': coursevariant.variantID, 'uni': coursevariant.uniName, 'campus': coursevariant.campus, 'feeType': coursevariant.feeType }))
 
 for courseOffering in courseOfferings:
     try:

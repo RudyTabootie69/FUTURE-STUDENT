@@ -7,9 +7,9 @@ CREATE DATABASE IF NOT EXISTS futurestudentdb;
 USE futurestudentdb;
 
 CREATE TABLE IF NOT EXISTS Institution(
-    acronym varchar(255) PRIMARY KEY,
+    acronym varchar(255),
     institutionType varchar(255),
-    name varchar(255),
+    name varchar(255) PRIMARY KEY,
     criscos varchar(255),
     teqsa varchar(255),
     rto varchar(255)
@@ -18,13 +18,14 @@ CREATE TABLE IF NOT EXISTS Institution(
 CREATE TABLE IF NOT EXISTS Campus(
     uni varchar(255),
     campus varchar(255),
-    FOREIGN KEY (uni) REFERENCES Institution(acronym),
+    FOREIGN KEY (uni) REFERENCES Institution(name),
     CONSTRAINT U_Campus UNIQUE (uni, campus)
 );
 
 CREATE TABLE IF NOT EXISTS School(
     name varchar(255) PRIMARY KEY,
-    location varchar(255)
+    location varchar(255),
+    nesaSchoolCode varchar(255)
 );
 
 CREATE TABLE IF NOT EXISTS User(
@@ -42,27 +43,34 @@ CREATE TABLE IF NOT EXISTS User(
 CREATE TABLE IF NOT EXISTS Student(
     stuID INT PRIMARY KEY,
     school varchar(255),
+    uacID varchar(255),
+    nesaNumber int,
     ecomStatus ENUM('low', 'medium', 'high'),
-    indigenousStatus BOOL,
+    indigenousStatus ENUM('yes', 'no', 'prefer_not_to_say'),
     culturalBackground varchar(255),
     studentPathStage int,
-    studentPathStagePage int,
     usi varchar (255),
     entryYear int,
     FOREIGN KEY (stuID) REFERENCES User(id),
     FOREIGN KEY (school) REFERENCES School(name)
 );
 
+CREATE TABLE IF NOT EXISTS ParentUser(
+    parID INT PRIMARY KEY,
+    FOREIGN KEY (parID) REFERENCES User(id)
+);
+
 CREATE TABLE IF NOT EXISTS Parent(
     parID INT PRIMARY KEY,
     childID INT,
-    FOREIGN KEY (parID) REFERENCES User(id),
+    FOREIGN KEY (parID) REFERENCES Parent(parID),
     FOREIGN KEY (childID) REFERENCES Student(stuID)
 );
 
 CREATE TABLE IF NOT EXISTS SecondaryRep(
     secID INT PRIMARY KEY,
     school varchar(255),
+    
     role varchar(255),
     FOREIGN KEY (secID) REFERENCES User(id),
     FOREIGN KEY (school) REFERENCES School(name)
@@ -73,14 +81,15 @@ CREATE TABLE IF NOT EXISTS TertiaryRep(
     uni varchar(255),
     campus varchar(255),
     role varchar(255),
+    department varchar(255),
     FOREIGN KEY (tertID) REFERENCES User(id),
-    FOREIGN KEY (uni) REFERENCES Institution(acronym),
+    FOREIGN KEY (uni) REFERENCES Institution(name),
     FOREIGN KEY (uni, campus) REFERENCES Campus(uni, campus)
 );
 
 CREATE TABLE IF NOT EXISTS Course(
     courseID varchar(255) PRIMARY KEY,
-    uniAcronym varchar(255),
+    uniName varchar(255),
     title varchar(255),
     header TEXT(8192),
     careerOptions TEXT(8192),
@@ -88,8 +97,8 @@ CREATE TABLE IF NOT EXISTS Course(
     pracDetails TEXT(8192),
     feeurl TEXT(255),
     courseurl TEXT(2048),
-    FOREIGN KEY (uniAcronym) REFERENCES Institution(acronym),
-    CONSTRAINT U_Course UNIQUE (courseID, title, uniAcronym)
+    FOREIGN KEY (uniName) REFERENCES Institution(name),
+    CONSTRAINT U_Course UNIQUE (courseID, title, uniName)
 );
 
 CREATE TABLE IF NOT EXISTS CourseVariant(

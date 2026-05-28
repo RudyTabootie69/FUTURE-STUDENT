@@ -27,8 +27,6 @@
     "nodemon": "^3.1.14",
     "supertest": "^7.2.2",
     "tsx": "^4.22.0"
-  },
-  "scripts": {
-    "dev": "nodemon --watch server --exec tsx server/routes/co.ts"
   }
+
 }

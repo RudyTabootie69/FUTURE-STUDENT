@@ -6,7 +6,7 @@ import { ProfileInput } from "@/components/ProfileInput";
 import { ProfileSelect } from "@/components/ProfileSelect";
 import { useNavigate } from "react-router-dom";
 import {User, Student, Parent, SecondaryRep, TertiaryRep, isStudent, isParent, isSecStaff, isTertStaff, indigenous, firstInFamily, getUserType} from "@shared/types/user";
-import { onboardingsteps, profilesteps } from "../data/onboardingsteps";
+import { onboardingsteps, profilesteps } from "@/pages/data/onboardingsteps";
 import {
   useFloating,
   offset,
@@ -109,7 +109,9 @@ export default function OnboardingProfile() {
             <ProfileInput
               label="NESA account number"
               value={onboardingprofile?.nesaNumber || ""}
-              onChange={(value) => update({ nesaNumber: value } as Partial<Student>)}
+              onChange={(value) => {
+                const filterNonNumbers = value.replace(/\D/g, "");
+                update({nesaNumber: filterNonNumbers} as Partial<Student>)}}
             />
 
             <ProfileInput

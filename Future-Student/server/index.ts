@@ -1,5 +1,5 @@
 
-import { User, Student, Parent, SecondaryRep, TertiaryRep } from "../shared/types/user.ts";
+import { User, Student, Parent, SecondaryRep, TertiaryRep, Profile, isStudent, isParent, isSecStaff, isTertStaff } from "../shared/types/user.ts";
 import "dotenv/config";
 import express from "express";
 import cors from "cors";
@@ -59,12 +59,12 @@ export function createServer() {
 
     // Create a new user
     server.post('/users/register', async (req, res) => {
-        const {firstname, lastname, username, password} = req.body;
+        const {user, username, password} = req.body;
         const saltRounds = 10;
         const salt = await bcrypt.genSalt(saltRounds);
         const hash = await bcrypt.hash(password, salt);
         let noCapitals = true;
-        if(!firstname || !lastname || !username || !password){
+        if(!user || !username || !password){
           return res.status(500).send( "Empty Fields" );
         }
         for (let i = 0; i<password.length; i++){
@@ -72,11 +72,11 @@ export function createServer() {
                 noCapitals = false;
             }
         } 
-
+        const insertuser = user as Profile;
         if(password.length<7 || noCapitals){
           return res.status(500).send( "Bad password" );
         }else{
-
+          
           try{
             const [rows] = await conn.query('select COUNT(username) AS count from User where username = ?', [username.toString()])
             if (rows[0].count > 0){
@@ -88,8 +88,31 @@ export function createServer() {
         };
 
         try{
-          await conn.query('insert into User (firstName, lastName, username, passwordHash, hashSalt) values (?, ?, ?, ?, ?)', [firstname.toString(), lastname.toString(), username.toString(), hash, salt]);
-          return res.send("User created!")
+          const [userResult] = await conn.query('insert into User (firstName, lastName, address, username, email, passwordHash, hashSalt) values (?, ?, ?, ?, ?)', [insertuser.firstName.toString(), insertuser.lastName.toString(), insertuser.address.toString(), username.toString(), insertuser.email.toString(), hash, salt]);
+          const id = (userResult as mysql.ResultSetHeader).insertId;
+
+
+          if(isStudent(insertuser)){ 
+            await conn.query('insert into Student (stuID, school,) values (?, ?, ?, ?, ?, ?, ?)', [id, insertuser.schoolName.toString(), insertuser.uacId.toString(), insertuser.nesaNumber.toString(), insertuser.indigenous.toString(), insertuser.culturalBackground.toString(), 0, insertuser.usi.toString()]);
+            if (insertuser.supervisorIds.length > 0){
+              for (const supervisorid of insertuser.supervisorIds) {
+                await conn.query('insert into Parent (parID, childID) values (?, ?)', [supervisorid, id]);
+              }
+            }
+            return res.send("User created!")
+          }
+          else if (isParent(insertuser)){
+            await conn.query('insert into Parent(parID) values (?)', [id]);
+            return res.send("User created!")
+          }
+          else if (isSecStaff(insertuser)){
+            await conn.query('insert into SecondaryRep(secID, school, role) (?, ?, ?)', [id, insertuser.schoolName, insertuser.role]);
+            return res.send("User created!")
+          }
+          else if (isTertStaff(insertuser)){
+            await conn.query('insert into TertiaryRep(tertID, uni, campus, role, department) values (?, ?, ?, ?, ?)', [id, insertuser.institutionName.toString(), insertuser.institutionAddress.toString(), insertuser.role.toString(), insertuser.department.toString()]);
+            return res.send("User created!")
+          }
         }catch(err){
           return res.status(500).json({ "User Creation Error": err.message });
         }
@@ -100,89 +123,55 @@ export function createServer() {
 
     // Check user for log in first time
     server.post('/users/login', async (req, res) => {
-      const { username, password, userType} = req.body;
+      const { username, password} = req.body;
 
       let user = User.default;
 
       try {
-            const [rows] = await conn.query('select hashSalt, passwordHash from User where username = ?', username)
-            const first = rows[0]
-            let salt = first.hashSalt;
-            let compareInput = bcrypt.hash(password, salt);
-            let compareDB = first.passwordHash;
-            console.log("Compareinput = " + compareInput);
-            console.log("CompareDB = " + compareDB);
-            if (compareInput != compareDB){
+          const [rows] = await conn.query('SELECT * FROM User urow LEFT JOIN Student sturow ON sturow.user_id = urow.id LEFT JOIN Parent parrow ON parrow.parID = urow.id LEFT JOIN SecondaryRep secrow ON secrow.secID = urow.id LEFT JOIN TertiaryRep tertrow ON tertrow.tertID = urow.id WHERE urow.username = ?', username)
+          const result = rows[0]
+          let salt = result.hashSalt;
+          let compareInput = bcrypt.hash(password, salt);
+          let compareDB = result.passwordHash;
+          console.log("Compareinput = " + compareInput);
+          console.log("CompareDB = " + compareDB);
+          if (compareInput != compareDB){
 
-                console.log('Log in Failure');
-                throw Error;
-                //res.send(user);  //Comment out this line to stop testing
-            }     
-          }catch (error) { 
-            return res.status(500).send('Login failed');
-          }
-
-      switch(userType){
-        case "Student":
-          try {
-            const [rows] = await conn.query('SELECT User.id, User.firstName, User.lastName, User.userName, User.email, User.dob, User.address,  Student.school, Student.nesaNumber, Student.usi, Student.entryYear, Student.firstInFamily, Student.indigenousStatus, Student.culturalBackground FROM User INNER JOIN Student ON User.id = Student.id WHERE User.username = ?', username)
-            const result = rows[0];
-            user = new Student(result.id, result.firstName, result.lastName, result.userName, result.email, result.dob, result.address, result.nesaNumber, result.entryYear, result.school);
-            user.usi = result.usi;
-            user.firstInFamily = result.firstInFamily;
-            user.indigenous = result.indigenousStatus;
-            user.culturalBackground = result.culturalBackground;
-            console.log('Log in success (Student)');
-            return res.send(user);
-          }catch (error) {
-            return res.status(500).send('Login failed'); // Handle any unexpected errors
-          }
-          break;
-        
-        case "Parent":
-          try {
-              const [rows] = await conn.query('SELECT User.id, User.firstName, User.lastName, User.userName, User.email, User.dob, User.address FROM User WHERE User.username = ?', username)
-              const result = rows[0];
+              console.log('Log in Failure');
+              throw Error;
+              //res.send(user);  //Comment out this line to stop testing
+          }     
+          
+          if(result.stuID){
+              user = new Student(result.id, result.firstName, result.lastName, result.userName, result.email, result.dob, result.address, result.nesaNumber, result.entryYear, result.school);
+              user.usi = result.usi;
+              user.firstInFamily = result.firstInFamily;
+              user.indigenous = result.indigenousStatus;
+              user.culturalBackground = result.culturalBackground;
+              console.log('Log in success (Student)');
+          } 
+          else if(result.parID){ 
               user = new Parent(result.id, result.firstName, result.lastName, result.userName, result.email, result.dob, result.address);
               console.log('Log in success (Parent)');
-              return res.send(user);
-          }catch (error) {
-            return res.status(500).send('Login failed'); // Handle any unexpected errors
           }
-          break;
-
-        case "SecondaryRep":
-          try {
-            const [rows] = await conn.query('SELECT User.id, User.firstName, User.lastName, User.userName, User.email, User.dob, User.address, SecondaryRep.school, School.location, SecondaryRep.role FROM User INNER JOIN SecondaryRep ON User.id = SecondaryRep.id INNER JOIN School ON SecondaryRep.school = School.name WHERE User.username = ?', username);
-            const result = rows[0];
+          else if(result.secID){
             user = new SecondaryRep(result.id, result.firstName, result.lastName, result.userName, result.email, result.dob, result.address, result.school, result.location, result.role);
             console.log('Log in success (Secondary Staff)');
-            return res.send(user);
-
-          }catch (error) {
-          return res.status(500).send('Login failed'); // Handle any unexpected errors
-        }
-        case "TertiaryRep":
-          try {
-            const [rows] = await conn.query('SELECT User.id, User.firstName, User.lastName, User.userName, User.email, User.dob, User.address, TertiaryRep.uni, TertiaryRep.role, TertiaryRep.campus, Institution.institutionType FROM User INNER JOIN TertiaryRep ON User.id = TertiaryRep.id INNER JOIN Institution ON Institution.acronym = TertiaryRep.uni WHERE User.username = ?', username);
-            const result = rows[0];
+          }
+          else if(result.parID){
             user = new TertiaryRep(result.id, result.firstName, result.lastName, result.userName, result.email, result.dob, result.address, result.uni, result.institutionType, result.campus, result.role);
             user.schoolName = result.schoolName
             console.log('Log in success (Tertiary Staff)');
-            return res.send(user);
-
-          }catch (error) {
-          return res.status(500).send('Login failed'); // Handle any unexpected errors
-        }
-
-  
-      
-        
-        default:
-          console.log("Error in user type");
-          return;
+          }
+          else{
+            console.log("Error in user type");
+            throw Error("User does not match any user type")
+          }
+      }catch (error) { 
+            
+            return res.status(500).send(error.message);
       }
-      
+
       const token = jwt.sign(
           { userID: user.id },  // Payload (data inside the token)
           process.env.JWT_SECRET,      // Secret key for signing the token

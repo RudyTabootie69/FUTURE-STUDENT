@@ -19,29 +19,30 @@
             "command": "npm run build && npx vite --port=4000",
             "cwd": "${workspaceFolder}/Future-Student",
             "sourceMaps": true,
-            "skipFiles": ["<node_internals>/**"],
-            "outFiles": ["${workspaceFolder}/dist/**/*.js"]
+            "skipFiles": ["<node_internals>/**"]
         },  
         {
             "type": "node-terminal",
             "name": "Run Script: Launch and Debug",
             "request": "launch",
-            "command": "npm run dev && npx vite --port=4000",
+            "command": "npm run dev ",
+            "cwd": "${workspaceFolder}/Future-Student",
+            "sourceMaps": true,
+            "skipFiles": ["<node_internals>/**"]
+        },  
+       {
+            "type": "node",
+            "request": "launch",
+            "name": "Debug Server (tsx)",
+            "runtimeArgs": ["-r", "tsx"],
+            "args": ["server/index.ts"],
             "cwd": "${workspaceFolder}/Future-Student",
             "sourceMaps": true,
             "skipFiles": ["<node_internals>/**"],
-            "outFiles": ["${workspaceFolder}/dist/**/*.js"]
-        },  
-        {
-            "type": "node",
-            "request": "launch",
-            "name": "Backend Debug",
-            "program": "${workspaceFolder}/Future-Student/server/index.ts",
             "console": "integratedTerminal",
-            "sourceMaps": true,
-            "restart": true,
-            "skipFiles": ["<node_internals>/**"],
-            "outFiles": ["${workspaceFolder}/dist/**/*.js"]
+            "env": {
+                "NODE_ENV": "development"
+            }
         },
         {
             "type": "firefox",
@@ -56,7 +57,7 @@
             "name": "Full Stack Debug",
             "configurations": [
                 //"Backend Debug",
-                "Run Script: Build and Launch",
+                "Run Script: Launch and Debug",
                 "Frontend Debug (Firefox)"
             ]
         }
