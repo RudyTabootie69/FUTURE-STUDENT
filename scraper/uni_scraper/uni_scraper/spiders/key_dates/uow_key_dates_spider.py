@@ -1,6 +1,9 @@
+import re
+from datetime import datetime, timezone
+
 from .key_dates_base import (
     BaseKeyDatesSpider,
-    infer_event_type,
+    clean_title,
     extract_date,
     extract_date_range,
 )
@@ -8,50 +11,62 @@ from .key_dates_base import (
 class UowKeyDatesSpider(BaseKeyDatesSpider):
     name = "uow_key_dates"
     allowed_domains = ["uow.edu.au"]
+
     provider_id = "UOW"
     provider_name = "University of Wollongong"
 
     start_urls = [
         "https://www.uow.edu.au/student/dates/",
-        "https://www.uow.edu.au/student/get-started/orientation/",
     ]
+
+    def clean(self, values):
+        text = " ".join(v.strip() for v in values if v.strip())
+        return re.sub(r"\s+", " ", text.replace("\xa0", " ")).strip()
 
     def parse(self, response):
         seen = set()
 
         for row in response.css("table tr"):
-            cols = [
-                x.strip()
-                for x in row.css("td ::text").getall()
-                if x.strip()
-            ]
+            cells = row.css("td")
 
-            if len(cols) < 2:
+            if len(cells) < 2:
                 continue
 
-            title = cols[0]
-            raw_date = " ".join(cols[1:])
+            title = self.clean(cells[0].css("::text").getall())
+            raw_date = self.clean(cells[1].css("::text").getall())
 
-            if title.lower() == "activity" and raw_date.lower() == "date":
+            if not title or not raw_date:
                 continue
 
-            key = (title, raw_date)
-            if key in seen:
+            if title.lower() == "activity" or raw_date.lower() == "date":
                 continue
-            seen.add(key)
 
             start_date, end_date = extract_date_range(raw_date)
 
-            parsed_date = start_date or extract_date(raw_date)
+            if not start_date:
+                start_date = extract_date(raw_date)
+
+            if not start_date:
+                continue
+
+            key = (
+                clean_title(title).lower(),
+                start_date,
+                end_date,
+            )
+
+            if key in seen:
+                continue
+
+            seen.add(key)
 
             yield {
                 "provider_id": self.provider_id,
                 "provider_name": self.provider_name,
-                "event_type": infer_event_type(title),
-                "event_title": title,
+                "event_title": clean_title(title),
                 "raw_date": raw_date,
-                "event_date": parsed_date,
+                "event_date": start_date,
                 "event_end_date": end_date,
                 "source_url": response.url,
-                "confidence": "parsed_date" if parsed_date else "raw_date",
+                "scraped_at": datetime.now(timezone.utc).isoformat(),
             }
