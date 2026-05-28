@@ -336,6 +336,41 @@ for duration in durations:
     conn.execute(table('Duration', Column('variantID'), Column('duration')).insert().values({ 'variantID': duration.variantID, 'duration': duration.duration}))
 for modeofattendance in modesofattendance:
     conn.execute(table('ModeOfAttendance', Column('variantID'), Column('mode')).insert().values({ 'variantID': modeofattendance.variantID,'mode': modeofattendance.mode}))
+conn.commit()
+
+data = []
+errors = []
+
+with open('uow_key_dates.json') as file:
+    jsonfile = json.load(file)
+    for data in jsonfile:
+        if not data:
+            print("Skipping")
+            continue
+        skipTitle = ["session break", "CENSUS", "Lecture", "Recess", "penalty", "Results", "Exam", "international", "Amenities"]
+            
+
+        newTitle = data["event_title"]
+
+        if any(x in newTitle for x in skipTitle):
+            print("Skipping")
+            continue
+        
+        newDescription = ""
+        newEventType = ""
+        if "Orientation" in newTitle:
+            newDescription = "This is an Orientation Day for UOW, this is a great chance to make connections, get a look at different fields and potentially achieve early entry! For more details check out https://www.uow.edu.au/student/get-started/orientation/"
+            newEventType = "Orientation"
+
+        neworganiser = data["provider_name"]
+        newDate = data["event_date"]
+        newEndDate = "null"
+        if  data["event_end_date"] is not None:
+            newEndDate = data["event_end_date"]
+        newLocation = "University of Wollongong, NSW, 2522"
+
+        events.add(Event(eventcounter, newTitle , newDescription, neworganiser, newLocation, newDate, newDate, "12:00:00", newEventType ))
+        eventcounter = eventcounter + 1
 
 for event in events:
     conn.execute(table('Event', Column('eventID'), Column('title'), Column('description'), Column('organiser'), Column('location'), Column('date'), Column('endDate'), Column('time'), Column('eventType')).insert().values({ 'eventID': event.eventID,'title': event.title, 'description': event.description, 'organiser': event.organiser,  'location': event.location, 'date': event.date, 'endDate': event.endDate, 'time': event.time, 'eventType': event.eventType }))
