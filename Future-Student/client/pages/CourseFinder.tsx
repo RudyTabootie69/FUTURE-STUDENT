@@ -11,10 +11,6 @@ import {useTags} from "@/context/TagContext"
 
 export default function CourseFinder() {
   const navigate = useNavigate();
-  const {checkAuth} = useAuth();
-  useEffect(() => {
-    checkAuth();
-  }, [checkAuth]);
   
   const { search, setSearch, courses } = useCourseFinder();
   const tags = useTags();

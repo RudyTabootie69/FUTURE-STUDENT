@@ -1,5 +1,7 @@
 import { number } from "zod/v4";
+import { useMemo } from "react";
 import Field, { fieldInputClass } from "./InputField";
+import { Search, ChevronDown } from "lucide-react";
 import type { StudentFormData, Gender, LinkedSupervisor } from "shared/types/user";
 
 export type StudentFormErrors = Partial<
@@ -38,6 +40,111 @@ const genderOptions: { value: Gender; label: string }[] = [
   { value: "non_binary", label: "Non-binary" },
   { value: "prefer_not_to_say", label: "Prefer not to say" },
 ];
+
+const schools = [
+    { value: "Airds High School", label: "Airds High School"},
+    { value: "Albury High School", label: "Albury High School"},
+    { value: "Armidale Secondary College", label: "Armidale Secondary College"},
+    { value: "Ballina Coast High School", label: "Ballina Coast High School"},
+    { value: "Banora Point High School", label: "Banora Point High School"},
+    { value: "Batemans Bay High School", label: "Batemans Bay High School"},
+    { value: "Bathurst High Campus", label: "Bathurst High Campus"},
+    { value: "Blaxland High School", label: "Blaxland High School"},
+    { value: "Bowral High School", label: "Bowral High School"},
+    { value: "Brisbane Water Secondary College", label: "Brisbane Water Secondary College"},
+    { value: "Bulli High School", label: "Bulli High School"},
+    { value: "Byron Bay High School", label: "Byron Bay High School"},
+    { value: "Camden Haven High School", label: "Camden Haven High School"},
+    { value: "Camden High School (New South Wales)", label: "Camden High School (New South Wales)"},
+    { value: "Canobolas Rural Technology High School", label: "Canobolas Rural Technology High School"},
+    { value: "Carenne School", label: "Carenne School"},
+    { value: "Cessnock High School", label: "Cessnock High School"},
+    { value: "Chatham High School (New South Wales)", label: "Chatham High School (New South Wales)"},
+    { value: "Coffs Harbour High School", label: "Coffs Harbour High School"},
+    { value: "Coffs Harbour Senior College", label: "Coffs Harbour Senior College"},
+    { value: "Coonabarabran High School", label: "Coonabarabran High School"},
+    { value: "Cootamundra High School", label: "Cootamundra High School"},
+    { value: "Corrimal High School", label: "Corrimal High School"},
+    { value: "Dapto High School", label: "Dapto High School"},
+    { value: "Deniliquin High School", label: "Deniliquin High School"},
+    { value: "Denison College of Secondary Education", label: "Denison College of Secondary Education"},
+    { value: "Dubbo College", label: "Dubbo College"},
+    { value: "Duval High School", label: "Duval High School"},
+    { value: "Erina High School", label: "Erina High School"},
+    { value: "Farrer Memorial Agricultural High School", label: "Farrer Memorial Agricultural High School"},
+    { value: "Figtree High School", label: "Figtree High School"},
+    { value: "Finley High School", label: "Finley High School"},
+    { value: "Gorokan High School", label: "Gorokan High School"},
+    { value: "Gosford High School", label: "Gosford High School"},
+    { value: "Goulburn High School", label: "Goulburn High School"},
+    { value: "Grafton High School (New South Wales)", label: "Grafton High School (New South Wales)"},
+    { value: "Great Lakes College", label: "Great Lakes College"},
+    { value: "Hay War Memorial High School", label: "Hay War Memorial High School"},
+    { value: "Henry Kendall High School", label: "Henry Kendall High School"},
+    { value: "Henry Lawson High School", label: "Henry Lawson High School"},
+    { value: "Hillston Central School", label: "Hillston Central School"},
+    { value: "Illawarra Sports High School", label: "Illawarra Sports High School"},
+    { value: "James Fallon High School", label: "James Fallon High School"},
+    { value: "Jindabyne Central School", label: "Jindabyne Central School"},
+    { value: "Kadina High Campus", label: "Kadina High Campus"},
+    { value: "Kanahooka High School", label: "Kanahooka High School"},
+    { value: "Karabar High School", label: "Karabar High School"},
+    { value: "Kariong Mountains High School", label: "Kariong Mountains High School"},
+    { value: "Keira High School", label: "Keira High School"},
+    { value: "Kelso High Campus", label: "Kelso High Campus"},
+    { value: "Kiama High School", label: "Kiama High School"},
+    { value: "Kincumber High School", label: "Kincumber High School"},
+    { value: "Kingscliff High School", label: "Kingscliff High School"},
+    { value: "Kooringal High School", label: "Kooringal High School"},
+    { value: "Lake Illawarra High School", label: "Lake Illawarra High School"},
+    { value: "Leeton High School", label: "Leeton High School"},
+    { value: "Lismore High Campus", label: "Lismore High Campus"},
+    { value: "Lurnea High School", label: "Lurnea High School"},
+    { value: "Macksville High School", label: "Macksville High School"},
+    { value: "Maitland Grossmann High School", label: "Maitland Grossmann High School"},
+    { value: "Maitland High School", label: "Maitland High School"},
+    { value: "Moruya High School", label: "Moruya High School"},
+    { value: "Moss Vale High School", label: "Moss Vale High School"},
+    { value: "Mount Austin High School", label: "Mount Austin High School"},
+    { value: "Mount View High School (Cessnock)", label: "Mount View High School (Cessnock)"},
+    { value: "Mudgee High School", label: "Mudgee High School"},
+    { value: "Murray High School, Lavington", label: "Murray High School, Lavington"},
+    { value: "Murrumbidgee Regional High School", label: "Murrumbidgee Regional High School"},
+    { value: "Murwillumbah High School", label: "Murwillumbah High School"},
+    { value: "Narara Valley High School", label: "Narara Valley High School"},
+    { value: "Nowra High School", label: "Nowra High School"},
+    { value: "Orange High School (New South Wales)", label: "Orange High School (New South Wales)"},
+    { value: "Orara High School", label: "Orara High School"},
+    { value: "Oxley High School", label: "Oxley High School"},
+    { value: "Parkes High School", label: "Parkes High School"},
+    { value: "Peak Hill Central School", label: "Peak Hill Central School"},
+    { value: "Peel High School", label: "Peel High School"},
+    { value: "Port Macquarie Campus", label: "Port Macquarie Campus"},
+    { value: "Queanbeyan High School", label: "Queanbeyan High School"},
+    { value: "Richmond River High Campus", label: "Richmond River High Campus"},
+    { value: "Rivers Secondary College", label: "Rivers Secondary College"},
+    { value: "Robert Townson High School", label: "Robert Townson High School"},
+    { value: "Rutherford Technology High School", label: "Rutherford Technology High School"},
+    { value: "Scone High School", label: "Scone High School"},
+    { value: "Singleton High School", label: "Singleton High School"},
+    { value: "Smith's Hill High School", label: "Smith's Hill High School"},
+    { value: "South Grafton High School", label: "South Grafton High School"},
+    { value: "Springwood High School (New South Wales)", label: "Springwood High School (New South Wales)"},
+    { value: "Tamworth High School", label: "Tamworth High School"},
+    { value: "Taree High School", label: "Taree High School"},
+    { value: "Tumut High School", label: "Tumut High School"},
+    { value: "Ulladulla High School", label: "Ulladulla High School"},
+    { value: "Vincentia High School", label: "Vincentia High School"},
+    { value: "Wagga Wagga High School", label: "Wagga Wagga High School"},
+    { value: "Warilla High School", label: "Warilla High School"},
+    { value: "Westfields Sports High School", label: "Westfields Sports High School"},
+    { value: "Winmalee High School", label: "Winmalee High School"},
+    { value: "Wollongong High School of the Performing Arts", label: "Wollongong High School of the Performing Arts"},
+    { value: "Woolgoolga High School", label: "Woolgoolga High School"},
+    { value: "Yanco Agricultural High School", label: "Yanco Agricultural High School"}
+  ]; 
+
+
 
 export default function StudentDetailsForm({
   form,
@@ -97,7 +204,7 @@ export default function StudentDetailsForm({
             value={form.nesaNumber}
             onChange={(e) =>{
                   const filterNonNumbers = e.target.value.replace(/\D/g, "");
-                  onChange({nesaNumber: Number(filterNonNumbers)})}
+                  onChange({nesaNumber:filterNonNumbers})}
                 }
             {...blur("nesaNumber")}
           />
@@ -187,16 +294,34 @@ export default function StudentDetailsForm({
             ))}
           </select>
         </Field>
-
-        <Field label="School name" error={errors.schoolName}>
-          <input
+        <Field
+          label={
+            <>
+              School <OptionalTag />
+            </>
+          }
+          error={errors.schoolName}
+        >
+          <select
             className={fieldInputClass}
-            placeholder="e.g. Albury High School"
             value={form.schoolName}
-            onChange={(e) => onChange({ schoolName: e.target.value })}
+            onChange={(e) =>
+              onChange({
+                schoolName: e.target
+                  .value as StudentFormData["schoolName"],
+              })
+            }
             {...blur("schoolName")}
-          />
+          >
+            <option value="">Select a school</option>
+            {schools.map(({ value, label }) => (
+              <option key={value} value={value}>
+                {label}
+              </option>
+            ))}
+          </select>
         </Field>
+
 
         <Field label="Home address" error={errors.address} colSpan="full">
           <input

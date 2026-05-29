@@ -46,8 +46,7 @@
             "name": "Full Stack Debug",
             "configurations": [
                 "Launch Backend",
-                "Launch Frontend",
-                "Launch Browser (Firefox)"
+                "Launch Frontend"
             ]
         }
     ]

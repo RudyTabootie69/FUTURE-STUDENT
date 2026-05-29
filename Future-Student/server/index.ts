@@ -45,7 +45,8 @@ export function createServer() {
       next();
     });
 
-    server.use(timeout("10s"));
+    //Uncomment after ending testing
+    //server.use(timeout("10s"));
 
     // If we're using Amazon EC2 these settings should not need to change, except for DB_PASSWORD
     const conn= mysql.createPool({
@@ -91,13 +92,19 @@ export function createServer() {
           const [userResult] = await conn.query('insert into User (firstName, lastName, address, username, email, passwordHash, hashSalt) values (?, ?, ?, ?, ?, ?, ?)', [insertuser.firstName.toString(), insertuser.lastName.toString(), insertuser.address.toString(), username.toString(), insertuser.email.toString(), hash, salt]);
           console.log("Complete 1")
           const id = (userResult as mysql.ResultSetHeader).insertId;
+          console.log("Complete 1.5")
           if(isStudent(insertuser)){ 
-            await conn.query('insert into Student (stuID, school, uacID, nesaNumber, indigenousStatus, culturalBackground, studentPathStage, usi, entryYear) values (?, ?, ?, ?, ?, ?, ?)', [id, insertuser.schoolName.toString(), insertuser.uacId.toString(), insertuser.nesaNumber.toString(), insertuser.indigenous.toString(), insertuser.culturalBackground.toString(), 0, insertuser.usi.toString(), insertuser.entryYear.toString()]);
+            console.log("Is Student")
+            await conn.query('insert into Student (stuID, school, uacID, nesaNumber, indigenousStatus, culturalBackground, studentPathStage, usi, entryYear) values (?, ?, ?, ?, ?, ?, ?, ?, ?)', [id, insertuser.schoolName.toString(), insertuser.uacId.toString(), insertuser.nesaNumber.toString(), insertuser.indigenous.toString(), insertuser.culturalBackground.toString(), 0, insertuser.usi.toString(), insertuser.entryYear.toString()]);
             console.log("Complete 2")
             if (insertuser.supervisorIds.length > 0){
               for (const supervisorid of insertuser.supervisorIds) {
+                try{
                 await conn.query('insert into Parent (parID, childID) values (?, ?)', [supervisorid, id]);
                 console.log("Complete 3")
+                }catch(error){
+                  console.log("Parent doesn't exist")
+                }
               }
             }
             return res.send("User created!")
@@ -129,20 +136,18 @@ export function createServer() {
       let user = User.default;
 
       try {
-          const [rows] = await conn.query('SELECT * FROM User urow LEFT JOIN Student sturow ON sturow.user_id = urow.id LEFT JOIN Parent parrow ON parrow.parID = urow.id LEFT JOIN SecondaryRep secrow ON secrow.secID = urow.id LEFT JOIN TertiaryRep tertrow ON tertrow.tertID = urow.id WHERE urow.username = ?', username)
+          const [rows] = await conn.query('SELECT * FROM User urow LEFT JOIN Student sturow ON sturow.stuID = urow.id LEFT JOIN Parent parrow ON parrow.parID = urow.id LEFT JOIN SecondaryRep secrow ON secrow.secID = urow.id LEFT JOIN TertiaryRep tertrow ON tertrow.tertID = urow.id WHERE urow.username = ?', username)
           const result = rows[0]
           let salt = result.hashSalt;
-          let compareInput = bcrypt.hash(password, salt);
-          let compareDB = result.passwordHash;
+          let compareInput = await bcrypt.hash(password, salt);
+          let compareDB = await result.passwordHash;
           console.log("Compareinput = " + compareInput);
           console.log("CompareDB = " + compareDB);
-          if (compareInput != compareDB){
-
-              console.log('Log in Failure');
-              throw Error;
-              //res.send(user);  //Comment out this line to stop testing
+          if (compareInput != compareDB){ 
+             //res.send(user);  //Comment out this line to stop testing
+              throw Error("Log in Failure");
           }     
-          
+          console.log(result)
           if(result.stuID){
               user = new Student(result.id, result.firstName, result.lastName, result.userName, result.email, result.dob, result.address, result.nesaNumber, result.entryYear, result.school);
               user.usi = result.usi;
