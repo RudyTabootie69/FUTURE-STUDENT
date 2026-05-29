@@ -1,5 +1,6 @@
 import Field, { fieldInputClass } from "./InputField";
 import type { SecondaryRepFormData } from "shared/types/user";
+import { schools } from "@/pages/data/highschools";
 
 export type SecondaryRepFormErrors = Partial<
   Record<keyof SecondaryRepFormData, string>
@@ -119,16 +120,33 @@ export default function SecondaryRepForm({
           <p className="text-sm font-semibold text-black">School details</p>
         </div>
 
-        <Field label="School name" error={errors.schoolName} colSpan="full">
-          <input
-            className={fieldInputClass}
-            placeholder="e.g. Albury High School"
-            value={form.schoolName}
-            onChange={(e) => onChange({ schoolName: e.target.value })}
-            {...blur("schoolName")}
-          />
+        <Field
+                  label={
+                    <>
+                      School <OptionalTag />
+                    </>
+                  }
+                  error={errors.schoolName}
+                >
+                  <select
+                    className={fieldInputClass}
+                    value={form.schoolName}
+                    onChange={(e) =>
+                      onChange({
+                        schoolName: e.target
+                          .value as SecondaryRepFormData["schoolName"],
+                      })
+                    }
+                    {...blur("schoolName")}
+                  >
+                    <option value="">Select a school</option>
+                    {schools.map(({ value, label }) => (
+                      <option key={value} value={value}>
+                        {label}
+                      </option>
+                    ))}
+                  </select>
         </Field>
-
         <Field
           label="School address"
           error={errors.schoolAddress}
