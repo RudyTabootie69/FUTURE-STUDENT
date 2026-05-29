@@ -4,61 +4,50 @@
     // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
     "version": "0.2.0",
     "configurations": [
-        {
-            "name": "Python Debugger: Current File",
-            "type": "debugpy",
+       {
+            "type": "chrome",
             "request": "launch",
-            "program": "${file}",
-            "console": "integratedTerminal",
-            "cwd": "${workspaceFolder}"
-        },
-        {
+            "name": "Launch Frontend (Chrome)",
+            "url": "http://localhost:4000",
+            "webRoot": "${workspaceFolder}/Future-Student"
+       },
+       {
             "type": "node-terminal",
-            "name": "Run Script: Build and Launch",
+            "name": "Launch Frontend",
             "request": "launch",
-            "command": "npm run build && npx vite --port=4000",
+            "command": "npm run build:client",
             "cwd": "${workspaceFolder}/Future-Student",
             "sourceMaps": true,
             "skipFiles": ["<node_internals>/**"]
-        },  
-        {
-            "type": "node-terminal",
-            "name": "Run Script: Launch and Debug",
+       },  
+       {
+            "type": "firefox",
             "request": "launch",
-            "command": "npm run dev ",
-            "cwd": "${workspaceFolder}/Future-Student",
-            "sourceMaps": true,
-            "skipFiles": ["<node_internals>/**"]
-        },  
+            "name": "Launch Browser (Firefox)",
+            "url": "http://localhost:4000", 
+            "webRoot": "${workspaceFolder}/Future-Student",
+       },
        {
             "type": "node",
             "request": "launch",
-            "name": "Debug Server (tsx)",
-            "runtimeArgs": ["-r", "tsx"],
-            "args": ["server/index.ts"],
+            "name": "Launch Backend",
+            "runtimeArgs": [
+                "-r",
+                "tsx"
+            ],
+            "args": ["server/index.ts"], 
             "cwd": "${workspaceFolder}/Future-Student",
-            "sourceMaps": true,
             "skipFiles": ["<node_internals>/**"],
-            "console": "integratedTerminal",
-            "env": {
-                "NODE_ENV": "development"
-            }
-        },
-        {
-            "type": "firefox",
-            "request": "launch",
-            "name": "Frontend Debug (Firefox)",
-            "url": "http://localhost:4000",
-            "webRoot": "${workspaceFolder}/Future-Student/client/"
+            "console": "integratedTerminal"
         }
     ],
     "compounds": [
         {
             "name": "Full Stack Debug",
             "configurations": [
-                //"Backend Debug",
-                "Run Script: Launch and Debug",
-                "Frontend Debug (Firefox)"
+                "Launch Backend",
+                "Launch Frontend",
+                "Launch Browser (Firefox)"
             ]
         }
     ]

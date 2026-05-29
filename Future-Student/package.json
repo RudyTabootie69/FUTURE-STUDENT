@@ -11,9 +11,9 @@
     ]
   },
   "scripts": {
-    "dev": "vite",
+    "dev": "node --inspect index.ts",
     "build": "npm run build:client && npm run build:server",
-    "build:client": "vite build",
+    "build:client": "npx vite --port 4000",
     "build:server": "vite build --config vite.config.server.ts",
     "test": "vitest --run",
     "format.fix": "prettier --write .",

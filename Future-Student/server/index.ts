@@ -88,15 +88,16 @@ export function createServer() {
         };
 
         try{
-          const [userResult] = await conn.query('insert into User (firstName, lastName, address, username, email, passwordHash, hashSalt) values (?, ?, ?, ?, ?)', [insertuser.firstName.toString(), insertuser.lastName.toString(), insertuser.address.toString(), username.toString(), insertuser.email.toString(), hash, salt]);
+          const [userResult] = await conn.query('insert into User (firstName, lastName, address, username, email, passwordHash, hashSalt) values (?, ?, ?, ?, ?, ?, ?)', [insertuser.firstName.toString(), insertuser.lastName.toString(), insertuser.address.toString(), username.toString(), insertuser.email.toString(), hash, salt]);
+          console.log("Complete 1")
           const id = (userResult as mysql.ResultSetHeader).insertId;
-
-
           if(isStudent(insertuser)){ 
-            await conn.query('insert into Student (stuID, school,) values (?, ?, ?, ?, ?, ?, ?)', [id, insertuser.schoolName.toString(), insertuser.uacId.toString(), insertuser.nesaNumber.toString(), insertuser.indigenous.toString(), insertuser.culturalBackground.toString(), 0, insertuser.usi.toString()]);
+            await conn.query('insert into Student (stuID, school, uacID, nesaNumber, indigenousStatus, culturalBackground, studentPathStage, usi, entryYear) values (?, ?, ?, ?, ?, ?, ?)', [id, insertuser.schoolName.toString(), insertuser.uacId.toString(), insertuser.nesaNumber.toString(), insertuser.indigenous.toString(), insertuser.culturalBackground.toString(), 0, insertuser.usi.toString(), insertuser.entryYear.toString()]);
+            console.log("Complete 2")
             if (insertuser.supervisorIds.length > 0){
               for (const supervisorid of insertuser.supervisorIds) {
                 await conn.query('insert into Parent (parID, childID) values (?, ?)', [supervisorid, id]);
+                console.log("Complete 3")
               }
             }
             return res.send("User created!")
@@ -114,7 +115,7 @@ export function createServer() {
             return res.send("User created!")
           }
         }catch(err){
-          return res.status(500).json({ "User Creation Error": err.message });
+          return res.status(500).json({ "User Creation Error": err.message});
         }
       
       } 
@@ -344,3 +345,5 @@ export function createServer() {
 
     return server;
 }
+
+createServer();
