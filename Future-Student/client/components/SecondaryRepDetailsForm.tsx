@@ -123,7 +123,7 @@ export default function SecondaryRepForm({
         <Field
                   label={
                     <>
-                      School <OptionalTag />
+                      School
                     </>
                   }
                   error={errors.schoolName}

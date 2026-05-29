@@ -193,7 +193,7 @@ export default function StudentDetailsForm({
         <Field
           label={
             <>
-              School <OptionalTag />
+              School
             </>
           }
           error={errors.schoolName}
