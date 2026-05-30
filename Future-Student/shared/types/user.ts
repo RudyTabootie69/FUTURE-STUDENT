@@ -63,7 +63,6 @@ export class Student extends User {
   indigenous?: indigenous;
   culturalBackground?: string;
   supervisors: LinkedSupervisor[];
-  supervisorIds: number[];
   userType = "Student" as const
   constructor(
     id: number,
@@ -83,7 +82,6 @@ export class Student extends User {
     this.entryYear = entryYear;
     this.schoolName = schoolName;
     this.supervisors = supervisors
-    this.supervisorIds = [];
   }
 }
 

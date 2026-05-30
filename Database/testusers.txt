@@ -1,0 +1,15 @@
+Secondary Staff
+username: tsec1
+password: pw
+
+Parent: 
+username: tpar1
+password: pw
+
+Student 1
+username: tstu1
+password: pw
+
+Student 2
+username: tstu2
+password: pw

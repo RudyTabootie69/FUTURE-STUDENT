@@ -35,8 +35,8 @@ CREATE TABLE IF NOT EXISTS User(
     address varchar(50),
     username varchar(50) NOT NULL,
     email varchar(50),
-    passwordHash varchar(50) NOT NULL,
-    hashSalt varchar(50) NOT NULL,
+    passwordHash varchar(255) NOT NULL,
+    hashSalt varchar(255) NOT NULL,
     CONSTRAINT U_User UNIQUE (id, username)
 );
 
@@ -63,7 +63,7 @@ CREATE TABLE IF NOT EXISTS ParentUser(
 CREATE TABLE IF NOT EXISTS Parent(
     parID INT PRIMARY KEY,
     childID INT,
-    FOREIGN KEY (parID) REFERENCES Parent(parID),
+    FOREIGN KEY (parID) REFERENCES ParentUser(parID),
     FOREIGN KEY (childID) REFERENCES Student(stuID)
 );
 

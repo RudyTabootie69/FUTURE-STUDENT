@@ -93,21 +93,20 @@ export function createServer() {
           const [userResult] = await conn.query('insert into User (firstName, lastName, address, username, email, passwordHash, hashSalt) values (?, ?, ?, ?, ?, ?, ?)', [insertuser.firstName.toString(), insertuser.lastName.toString(), insertuser.address.toString(), username.toString(), insertuser.email.toString(), hash, salt]);
           const id = (userResult as mysql.ResultSetHeader).insertId;
           if(isStudent(insertuser)){ 
-            await conn.query('insert into Student (stuID, school, uacID, nesaNumber, indigenousStatus, culturalBackground, studentPathStage, usi, entryYear) values (?, ?, ?, ?, ?, ?, ?, ?, ?)', [id, insertuser.schoolName.toString(), insertuser.uacId.toString(), insertuser.nesaNumber, insertuser.indigenous.toString(), insertuser.culturalBackground.toString(), 0, insertuser.usi.toString(), insertuser.entryYear.toString()]);
-            if (insertuser.supervisorIds.length > 0){
-              for (const supervisorid of insertuser.supervisorIds) {
+            await conn.query('insert into Student (stuID, school, uacID, nesaNumber, indigenousStatus, culturalBackground, studentPathStage, usi, entryYear) values (?, ?, ?, ?, ?, ?, ?, ?, ?)', [id, insertuser.schoolName.toString(), insertuser.uacId.toString(), insertuser.nesaNumber.toString(), insertuser.indigenous.toString(), insertuser.culturalBackground.toString(), 0, insertuser.usi.toString(), insertuser.entryYear.toString()]);
+            if (insertuser.supervisors.length > 0){
+              for (const supervisor of insertuser.supervisors) {
                 try{
-                await conn.query('insert into Parent (parID, childID) values (?, ?)', [supervisorid, id]);
-                console.log("Complete 3")
+                await conn.query('insert into Parent (parID, childID) values (?, ?)', [supervisor.id.toString(), id]);
                 }catch(error){
-                  console.log("Parent doesn't exist")
+                  console.log(error.message)
                 }
               }
             }
             return res.send("User created!")
           }
           else if (isParent(insertuser)){
-            await conn.query('insert into Parent(parID) VALUES (?)', [id]);
+            await conn.query('insert into ParentUser(parID) VALUES (?)', [id]);
             return res.send("User created!")
           }
           else if (isSecStaff(insertuser)){
