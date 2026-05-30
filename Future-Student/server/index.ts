@@ -213,7 +213,6 @@ export function createServer() {
           let user = User.default;
           const [rows] = await conn.query('SELECT * FROM User urow LEFT JOIN Student sturow ON sturow.stuID = urow.id LEFT JOIN Parent parrow ON parrow.parID = urow.id LEFT JOIN SecondaryRep secrow ON secrow.secID = urow.id LEFT JOIN School schrow ON schrow.name = secrow.school LEFT JOIN TertiaryRep tertrow ON tertrow.tertID = urow.id WHERE urow.id = ?', userId)
           const result = rows[0] 
-          console.log("Result:" +result)
           if(result.stuID){
               user = new Student(result.id, result.firstName, result.lastName, result.userName, result.email, result.dob, result.address, result.nesaNumber, result.entryYear, result.school);
               user.usi = result.usi;
@@ -344,6 +343,35 @@ export function createServer() {
       }catch(err){
       return res.status(500).json({ error: err.message });
       }
+    });
+
+    server.post('/coursesearch', async (req, res) => {
+        const {search, universityFilter, atarMin,atarMax, sortBy, offset} = req.body;
+        let sql = 'SELECT crow.uniName, campus, crow.courseID, startDate, lastDate FROM Course crow LEFT JOIN CourseVariant cvrow on crow.courseID = cvrow.courseID LEFT JOIN CourseOffering corow on corow.variantID = cvrow.variantID LEFT JOIN ModeOfAttendance moarow on moarow.variantID = moarow.variantID LEFT JOIN Duration drow on drow.variantID = cvrow.variantID LEFT JOIN Requirement rrow on rrow.variantID = cvrow.variantID WHERE (lowestAtar IS NULL OR (lowestAtar >= ? AND lowestAtar <= ?))';
+
+        const params = [atarMin, atarMax];
+
+        if (search) {
+          sql += 'AND (LOWER(crow.uniName) LIKE ? OR LOWER(title) LIKE ? OR LOWER(crow.courseID) LIKE ?)';
+          const lowersearch = `%${search.toLowerCase()}%`;
+          params.push(lowersearch, lowersearch, lowersearch);
+        }
+
+        if (universityFilter !== "All Universities") {
+          sql += ' AND crow.uniName = ?';
+          params.push(universityFilter);
+        }
+
+        if (sortBy === "uni") {
+          sql += ' ORDER BY crow.uniName ASC';
+        } else if (sortBy === "course") {
+          sql += ' ORDER BY title ASC';
+        }
+        sql += ' LIMIT 20 OFFSET ?';
+        params.push(offset);
+        const [rows] = await conn.query(sql, params)
+        return res.json({data: rows});
+
     });
 
     return server;

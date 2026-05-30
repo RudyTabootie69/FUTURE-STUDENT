@@ -3,11 +3,11 @@ export class Course {
   uniID?: string; 
   title: string;
   description?: string;
-  university: string;
-  location: string;
-  code: string;
-  startDate: string;
-  closingDate: string;
+  uniName: string;
+  campus: string;
+  courseID: string;
+  startDate: string | null;
+  lastDate: string | null;
   applicationOpenDate?: string;
   openDayDate?: string;
   offerReleaseDate?: string;
@@ -38,7 +38,6 @@ export class Course {
   });
 }
 
-
 export function toString(c: Course): string {
-  return `${c.university}__${c.uacID}`;
+  return `${c.uniName}__${c.uacID}`;
 }

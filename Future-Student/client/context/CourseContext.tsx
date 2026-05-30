@@ -4,8 +4,10 @@ import { toString } from "@shared/types/course";
 import {useAuth} from "@/context/AuthContext"
 import { requestdelay } from "@/pages/data/connection-data";
 
+interface DisplayCourse{}
 interface CourseContextValue {
   courses: Course[];
+  scrollCourses: () => void;
   loading: boolean;
   error: string;
   search: string;
@@ -20,15 +22,17 @@ interface CourseContextValue {
   setAtarMin: Dispatch<SetStateAction<number>>
   setAtarMax: Dispatch<SetStateAction<number>>
   setSortBy: Dispatch<SetStateAction<"none" | "uni" | "course">>
+  setScroll: Dispatch<SetStateAction<number>>
 }
 
 const CourseContext = createContext<CourseContextValue | undefined>(undefined);
 
 export function CourseProvider({ children }: { children: React.ReactNode }) {
-  const [search, setSearch] = useState<string>("");
+  const [search, setSearch] = useState<string>(" ");
   const [courses, setCourses] = useState<Course[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [scroll, setScroll] = useState(0);
   const [fieldFilter, setFieldFilter] = useState<string>("All Fields");
   const [universityFilter, setUniversityFilter] = useState<string>("All Universities");
   const [atarMin, setAtarMin] = useState<number>(30);
@@ -36,12 +40,12 @@ export function CourseProvider({ children }: { children: React.ReactNode }) {
   const [sortBy, setSortBy] = useState<"none" | "uni" | "course">("none");
   
   useEffect(() => {
-    if (search.trim().length < 4) {
+    if (search.trim().length < 0) {
       return;
     }
 
     const timeout = setTimeout(() => {
-      fetchCourses(search);
+      fetchCourses(search, fieldFilter, universityFilter, atarMin, atarMax, sortBy);
     }, requestdelay);
 
     return () => clearTimeout(timeout);
@@ -55,21 +59,30 @@ export function CourseProvider({ children }: { children: React.ReactNode }) {
     sortBy
   ]);
 
-  async function fetchCourses(search) {
+  async function fetchCourses(search, fieldFilter, universityFilter, atarMin, atarMax, sortBy) {
     try {
       setLoading(true);
       setError(null);
 
-      const res = await fetch(
-        `/courseSearch=${encodeURIComponent(search)}`, {
-        credentials: "include",
+      const response = await fetch("/backend/coursesearch", {
+        method: "POST",
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: 
+          JSON.stringify({"search": search, "fieldFilter": fieldFilter, "universityFilter": universityFilter, "atarMin": atarMin, "atarMax": atarMax, "sortBy": sortBy, "offset": 0}), 
       });
-
-      if (!res.ok) {
+      if (!response.ok) {
+          const res = await response.json();
+          throw new Error(res || "Request failed");
+      }
+      const res = await response.json();
+      if (!res.data) {
         throw new Error("Failed to fetch results");
       }
 
-      const data = await res.json();
+      const data = res.data;
+      console.log(data);
       setCourses(data);
     } catch (err) {
       setError(err.message);
@@ -78,45 +91,38 @@ export function CourseProvider({ children }: { children: React.ReactNode }) {
     }
   }
   
+  const scrollCourses = async ()  => {
+    try {
+      setLoading(true);
+      setError(null);
 
-  const filteredCourses = useMemo(() => {
-    const q = search.trim().toLowerCase();
-    let list = courses.filter(
-      (c) => c.atar === undefined || (c.atar >= atarMin && c.atar <= atarMax),
-    );
+      const response = await fetch("/backend/coursesearch", {
+        method: "POST",
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: 
+          JSON.stringify({"search": search, "fieldFilter": fieldFilter, "universityFilter": universityFilter, "atarMin": atarMin, "atarMax": atarMax, "sortBy": sortBy, "offset": scroll*20}), 
+      });
+      if (!response.ok) {
+          const res = await response.json();
+          throw new Error(res || "Request failed");
+      }
+      const res = await response.json();
+      if (!res.data) {
+        throw new Error("Failed to fetch results");
+      }
 
-    if (q) {
-      list = list.filter(
-        (c) =>
-          c.university.toLowerCase().includes(q) ||
-          c.title.toLowerCase().includes(q) ||
-          c.code.toLowerCase().includes(q),
-      );
+      const data = await res.json();
+      setCourses(prev => [...prev, ...data]);
+    } catch (err) {
+      setError(err.message);
+    } finally {
+      setLoading(false);
     }
+  }
 
-    if (fieldFilter !== "All Fields")
-      list = list.filter((c) => c.field === fieldFilter);
-    if (universityFilter !== "All Universities")
-      list = list.filter((c) => c.university === universityFilter);
-
-    if (sortBy === "uni")
-      list = [...list].sort((a, b) => a.university.localeCompare(b.university));
-    if (sortBy === "course")
-      list = [...list].sort((a, b) => a.title.localeCompare(b.title));
-
-    return list;
-  }, [
-    courses,
-    search,
-    fieldFilter,
-    universityFilter,
-    atarMin,
-    atarMax,
-    sortBy,
-  ]);
-
-
-  return <CourseContext.Provider value={{courses, loading, error, search, fieldFilter, universityFilter, atarMin, atarMax, sortBy, setSearch, setFieldFilter, setUniversityFilter, setAtarMin, setAtarMax, setSortBy}}>{children}</CourseContext.Provider>;
+  return <CourseContext.Provider value={{courses, loading, error, search, fieldFilter, universityFilter, atarMin, atarMax, sortBy, scrollCourses, setScroll, setSearch, setFieldFilter, setUniversityFilter, setAtarMin, setAtarMax, setSortBy}}>{children}</CourseContext.Provider>;
 }
 
 export function useCourseFinder() {

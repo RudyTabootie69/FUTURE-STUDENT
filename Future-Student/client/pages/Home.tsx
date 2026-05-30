@@ -1,4 +1,4 @@
-import { useMemo } from "react";
+import { useMemo, useEffect } from "react";
 import Navigation from "@/components/Navigation";
 import Footer from "@/components/Footer";
 import { useWishlist } from "@/context/WishlistContext";
@@ -10,8 +10,9 @@ import { QuickActions } from "@/sections/QuickActions";
 import { useNavigate } from "react-router-dom";
 import { actionCards } from "./data/home-data";
 import { getUpcomingDeadlines } from "@/lib/utils";
-
+import { useCourseFinder } from "@/context/CourseContext";
 import type { JourneyStep } from "@shared/types/types";
+import { isStudent } from "@shared/types/user";
 
 function getStepStatus(
   tasks: { completed: boolean }[],
@@ -25,12 +26,19 @@ function getStepStatus(
 }
 
 export default function Home() {
+  const { setSearch } = useCourseFinder();
   const navigate = useNavigate();
   const { wishlist } = useWishlist();
   const { profile } = useProfile();
   const upcomingDeadlines = useMemo(() => {
     return getUpcomingDeadlines(wishlist);
   }, [wishlist]);
+  
+  if(isStudent(profile)){
+    useEffect(() => {
+      setSearch("");
+    }, []);
+  }
 
   const journeySteps: JourneyStep[] = useMemo(() => {
     const hasSavedEnoughCourses = wishlist.length >= 3;

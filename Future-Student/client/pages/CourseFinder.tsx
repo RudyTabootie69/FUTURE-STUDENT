@@ -9,82 +9,33 @@ import { useNavigate } from "react-router-dom";
 import { useCourseFinder } from "@/context/CourseContext";
 import {useTags} from "@/context/TagContext"
 import { universities } from "./data/universities";
+import { useRef } from "react";
 
 export default function CourseFinder() {
   const navigate = useNavigate();
-  const { courses, search, fieldFilter, universityFilter, atarMin, atarMax, sortBy, setSearch, setFieldFilter, setUniversityFilter, setAtarMin, setAtarMax, setSortBy} = useCourseFinder();
+  const { courses, search, fieldFilter, universityFilter, atarMin, atarMax, sortBy, setSearch, scrollCourses, setScroll, setFieldFilter, setUniversityFilter, setAtarMin, setAtarMax, setSortBy} = useCourseFinder();
   const tags = useTags();
   const coursetags = tags.courseTags;
+  const tableRef = useRef(null);
 
-  //The functionality here needs to be replaced with searching and saving universities
-  //Make iterable loadedUniversities and loadedDegrees
-  /*
-  const degrees = [
-    {
-      title: "Bachelor of Computer Science",
-      abbr: "CS",
-      field: "Computing & IT",
-    },
-    {
-      title: "Bachelor of Information Technology",
-      abbr: "IT",
-      field: "Computing & IT",
-    },
-    { title: "Bachelor of Data Science", abbr: "DS", field: "Computing & IT" },
-    {
-      title: "Bachelor of Software Engineering",
-      abbr: "SE",
-      field: "Computing & IT",
-    },
-    {
-      title: "Bachelor of Electrical Engineering",
-      abbr: "EE",
-      field: "Engineering",
-    },
-    {
-      title: "Bachelor of Mechanical Engineering",
-      abbr: "ME",
-      field: "Engineering",
-    },
-    {
-      title: "Bachelor of Civil Engineering",
-      abbr: "CE",
-      field: "Engineering",
-    },
-    { title: "Bachelor of Business", abbr: "BUS", field: "Business" },
-    { title: "Bachelor of Commerce", abbr: "BCOM", field: "Business" },
-    { title: "Bachelor of Accounting", abbr: "ACC", field: "Business" },
-    { title: "Bachelor of Finance", abbr: "FIN", field: "Business" },
-    { title: "Bachelor of Law", abbr: "LLB", field: "Law" },
-    { title: "Bachelor of Arts", abbr: "BA", field: "Arts & Design" },
-    { title: "Bachelor of Design", abbr: "DES", field: "Arts & Design" },
-    { title: "Bachelor of Architecture", abbr: "ARCH", field: "Arts & Design" },
-    {
-      title: "Bachelor of Education",
-      abbr: "EDU",
-      field: "Education & Health",
-    },
-    { title: "Bachelor of Nursing", abbr: "NURS", field: "Education & Health" },
-    {
-      title: "Bachelor of Psychology",
-      abbr: "PSY",
-      field: "Education & Health",
-    },
-    { title: "Bachelor of Biomedical Science", abbr: "BIOM", field: "Science" },
-    { title: "Bachelor of Pharmacy", abbr: "PHAR", field: "Science" },
-    {
-      title: "Bachelor of Environmental Science",
-      abbr: "ENV",
-      field: "Science",
-    },
-    {
-      title: "Bachelor of Communication",
-      abbr: "COMM",
-      field: "Arts & Design",
-    },
-  ];
-  */
+  useEffect(() => {
+    if (tableRef.current) {
+      tableRef.current.scrollTop = 0;
+    }
+    setScroll(0);
+  }, []);
 
+  const handleScroll = () => {
+      const el = tableRef.current;
+
+      const nearBottom =
+        el.scrollTop + el.clientHeight >= el.scrollHeight - 50;
+
+      if (nearBottom) {
+        scrollCourses();
+      }
+  };
+  
   const sem1 = { start: "26-FEB-2026", close: "31-JAN-2026" };
   const sem2 = { start: "22-JUL-2026", close: "30-JUN-2026" };
 
@@ -146,11 +97,12 @@ export default function CourseFinder() {
   const { add, has } = useWishlist();
 
 
-  const goToCourse = (course: Course) => {
-    if(course){
-      navigate("/course",{state: { course: course }});
+  const goToCourse = (courseID: string) => {
+    if(courseID){
+      navigate("/course",{state: { course: courseID }});
     }
   }
+
 
   return (
     <div className="min-h-screen bg-bg-soft">
@@ -298,14 +250,14 @@ export default function CourseFinder() {
             </div>
 
             {/* Scrollable vertical list */}
-            <div className="h-[632px] overflow-x-auto overflow-y-auto">
+            <div className="h-[632px] overflow-x-auto overflow-y-auto" onScroll={handleScroll}>
               <table className="w-full">
                 <tbody className="divide-y divide-[#E9E8FC]">
                   {courses.map((course, index) => (
                     <tr
                       key={toString(course) + index}
                       className="hover:bg-gray-50 transition-colors"
-                      onClick = {() => goToCourse(course)}
+                      onClick = {() => goToCourse(course.courseID)}
                     >
                       <td className="p-4">
                         <div className="flex items-center gap-4">
@@ -314,10 +266,10 @@ export default function CourseFinder() {
                           <div className="min-w-0 flex-1 grid grid-cols-1 md:grid-cols-5 gap-4 items-center">
                             <div className="space-y-1">
                               <div className="font-normal text-[#27273F] text-base">
-                                {course.university}
+                                {course.uniName}
                               </div>
                               <div className="text-grey-400 text-base">
-                                {course.location}
+                                {course.campus}
                               </div>
                             </div>
                             <div className="space-y-1">
@@ -325,7 +277,7 @@ export default function CourseFinder() {
                                 {course.title}
                               </div>
                               <div className="text-grey-400 text-base">
-                                {course.code}
+                                {course.courseID}
                               </div>
                             </div>
                             <div className="space-y-1 text-right">
@@ -341,7 +293,7 @@ export default function CourseFinder() {
                                 Final Closing
                               </div>
                               <div className="text-grey-400 text-base">
-                                {course.closingDate}
+                                {course.lastDate}
                               </div>
                             </div>
                             <div className="text-right">
