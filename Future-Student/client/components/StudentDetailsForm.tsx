@@ -77,6 +77,7 @@ export default function StudentDetailsForm({
             className={fieldInputClass}
             autoComplete="given-name"
             value={form.firstName}
+            maxLength={50}
             onChange={(e) => onChange({ firstName: e.target.value })}
             {...blur("firstName")}
           />
@@ -87,6 +88,7 @@ export default function StudentDetailsForm({
             className={fieldInputClass}
             autoComplete="family-name"
             value={form.lastName}
+            maxLength={50}
             onChange={(e) => onChange({ lastName: e.target.value })}
             {...blur("lastName")}
           />
@@ -98,6 +100,7 @@ export default function StudentDetailsForm({
             inputMode="numeric"
             placeholder="e.g. 1234567890"
             value={form.nesaNumber}
+            maxLength={20}
             onChange={(e) =>{
                   const filterNonNumbers = e.target.value.replace(/\D/g, "");
                   onChange({nesaNumber:filterNonNumbers})}
@@ -118,6 +121,7 @@ export default function StudentDetailsForm({
             className={fieldInputClass}
             inputMode="numeric"
             placeholder="Universities Admissions Centre ID"
+            maxLength={15}
             value={form.uacId}
             onChange={(e) => onChange({ uacId: e.target.value })}
             {...blur("uacId")}
@@ -135,6 +139,7 @@ export default function StudentDetailsForm({
           <input
             className={fieldInputClass}
             placeholder="Unique Student Identifier"
+            maxLength={15}
             value={form.usi}
             onChange={(e) => onChange({ usi: e.target.value })}
             {...blur("usi")}

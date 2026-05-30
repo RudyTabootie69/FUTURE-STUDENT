@@ -59,6 +59,7 @@ export default function SecondaryRepForm({
             className={fieldInputClass}
             autoComplete="given-name"
             value={form.firstName}
+            maxLength={50}
             onChange={(e) => onChange({ firstName: e.target.value })}
             {...blur("firstName")}
           />
@@ -69,6 +70,7 @@ export default function SecondaryRepForm({
             className={fieldInputClass}
             autoComplete="family-name"
             value={form.lastName}
+            maxLength={50}
             onChange={(e) => onChange({ lastName: e.target.value })}
             {...blur("lastName")}
           />
@@ -81,6 +83,7 @@ export default function SecondaryRepForm({
             autoComplete="email"
             placeholder="you@school.nsw.edu.au"
             value={form.email}
+            maxLength={50}
             onChange={(e) => onChange({ email: e.target.value })}
             {...blur("email")}
           />
@@ -93,6 +96,7 @@ export default function SecondaryRepForm({
             autoComplete="tel"
             placeholder="e.g. 02 6021 1234"
             inputMode="tel"
+            maxLength={20}
             value={form.phone}
             onChange={(e) => onChange({ phone: e.target.value })}
             {...blur("phone")}
@@ -116,10 +120,6 @@ export default function SecondaryRepForm({
         </Field>
 
         {/* School details */}
-        <div className="sm:col-span-2 pt-2 border-t">
-          <p className="text-sm font-semibold text-black">School details</p>
-        </div>
-
         <Field
                   label={
                     <>
@@ -146,37 +146,6 @@ export default function SecondaryRepForm({
                       </option>
                     ))}
                   </select>
-        </Field>
-        <Field
-          label="School address"
-          error={errors.schoolAddress}
-          colSpan="full"
-        >
-          <input
-            className={fieldInputClass}
-            placeholder="Street address, suburb, state, postcode"
-            value={form.schoolAddress}
-            onChange={(e) => onChange({ schoolAddress: e.target.value })}
-            {...blur("schoolAddress")}
-          />
-        </Field>
-
-        <Field
-          label={
-            <>
-              NESA school code <OptionalTag />
-            </>
-          }
-          error={errors.nesaSchoolCode}
-        >
-          <input
-            className={fieldInputClass}
-            inputMode="numeric"
-            placeholder="e.g. 4321"
-            value={form.nesaSchoolCode}
-            onChange={(e) => onChange({ nesaSchoolCode: e.target.value })}
-            {...blur("nesaSchoolCode")}
-          />
         </Field>
       </div>
     </div>

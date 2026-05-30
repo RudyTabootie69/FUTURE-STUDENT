@@ -60,6 +60,7 @@ export function createServer() {
 
     // Create a new user
     server.post('/users/register', async (req, res) => {
+        const createTestUser = true
         const {user, username, password} = req.body;
         const saltRounds = 10;
         const salt = await bcrypt.genSalt(saltRounds);
@@ -74,7 +75,7 @@ export function createServer() {
             }
         } 
         const insertuser = user as Profile;
-        if(password.length<7 || noCapitals){
+        if(password.length<7 || noCapitals && !createTestUser ){
           return res.status(500).send( "Bad password" );
         }else{
           
@@ -90,13 +91,9 @@ export function createServer() {
 
         try{
           const [userResult] = await conn.query('insert into User (firstName, lastName, address, username, email, passwordHash, hashSalt) values (?, ?, ?, ?, ?, ?, ?)', [insertuser.firstName.toString(), insertuser.lastName.toString(), insertuser.address.toString(), username.toString(), insertuser.email.toString(), hash, salt]);
-          console.log("Complete 1")
           const id = (userResult as mysql.ResultSetHeader).insertId;
-          console.log("Complete 1.5")
           if(isStudent(insertuser)){ 
-            console.log("Is Student")
             await conn.query('insert into Student (stuID, school, uacID, nesaNumber, indigenousStatus, culturalBackground, studentPathStage, usi, entryYear) values (?, ?, ?, ?, ?, ?, ?, ?, ?)', [id, insertuser.schoolName.toString(), insertuser.uacId.toString(), insertuser.nesaNumber.toString(), insertuser.indigenous.toString(), insertuser.culturalBackground.toString(), 0, insertuser.usi.toString(), insertuser.entryYear.toString()]);
-            console.log("Complete 2")
             if (insertuser.supervisorIds.length > 0){
               for (const supervisorid of insertuser.supervisorIds) {
                 try{
@@ -136,7 +133,7 @@ export function createServer() {
       let user = User.default;
 
       try {
-          const [rows] = await conn.query('SELECT * FROM User urow LEFT JOIN Student sturow ON sturow.stuID = urow.id LEFT JOIN Parent parrow ON parrow.parID = urow.id LEFT JOIN SecondaryRep secrow ON secrow.secID = urow.id LEFT JOIN TertiaryRep tertrow ON tertrow.tertID = urow.id WHERE urow.username = ?', username)
+          const [rows] = await conn.query('SELECT * FROM User urow LEFT JOIN Student sturow ON sturow.stuID = urow.id LEFT JOIN Parent parrow ON parrow.parID = urow.id LEFT JOIN SecondaryRep secrow ON secrow.secID = urow.id LEFT JOIN School schrow ON schrow.name = secrow.school LEFT JOIN TertiaryRep tertrow ON tertrow.tertID = urow.id WHERE urow.username = ?', username)
           const result = rows[0]
           let salt = result.hashSalt;
           let compareInput = await bcrypt.hash(password, salt);
@@ -160,8 +157,9 @@ export function createServer() {
               user = new Parent(result.id, result.firstName, result.lastName, result.userName, result.email, result.dob, result.address);
               console.log('Log in success (Parent)');
           }
-          else if(result.secID){
+          else if(result.secID && result.location){
             user = new SecondaryRep(result.id, result.firstName, result.lastName, result.userName, result.email, result.dob, result.address, result.school, result.location, result.role);
+            user.nesaSchoolCode = result.nesaSchoolCode
             console.log('Log in success (Secondary Staff)');
           }
           else if(result.parID){
@@ -241,13 +239,43 @@ export function createServer() {
       const decoded = jwt.verify(token, process.env.JWT_SECRET, (err) => {
             if (err) return res.status(401).send('Invalid Token'); // Token verification failed
       });
-
+      if (!decoded){
+        return res.status(401).send('Empty Token');
+      }
       const userId = decoded.userID;
-      try{
-        const [rows] = await conn.query('SELECT * FROM users WHERE id = ?', userId)
-      return res.json(rows[0]);
-      }catch(err){
-        return res.status(500).json({ error: err.message });
+      let user = User.default;
+      try {
+          const [rows] = await conn.query('SELECT * FROM User urow LEFT JOIN Student sturow ON sturow.stuID = urow.id LEFT JOIN Parent parrow ON parrow.parID = urow.id LEFT JOIN SecondaryRep secrow ON secrow.secID = urow.id LEFT JOIN TertiaryRep tertrow ON tertrow.tertID = urow.id WHERE urow.id = ?', userId)
+          const result = rows[0]
+          console.log(result)
+          if(result.stuID){
+              user = new Student(result.id, result.firstName, result.lastName, result.userName, result.email, result.dob, result.address, result.nesaNumber, result.entryYear, result.school);
+              user.usi = result.usi;
+              user.firstInFamily = result.firstInFamily;
+              user.indigenous = result.indigenousStatus;
+              user.culturalBackground = result.culturalBackground;
+              console.log('Log in success (Student)');
+          } 
+          else if(result.parID){ 
+              user = new Parent(result.id, result.firstName, result.lastName, result.userName, result.email, result.dob, result.address);
+              console.log('Log in success (Parent)');
+          }
+          else if(result.secID){
+            user = new SecondaryRep(result.id, result.firstName, result.lastName, result.userName, result.email, result.dob, result.address, result.school, result.location, result.role);
+            console.log('Log in success (Secondary Staff)');
+          }
+          else if(result.parID){
+            user = new TertiaryRep(result.id, result.firstName, result.lastName, result.userName, result.email, result.dob, result.address, result.uni, result.institutionType, result.campus, result.role);
+            user.schoolName = result.schoolName
+            console.log('Log in success (Tertiary Staff)');
+          }
+          else{
+            console.log("Error in user type");
+            throw Error("User does not match any user type")
+          }
+      }catch (error) { 
+            
+            return res.status(500).send(error.message);
       }
       
     });
@@ -260,7 +288,6 @@ export function createServer() {
       }catch(err){
         return res.status(500).json({ error: err.message });
       }
-
     });
 
     // Get user by ID

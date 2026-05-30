@@ -1,6 +1,7 @@
 import { createContext, useContext, useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import {Profile, User, getUserType} from "@shared/types/user"
+import {Profile} from "@shared/types/user"
+import { useProfile } from "./ProfileContext";
 interface AuthContextValue {
   token: any
   isAuthenticated: boolean;
@@ -17,7 +18,7 @@ const AuthContext = createContext<AuthContextValue | undefined>(undefined);
 
 
 export const AuthProvider = ({ children }) => {
-
+  //const { save } = useProfile()
   const [token, setToken] = useState(localStorage.getItem("site") || "");
   const [isAuthenticated, setIsAuthenticated] = useState<boolean>(false);
   const [authLoading, setAuthLoading] = useState(true);
@@ -82,6 +83,7 @@ export const AuthProvider = ({ children }) => {
         setIsAuthenticated(res.ok)
         setToken(res.token);
         localStorage.setItem("token", res.token);
+        //save(JSON.parse(res.data))
         navigate("/home");
         return;
       }
