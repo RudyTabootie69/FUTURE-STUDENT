@@ -64,8 +64,7 @@ const REQUIRED_SECONDARY_FIELDS: (keyof SecondaryRepFormData)[] = [
   "email",
   "phone",
   "role",
-  "schoolName",
-  "schoolAddress",
+  "schoolName"
 ];
 
 const REQUIRED_TERTIARY_FIELDS: (keyof TertiaryRepFormData)[] = [
@@ -340,9 +339,12 @@ export default function Registration() {
 
   // -- Register --
   function handleRegister() {
-    if (!userType) return;
+    if (!userType) {
+    console.log("No user type")  
+    return};
 
     if (isStudent) {
+      console.log("Student")  
       const errors = validateAllStudent(studentForm);
       if (hasSupervisorErrors(errors) || Object.keys(errors).length > 0) {
         setStudentErrors(errors);
@@ -369,6 +371,7 @@ export default function Registration() {
       student.culturalBackground = studentForm.culturalBackground || undefined;
       register(student, username, password);
     } else if (isParent) {
+      console.log("Parent")  
       const errors = validateAllParent(parentForm);
       const parent = new Parent(
         Date.now(),
@@ -382,6 +385,7 @@ export default function Registration() {
       parent.phone = parentForm.phone;
       register(parent, username, password);
     } else if (isSecondary) {
+      console.log("Secondary")  
       const errors = validateAllSecondary(secondaryForm);
       if (Object.keys(errors).length > 0) {
         setSecondaryErrors(errors);
@@ -396,11 +400,10 @@ export default function Registration() {
         "",
         "",
         secondaryForm.schoolName,
-        secondaryForm.schoolAddress,
+        "",
         secondaryForm.role,
       );
       rep.phone = secondaryForm.phone;
-      rep.nesaSchoolCode = secondaryForm.nesaSchoolCode || undefined;
       register(rep, username, password);
     } else if (isTertiary) {
       const errors = validateAllTertiary(tertiaryForm);

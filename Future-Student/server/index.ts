@@ -75,7 +75,7 @@ export function createServer() {
             }
         } 
         const insertuser = user as Profile;
-        if(password.length<7 || noCapitals && !createTestUser ){
+        if(!createTestUser && (password.length<7 || noCapitals)){
           return res.status(500).send( "Bad password" );
         }else{
           
@@ -93,7 +93,7 @@ export function createServer() {
           const [userResult] = await conn.query('insert into User (firstName, lastName, address, username, email, passwordHash, hashSalt) values (?, ?, ?, ?, ?, ?, ?)', [insertuser.firstName.toString(), insertuser.lastName.toString(), insertuser.address.toString(), username.toString(), insertuser.email.toString(), hash, salt]);
           const id = (userResult as mysql.ResultSetHeader).insertId;
           if(isStudent(insertuser)){ 
-            await conn.query('insert into Student (stuID, school, uacID, nesaNumber, indigenousStatus, culturalBackground, studentPathStage, usi, entryYear) values (?, ?, ?, ?, ?, ?, ?, ?, ?)', [id, insertuser.schoolName.toString(), insertuser.uacId.toString(), insertuser.nesaNumber.toString(), insertuser.indigenous.toString(), insertuser.culturalBackground.toString(), 0, insertuser.usi.toString(), insertuser.entryYear.toString()]);
+            await conn.query('insert into Student (stuID, school, uacID, nesaNumber, indigenousStatus, culturalBackground, studentPathStage, usi, entryYear) values (?, ?, ?, ?, ?, ?, ?, ?, ?)', [id, insertuser.schoolName.toString(), insertuser.uacId.toString(), insertuser.nesaNumber, insertuser.indigenous.toString(), insertuser.culturalBackground.toString(), 0, insertuser.usi.toString(), insertuser.entryYear.toString()]);
             if (insertuser.supervisorIds.length > 0){
               for (const supervisorid of insertuser.supervisorIds) {
                 try{
@@ -107,15 +107,15 @@ export function createServer() {
             return res.send("User created!")
           }
           else if (isParent(insertuser)){
-            await conn.query('insert into Parent(parID) values (?)', [id]);
+            await conn.query('insert into Parent(parID) VALUES (?)', [id]);
             return res.send("User created!")
           }
           else if (isSecStaff(insertuser)){
-            await conn.query('insert into SecondaryRep(secID, school, role) (?, ?, ?)', [id, insertuser.schoolName, insertuser.role]);
+            await conn.query('insert into SecondaryRep(secID, school, role) VALUES (?, ?, ?)', [id, insertuser.schoolName, insertuser.role]);
             return res.send("User created!")
           }
           else if (isTertStaff(insertuser)){
-            await conn.query('insert into TertiaryRep(tertID, uni, campus, role, department) values (?, ?, ?, ?, ?)', [id, insertuser.institutionName.toString(), insertuser.institutionAddress.toString(), insertuser.role.toString(), insertuser.department.toString()]);
+            await conn.query('insert into TertiaryRep(tertID, uni, campus, role, department) VALUES (?, ?, ?, ?, ?)', [id, insertuser.institutionName.toString(), insertuser.institutionAddress.toString(), insertuser.role.toString(), insertuser.department.toString()]);
             return res.send("User created!")
           }
         }catch(err){

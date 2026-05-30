@@ -122,8 +122,6 @@ export interface SecondaryRepFormData {
   phone: string;
   role: string;
   schoolName: string;
-  schoolAddress: string;
-  nesaSchoolCode: string;
 }
 
 export const defaultSecondaryRepFormData: SecondaryRepFormData = {
@@ -132,9 +130,7 @@ export const defaultSecondaryRepFormData: SecondaryRepFormData = {
   email: "",
   phone: "",
   role: "",
-  schoolName: "",
-  schoolAddress: "",
-  nesaSchoolCode: "",
+  schoolName: ""
 };
 
 // ---------------------------------------------------------------------------

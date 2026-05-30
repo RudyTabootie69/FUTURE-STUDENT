@@ -7,49 +7,49 @@ CREATE DATABASE IF NOT EXISTS futurestudentdb;
 USE futurestudentdb;
 
 CREATE TABLE IF NOT EXISTS Institution(
-    acronym varchar(255),
-    institutionType varchar(255),
+    acronym varchar(50),
+    institutionType varchar(50),
     name varchar(255) PRIMARY KEY,
-    criscos varchar(255),
-    teqsa varchar(255),
-    rto varchar(255)
+    criscos varchar(50),
+    teqsa varchar(50),
+    rto varchar(50)
 );
 
 CREATE TABLE IF NOT EXISTS Campus(
     uni varchar(255),
-    campus varchar(255),
+    campus varchar(50),
     FOREIGN KEY (uni) REFERENCES Institution(name),
     CONSTRAINT U_Campus UNIQUE (uni, campus)
 );
 
 CREATE TABLE IF NOT EXISTS School(
-    name varchar(255) PRIMARY KEY,
-    location varchar(255),
-    nesaSchoolCode varchar(255)
+    name varchar(50) PRIMARY KEY,
+    location varchar(50),
+    nesaSchoolCode varchar(50)
 );
 
 CREATE TABLE IF NOT EXISTS User(
     id INT AUTO_INCREMENT PRIMARY KEY,
-    firstName varchar(255),
-    lastName varchar(255),
-    address varchar(255),
-    username varchar(255) NOT NULL,
-    email varchar(255),
-    passwordHash varchar(255) NOT NULL,
-    hashSalt varchar(255) NOT NULL,
+    firstName varchar(50),
+    lastName varchar(50),
+    address varchar(50),
+    username varchar(50) NOT NULL,
+    email varchar(50),
+    passwordHash varchar(50) NOT NULL,
+    hashSalt varchar(50) NOT NULL,
     CONSTRAINT U_User UNIQUE (id, username)
 );
 
 CREATE TABLE IF NOT EXISTS Student(
     stuID INT PRIMARY KEY,
-    school varchar(255),
-    uacID varchar(255),
+    school varchar(50),
+    uacID varchar(50),
     nesaNumber int,
     ecomStatus ENUM('low', 'medium', 'high'),
     indigenousStatus ENUM('yes', 'no', 'prefer_not_to_say'),
-    culturalBackground varchar(255),
+    culturalBackground varchar(50),
     studentPathStage int,
-    usi varchar (255),
+    usi varchar (50),
     entryYear int,
     FOREIGN KEY (stuID) REFERENCES User(id),
     FOREIGN KEY (school) REFERENCES School(name)
@@ -69,9 +69,9 @@ CREATE TABLE IF NOT EXISTS Parent(
 
 CREATE TABLE IF NOT EXISTS SecondaryRep(
     secID INT PRIMARY KEY,
-    school varchar(255),
+    school varchar(50),
     
-    role varchar(255),
+    role varchar(50),
     FOREIGN KEY (secID) REFERENCES User(id),
     FOREIGN KEY (school) REFERENCES School(name)
 );
@@ -79,17 +79,17 @@ CREATE TABLE IF NOT EXISTS SecondaryRep(
 CREATE TABLE IF NOT EXISTS TertiaryRep(
     tertID INT PRIMARY KEY,
     uni varchar(255),
-    campus varchar(255),
-    role varchar(255),
-    department varchar(255),
+    campus varchar(50),
+    role varchar(50),
+    department varchar(50),
     FOREIGN KEY (tertID) REFERENCES User(id),
     FOREIGN KEY (uni) REFERENCES Institution(name),
     FOREIGN KEY (uni, campus) REFERENCES Campus(uni, campus)
 );
 
 CREATE TABLE IF NOT EXISTS Course(
-    courseID varchar(255) PRIMARY KEY,
-    uniName varchar(255),
+    courseID varchar(50) PRIMARY KEY,
+    uniName varchar(50),
     title varchar(255),
     header TEXT(8192),
     careerOptions TEXT(8192),
@@ -102,18 +102,18 @@ CREATE TABLE IF NOT EXISTS Course(
 );
 
 CREATE TABLE IF NOT EXISTS CourseVariant(
-    courseID varchar(255),
-    variantID varchar(255) PRIMARY KEY, 
-    uni varchar(255),
-    campus varchar(255),
-    feeType varchar(255),
+    courseID varchar(50),
+    variantID varchar(50) PRIMARY KEY, 
+    uni varchar(50),
+    campus varchar(50),
+    feeType varchar(50),
     FOREIGN KEY (courseID) REFERENCES Course(courseID),
 	FOREIGN KEY (uni, campus) REFERENCES Campus(uni, campus)
 );
 
 #
 CREATE TABLE IF NOT EXISTS CourseOffering(
-    variantID varchar(255), 
+    variantID varchar(50), 
     startDate date,
     lastDate date,
     FOREIGN KEY (variantID) REFERENCES CourseVariant(variantID),
@@ -121,21 +121,21 @@ CREATE TABLE IF NOT EXISTS CourseOffering(
 );
 
 CREATE TABLE IF NOT EXISTS ModeOfAttendance(
-    variantID varchar(255), 
-    mode varchar(255),
+    variantID varchar(50), 
+    mode varchar(50),
     FOREIGN KEY (variantID) REFERENCES CourseVariant(variantID),
     CONSTRAINT PK_REQUIREMENTS PRIMARY KEY (variantID, mode)
 );
 
 CREATE TABLE IF NOT EXISTS Duration(
-    variantID varchar(255), 
-    duration varchar(255),
+    variantID varchar(50), 
+    duration varchar(50),
     FOREIGN KEY (variantID) REFERENCES CourseVariant(variantID),
     CONSTRAINT PK_REQUIREMENTS PRIMARY KEY (variantID, duration)
 );
 
 CREATE TABLE IF NOT EXISTS Requirement(
-    variantID varchar(255),
+    variantID varchar(50),
     lowestAtar FLOAT,
     medianAtar FLOAT,
     lowestRank FLOAT,
@@ -145,7 +145,7 @@ CREATE TABLE IF NOT EXISTS Requirement(
 );
 
 CREATE TABLE IF NOT EXISTS Application(
-    courseID varchar(255),
+    courseID varchar(50),
     studentID INT, 
     applier ENUM('student', 'uni'),
     accepted BOOL,
@@ -158,12 +158,12 @@ CREATE TABLE IF NOT EXISTS Event(
     eventID INT AUTO_INCREMENT PRIMARY KEY,
     title varchar (255),
     description TEXT(8192),
-	organiser varchar(255),
-	location varchar (255),
+	organiser varchar(50),
+	location varchar (50),
 	date date,
     endDate date,
-	time varchar (255),
-	eventType varchar (255)
+	time varchar (50),
+	eventType varchar (50)
 );
 
 CREATE TABLE IF NOT EXISTS Tag(
@@ -172,7 +172,7 @@ CREATE TABLE IF NOT EXISTS Tag(
 );
 
 CREATE TABLE IF NOT EXISTS CourseTag(
-    courseID varchar(255),
+    courseID varchar(50),
     tagID INT,
     CONSTRAINT PK_APPLICATION PRIMARY KEY (courseID, tagID),
     FOREIGN KEY (courseID) REFERENCES Course(courseID),
@@ -194,15 +194,3 @@ CREATE TABLE IF NOT EXISTS StudentTag(
     FOREIGN KEY (eventID) REFERENCES Event(eventID),
     FOREIGN KEY (studentID) REFERENCES Student(stuID)
 );
-
-/*CREATE TABLE IF NOT EXISTS Pathway(
-    studentID SERIAL,
-    stage INT,
-    tagID SERIAL,
-    journeyStage INT,
-    journeyUrl varchar(255),
-    journeyDesc varchar(255),
-    CONSTRAINT PK_APPLICATION PRIMARY KEY (eventID, tagID),
-    FOREIGN KEY (eventID) REFERENCES Events(eventID),
-    FOREIGN KEY (studentID) REFERENCES Students(id)
-);*/
