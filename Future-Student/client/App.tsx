@@ -36,6 +36,7 @@ import CoursePage from "./pages/CoursePage";
 import Registration from "./pages/Registration";
 import ProtectedRoute from "./components/ProtectedRoute";
 import LogIn from "./pages/LogInPage";
+import StudentFinder from "./pages/StudentFinder";
 
 
 const queryClient = new QueryClient();
@@ -63,6 +64,7 @@ const App = () => (
                             <Route path="/profile" element={<Profile />} />
                             <Route path="/course" element={<CoursePage />} />
                             <Route path="/event" element={<EventPage />} />
+                            <Route path="/student-finder" element={<StudentFinder />} />
                           </Route>
                           <Route path="/" element={<LandingPage />} />
                           <Route path="/registration" element={<Registration />} />

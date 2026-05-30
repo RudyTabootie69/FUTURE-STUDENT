@@ -60,7 +60,7 @@ export function createServer() {
 
     // Create a new user
     server.post('/users/register', async (req, res) => {
-        const createTestUser = true
+        const createTestUser = false
         const {user, username, password} = req.body;
         const saltRounds = 10;
         const salt = await bcrypt.genSalt(saltRounds);
@@ -132,44 +132,15 @@ export function createServer() {
       let user = User.default;
 
       try {
-          const [rows] = await conn.query('SELECT * FROM User urow LEFT JOIN Student sturow ON sturow.stuID = urow.id LEFT JOIN Parent parrow ON parrow.parID = urow.id LEFT JOIN SecondaryRep secrow ON secrow.secID = urow.id LEFT JOIN School schrow ON schrow.name = secrow.school LEFT JOIN TertiaryRep tertrow ON tertrow.tertID = urow.id WHERE urow.username = ?', username)
+          const [rows] = await conn.query('SELECT * FROM User urow LEFT JOIN Student sturow ON sturow.stuID = urow.id LEFT JOIN Parent parrow ON parrow.parID = urow.id LEFT JOIN SecondaryRep secrow ON secrow.secID = urow.id LEFT JOIN School schrow ON schrow.name = secrow.school LEFT JOIN TertiaryRep tertrow ON tertrow.tertID = urow.id WHERE urow.username = ?', username.toString())
           const result = rows[0]
           let salt = result.hashSalt;
           let compareInput = await bcrypt.hash(password, salt);
           let compareDB = await result.passwordHash;
-          console.log("Compareinput = " + compareInput);
-          console.log("CompareDB = " + compareDB);
           if (compareInput != compareDB){ 
-             //res.send(user);  //Comment out this line to stop testing
-              throw Error("Log in Failure");
+              return res.status(401).send({ message: 'Unauthorized access' });
           }     
-          console.log(result)
-          if(result.stuID){
-              user = new Student(result.id, result.firstName, result.lastName, result.userName, result.email, result.dob, result.address, result.nesaNumber, result.entryYear, result.school);
-              user.usi = result.usi;
-              user.firstInFamily = result.firstInFamily;
-              user.indigenous = result.indigenousStatus;
-              user.culturalBackground = result.culturalBackground;
-              console.log('Log in success (Student)');
-          } 
-          else if(result.parID){ 
-              user = new Parent(result.id, result.firstName, result.lastName, result.userName, result.email, result.dob, result.address);
-              console.log('Log in success (Parent)');
-          }
-          else if(result.secID && result.location){
-            user = new SecondaryRep(result.id, result.firstName, result.lastName, result.userName, result.email, result.dob, result.address, result.school, result.location, result.role);
-            user.nesaSchoolCode = result.nesaSchoolCode
-            console.log('Log in success (Secondary Staff)');
-          }
-          else if(result.parID){
-            user = new TertiaryRep(result.id, result.firstName, result.lastName, result.userName, result.email, result.dob, result.address, result.uni, result.institutionType, result.campus, result.role);
-            user.schoolName = result.schoolName
-            console.log('Log in success (Tertiary Staff)');
-          }
-          else{
-            console.log("Error in user type");
-            throw Error("User does not match any user type")
-          }
+          user = result;
       }catch (error) { 
             
             return res.status(500).send(error.message);
@@ -184,7 +155,7 @@ export function createServer() {
           httpOnly: true,   // Not accessible via JavaScript
           secure: false,    // Set to true in production (HTTPS)
         });
-        return res.send(user);
+        return res.json({"ok": true});;
     });
 
     server.post('/users/logout', (req, res) => {
@@ -235,18 +206,14 @@ export function createServer() {
       if (!token) {
             return res.status(401).send({ message: 'Unauthorized access' });
       }
-      const decoded = jwt.verify(token, process.env.JWT_SECRET, (err) => {
-            if (err) return res.status(401).send('Invalid Token'); // Token verification failed
-      });
-      if (!decoded){
-        return res.status(401).send('Empty Token');
-      }
-      const userId = decoded.userID;
-      let user = User.default;
       try {
-          const [rows] = await conn.query('SELECT * FROM User urow LEFT JOIN Student sturow ON sturow.stuID = urow.id LEFT JOIN Parent parrow ON parrow.parID = urow.id LEFT JOIN SecondaryRep secrow ON secrow.secID = urow.id LEFT JOIN TertiaryRep tertrow ON tertrow.tertID = urow.id WHERE urow.id = ?', userId)
-          const result = rows[0]
-          console.log(result)
+          const decoded = jwt.verify(token, process.env.JWT_SECRET);
+          const userId = decoded.userID;
+          console.log("User ID" + userId)
+          let user = User.default;
+          const [rows] = await conn.query('SELECT * FROM User urow LEFT JOIN Student sturow ON sturow.stuID = urow.id LEFT JOIN Parent parrow ON parrow.parID = urow.id LEFT JOIN SecondaryRep secrow ON secrow.secID = urow.id LEFT JOIN School schrow ON schrow.name = secrow.school LEFT JOIN TertiaryRep tertrow ON tertrow.tertID = urow.id WHERE urow.id = ?', userId)
+          const result = rows[0] 
+          console.log("Result:" +result)
           if(result.stuID){
               user = new Student(result.id, result.firstName, result.lastName, result.userName, result.email, result.dob, result.address, result.nesaNumber, result.entryYear, result.school);
               user.usi = result.usi;
@@ -254,19 +221,24 @@ export function createServer() {
               user.indigenous = result.indigenousStatus;
               user.culturalBackground = result.culturalBackground;
               console.log('Log in success (Student)');
+              res.send(user)
           } 
           else if(result.parID){ 
               user = new Parent(result.id, result.firstName, result.lastName, result.userName, result.email, result.dob, result.address);
               console.log('Log in success (Parent)');
+               res.send(user)
           }
-          else if(result.secID){
-            user = new SecondaryRep(result.id, result.firstName, result.lastName, result.userName, result.email, result.dob, result.address, result.school, result.location, result.role);
-            console.log('Log in success (Secondary Staff)');
+          else if(result.secID && result.location){
+              user = new SecondaryRep(result.id, result.firstName, result.lastName, result.userName, result.email, result.dob, result.address, result.school, result.location, result.role);
+              user.nesaSchoolCode = result.nesaSchoolCode
+              console.log('Log in success (Secondary Staff)');
+              res.send(user)
           }
           else if(result.parID){
             user = new TertiaryRep(result.id, result.firstName, result.lastName, result.userName, result.email, result.dob, result.address, result.uni, result.institutionType, result.campus, result.role);
             user.schoolName = result.schoolName
             console.log('Log in success (Tertiary Staff)');
+            res.send(user)
           }
           else{
             console.log("Error in user type");

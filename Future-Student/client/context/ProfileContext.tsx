@@ -1,12 +1,15 @@
 import { createContext, useContext, useEffect, useMemo, useState } from "react";
 import { useAuth } from "@/context/AuthContext";
+import { useNavigate } from "react-router-dom";
 import { Student, Parent, SecondaryRep, TertiaryRep, Profile, isStudent, isParent, isSecStaff, isTertStaff } from "@shared/types/user";
+import { clear } from "console";
 
 
 interface ProfileContextValue {
   profile: Profile;
   save: (p: Profile) => void;
   update: (p: Partial<Profile>) => void;
+  logout: () => void;
 }
 
 const ProfileContext = createContext<ProfileContextValue | undefined>(undefined);
@@ -14,11 +17,12 @@ const ProfileContext = createContext<ProfileContextValue | undefined>(undefined)
 
 export const ProfileProvider = ({ children }: { children: React.ReactNode }) => {
   const [profile, setProfile] = useState<Profile | null>(null);
-  const { token } = useAuth();
-  const { isAuthenticated } = useAuth();
+  const { isAuthenticated,  clearCookies } = useAuth();
+  const navigate = useNavigate();
 
   useEffect(() => {
     if (!isAuthenticated) {
+      navigate("/");
       setProfile(null);
       return;
     }
@@ -31,7 +35,9 @@ export const ProfileProvider = ({ children }: { children: React.ReactNode }) => 
 
         const data = await res.json();
         setProfile(data);
+        navigate("/home");
       } catch (err) {
+        navigate("/");
         console.error(err);
         setProfile(null);
       }
@@ -58,31 +64,35 @@ export const ProfileProvider = ({ children }: { children: React.ReactNode }) => 
     }
   }
 
-    const value = useMemo<ProfileContextValue>(() => ({
-      profile,
-      save: (p) => setProfile(p),
-      update: (p) =>
-        setProfile((prev) => {
-          if (!prev) return prev
-          
-          // Use a type guard to handle the update based on current state
-          if (isStudent(prev)) {
-            return { ...prev, ...p } as Student;
-          }
-          if (isParent(prev)) {
-            return { ...prev, ...p } as Parent;
-          }
-          if (isSecStaff(prev)) {
-            return { ...prev, ...p } as SecondaryRep;
-          }
-          if (isTertStaff(prev)) {
-            return { ...prev, ...p } as TertiaryRep;
-          }
-          const finalCheck: never = prev;
-          return finalCheck;
-        }),
-      clear: () => setProfile(null),
-    }), [profile]);
+
+
+  const value = useMemo<ProfileContextValue>(() => ({
+    profile,
+    save: (p) => setProfile(p),
+    update: (p) =>
+      setProfile((prev) => {
+        if (!prev) return prev
+        
+        // Use a type guard to handle the update based on current state
+        if (isStudent(prev)) {
+          return { ...prev, ...p } as Student;
+        }
+        if (isParent(prev)) {
+          return { ...prev, ...p } as Parent;
+        }
+        if (isSecStaff(prev)) {
+          return { ...prev, ...p } as SecondaryRep;
+        }
+        if (isTertStaff(prev)) {
+          return { ...prev, ...p } as TertiaryRep;
+        }
+        const finalCheck: never = prev;
+        return finalCheck;
+      }),
+    logout: () =>{
+      clearCookies();
+    }
+  }), [profile]);
 
   return <ProfileContext.Provider value={value}> {children} </ProfileContext.Provider>;
 }

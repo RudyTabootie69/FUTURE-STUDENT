@@ -2,7 +2,7 @@ import { useMemo } from "react";
 import Navigation from "@/components/Navigation";
 import Footer from "@/components/Footer";
 import { useWishlist } from "@/context/WishlistContext";
-import { useAuth } from "@/context/AuthContext";
+import { useProfile } from "@/context/ProfileContext";
 import { Hero } from "@/sections/Hero";
 import { ApplicationJourney } from "@/sections/ApplicationJourney";
 import { StatsGrid } from "@/sections/StatsGrid";
@@ -27,7 +27,7 @@ function getStepStatus(
 export default function Home() {
   const navigate = useNavigate();
   const { wishlist } = useWishlist();
-
+  const { profile } = useProfile();
   const upcomingDeadlines = useMemo(() => {
     return getUpcomingDeadlines(wishlist);
   }, [wishlist]);
@@ -125,7 +125,7 @@ export default function Home() {
       <Navigation />
 
       <Hero
-        title="Welcome, Student!"
+        title={`Welcome, ${profile?.firstName || "Student"}!`}
         description="Let’s continue planning your path to University. You’re doing great!"
         cta={{
           label: "Find Your Perfect Course",

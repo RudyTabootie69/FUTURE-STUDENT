@@ -1,14 +1,12 @@
 import { createContext, useContext, useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import {Profile} from "@shared/types/user"
-import { useProfile } from "./ProfileContext";
+import {Profile, isStudent, isSecStaff, isParent, isTertStaff} from "@shared/types/user"
 interface AuthContextValue {
-  token: any
   isAuthenticated: boolean;
   authLoading: boolean;
   register: (user: Profile, username: string, password: string) => Promise<void>;
   login: (username: string, password: string) => Promise<void>;
-  logout: () => Promise<void>;
+  clearCookies: () => Promise<void>;
 }
 
 const AuthContext = createContext<AuthContextValue | undefined>(undefined);
@@ -18,8 +16,6 @@ const AuthContext = createContext<AuthContextValue | undefined>(undefined);
 
 
 export const AuthProvider = ({ children }) => {
-  //const { save } = useProfile()
-  const [token, setToken] = useState(localStorage.getItem("site") || "");
   const [isAuthenticated, setIsAuthenticated] = useState<boolean>(false);
   const [authLoading, setAuthLoading] = useState(true);
   const navigate = useNavigate();
@@ -56,8 +52,6 @@ export const AuthProvider = ({ children }) => {
       const res = await response.json();
       console.log(res)
       if (res.data) {
-        setToken(res.token);
-        localStorage.setItem("token", res.token);
         navigate("/login");
         return;
       }
@@ -79,22 +73,20 @@ export const AuthProvider = ({ children }) => {
         body: JSON.stringify(data),
       });
       const res = await response.json();
-      if (res.data) {
+      if (res.ok) {
+        console.log(res.ok)
         setIsAuthenticated(res.ok)
-        setToken(res.token);
-        localStorage.setItem("token", res.token);
-        //save(JSON.parse(res.data))
-        navigate("/home");
         return;
       }
-      throw new Error(res.message);
+      throw new Error("No data" + res.ok);
     } catch (err) {
       console.error(err);
       navigate("/");
     }
   };
   
-  const logout = async () => {
+  const clearCookies = async () => {
+    setIsAuthenticated(false);
     await fetch("/backend/users/logout", {
         method: "POST",
         headers: {
@@ -104,7 +96,7 @@ export const AuthProvider = ({ children }) => {
     });
   };
 
-  return <AuthContext.Provider value={{token, isAuthenticated, authLoading, register, login, logout}}>{children}</AuthContext.Provider>;
+  return <AuthContext.Provider value={{isAuthenticated, authLoading, register, login, clearCookies}}>{children}</AuthContext.Provider>;
 }
 
 export function useAuth() {
