@@ -8,75 +8,14 @@ import { useAuth } from "@/context/AuthContext";
 import { useNavigate } from "react-router-dom";
 import { useCourseFinder } from "@/context/CourseContext";
 import {useTags} from "@/context/TagContext"
+import { universities } from "./data/universities";
 
 export default function CourseFinder() {
   const navigate = useNavigate();
-  
-  const { search, setSearch, courses } = useCourseFinder();
+  const { courses, search, fieldFilter, universityFilter, atarMin, atarMax, sortBy, setSearch, setFieldFilter, setUniversityFilter, setAtarMin, setAtarMax, setSortBy} = useCourseFinder();
   const tags = useTags();
   const coursetags = tags.courseTags;
-  // Filters & sort
-  const [fieldFilter, setFieldFilter] = useState<string>("All Fields");
-  const [universityFilter, setUniversityFilter] =
-    useState<string>("All Universities");
-  const [atarMin, setAtarMin] = useState<number>(30);
-  const [atarMax, setAtarMax] = useState<number>(99.95);
-  const [sortBy, setSortBy] = useState<"none" | "uni" | "course">("none");
-  
-  const universities = [
-    {
-      name: "University of Wollongong",
-      location: "Wollongong, NSW",
-      abbr: "UOW",
-    },
-    {
-      name: "Australian National University",
-      location: "Acton, CBR",
-      abbr: "ANU",
-    },
-    {
-      name: "University of New South Wales",
-      location: "Kensington, NSW",
-      abbr: "UNSW",
-    },
-    { name: "University of Sydney", location: "Camperdown, NSW", abbr: "USYD" },
-    {
-      name: "University of Technology Sydney",
-      location: "Ultimo, NSW",
-      abbr: "UTS",
-    },
-    {
-      name: "Macquarie University",
-      location: "Macquarie Park, NSW",
-      abbr: "MQ",
-    },
-    {
-      name: "Western Sydney University",
-      location: "Parramatta, NSW",
-      abbr: "WSU",
-    },
-    {
-      name: "University of Newcastle",
-      location: "Callaghan, NSW",
-      abbr: "UON",
-    },
-    { name: "University of Canberra", location: "Bruce, ACT", abbr: "UC" },
-    {
-      name: "Charles Sturt University",
-      location: "Wagga Wagga, NSW",
-      abbr: "CSU",
-    },
-    {
-      name: "Australian Catholic University",
-      location: "North Sydney, NSW",
-      abbr: "ACU",
-    },
-    {
-      name: "University of New England",
-      location: "Armidale, NSW",
-      abbr: "UNE",
-    },
-  ]; 
+
   //The functionality here needs to be replaced with searching and saving universities
   //Make iterable loadedUniversities and loadedDegrees
   /*
@@ -206,44 +145,6 @@ export default function CourseFinder() {
 
   const { add, has } = useWishlist();
 
-  // Filtering + sorting pipeline
-  /*
-  const filteredCourses = useMemo(() => {
-    const q = search.trim().toLowerCase();
-    let list = courses.filter(
-      (c) => c.atar === undefined || (c.atar >= atarMin && c.atar <= atarMax),
-    );
-
-    if (q) {
-      list = list.filter(
-        (c) =>
-          c.university.toLowerCase().includes(q) ||
-          c.title.toLowerCase().includes(q) ||
-          c.code.toLowerCase().includes(q),
-      );
-    }
-
-    if (fieldFilter !== "All Fields")
-      list = list.filter((c) => c.field === fieldFilter);
-    if (universityFilter !== "All Universities")
-      list = list.filter((c) => c.university === universityFilter);
-
-    if (sortBy === "uni")
-      list = [...list].sort((a, b) => a.university.localeCompare(b.university));
-    if (sortBy === "course")
-      list = [...list].sort((a, b) => a.title.localeCompare(b.title));
-
-    return list;
-  }, [
-    courses,
-    search,
-    fieldFilter,
-    universityFilter,
-    atarMin,
-    atarMax,
-    sortBy,
-  ]);
-  */
 
   const goToCourse = (course: Course) => {
     if(course){
