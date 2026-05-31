@@ -347,7 +347,7 @@ export function createServer() {
 
     server.post('/coursesearch', async (req, res) => {
         const {search, universityFilter, atarMin,atarMax, sortBy, offset} = req.body;
-        let sql = 'SELECT crow.uniName, campus, cvrow.variantID, startDate, lastDate FROM Course crow LEFT JOIN CourseVariant cvrow on crow.courseID = cvrow.courseID LEFT JOIN CourseOffering corow on corow.variantID = cvrow.variantID LEFT JOIN ModeOfAttendance moarow on moarow.variantID = moarow.variantID LEFT JOIN Duration drow on drow.variantID = cvrow.variantID LEFT JOIN Requirement rrow on rrow.variantID = cvrow.variantID WHERE (lowestAtar IS NULL OR (lowestAtar >= ? AND lowestAtar <= ?))';
+        let sql = 'SELECT crow.uniName, campus, cvrow.variantID, startDate, lastDate FROM Course crow LEFT JOIN CourseVariant cvrow on crow.courseID = cvrow.courseID LEFT JOIN CourseOffering corow on corow.variantID = cvrow.variantID LEFT JOIN ModeOfAttendance moarow on moarow.variantID = cvrow.variantID LEFT JOIN Duration drow on drow.variantID = cvrow.variantID LEFT JOIN Requirement rrow on rrow.variantID = cvrow.variantID WHERE (lowestAtar IS NULL OR (lowestAtar >= ? AND lowestAtar <= ?))';
 
         const params = [atarMin, atarMax];
 

@@ -17,6 +17,7 @@ export function ProfileInput({
     <div className={className}>
       <label className="block text-sm font-medium text-black">{label}</label>
       <input
+        maxLength={50}
         type={type}
         className="w-full rounded-lg border border-[#1A1818] bg-bg-soft px-3 py-2.5 text-sm"
         value={value}

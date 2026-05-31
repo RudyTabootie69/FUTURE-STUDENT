@@ -34,13 +34,13 @@ export default function Profile() {
           <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
             <ProfileInput
               className="sm:col-span-2"
-              label="Full Name"
+              label="First Name"
               value={profile?.firstName || ""}
               onChange={(value) => update({ firstName: value })}
             />
             <ProfileInput
               className="sm:col-span-2"
-              label="Full Name"
+              label="Last Name"
               value={profile?.lastName || ""}
               onChange={(value) => update({ lastName: value })}
             />
@@ -149,6 +149,7 @@ export default function Profile() {
               </label>
               <div className="flex gap-2">
                 <input
+                  maxLength={20}
                   type="text"
                   value={hscSubject}
                   onChange={(e) => setHscSubject(e.target.value)}
@@ -230,13 +231,13 @@ export default function Profile() {
           <div className="grid grid-cols-1 gap-4 sm:grid-cols-2" >
             <ProfileInput
               className="sm:col-span-2"
-              label="Full Name"
+              label="First Name"
               value={profile?.firstName || ""}
               onChange={(value) => update({ firstName: value })}
             />
             <ProfileInput
               className="sm:col-span-2"
-              label="Full Name"
+              label="Last Name"
               value={profile?.lastName || ""}
               onChange={(value) => update({ lastName: value })}
             />
@@ -278,81 +279,6 @@ export default function Profile() {
           </div>
         )}
         */}
-
-        <ProfileSectionCard title="Your Profile Preferences">
-          <div className="space-y-6">
-            <ProfileInput
-              className="sm:col-span-2"
-              label="Estimated ATAR"
-              value={atar}
-              onChange={setAtar}
-            />
-
-            {/* HSC Subjects */}
-            <div className="space-y-2">
-              <label className="block text-sm font-medium text-black">
-                HSC Subjects
-              </label>
-              <div className="flex gap-2">
-                <input
-                  type="text"
-                  value={hscSubject}
-                  onChange={(e) => setHscSubject(e.target.value)}
-                  placeholder="e.g Mathematics Advanced"
-                  className="flex-1 px-3 py-2.5 border border-[#1A1818] rounded-lg bg-bg-soft text-sm text-[#5D5D5D] placeholder:text-[#5D5D5D] focus:outline-none focus:ring-2 focus:ring-primary-blue"
-                />
-                <button className="px-4 py-2 text-sm font-medium text-white bg-primary-blue rounded-lg hover:bg-blue-600 transition-colors whitespace-nowrap">
-                  Add
-                </button>
-              </div>
-            </div>
-
-            {/* Fields of Interest */}
-            <div className="space-y-2">
-              <label className="block text-sm font-medium text-black">
-                Fields of Interest
-              </label>
-              <div className="flex gap-2">
-                <input
-                  type="text"
-                  value={fieldOfInterest}
-                  onChange={(e) => setFieldOfInterest(e.target.value)}
-                  placeholder="e.g Engineering, Medicine"
-                  className="flex-1 px-3 py-2.5 border border-[#1A1818] rounded-lg bg-bg-soft text-sm text-[#5D5D5D] placeholder:text-[#5D5D5D] focus:outline-none focus:ring-2 focus:ring-primary-blue"
-                />
-                <button className="px-4 py-2 text-sm font-medium text-white bg-primary-blue rounded-lg hover:bg-blue-600 transition-colors whitespace-nowrap">
-                  Add
-                </button>
-              </div>
-            </div>
-
-            {/* Preferred Location */}
-            <div className="space-y-2">
-              <label className="block text-sm font-medium text-black">
-                Preferred Location
-              </label>
-              <div className="flex gap-2">
-                <input
-                  type="text"
-                  value={location}
-                  onChange={(e) => setLocation(e.target.value)}
-                  placeholder="e.g Sydney, Wollongong, Newcastle"
-                  className="flex-1 px-3 py-2.5 border border-[#1A1818] rounded-lg bg-bg-soft text-sm text-[#5D5D5D] placeholder:text-[#5D5D5D] focus:outline-none focus:ring-2 focus:ring-primary-blue"
-                />
-                <button className="px-4 py-2 text-sm font-medium text-white bg-primary-blue rounded-lg hover:bg-blue-600 transition-colors whitespace-nowrap">
-                  Add
-                </button>
-              </div>
-            </div>
-
-            {/* Save Button */}
-            <div className="flex justify-end pt-4">
-              <button className="px-4 py-2 text-sm font-medium text-white bg-primary-blue rounded-lg hover:bg-blue-600 transition-colors">
-                Save Changes
-              </button>
-            </div>
-          </div>
-        </ProfileSectionCard>
       </div>
     );
   }
@@ -375,13 +301,13 @@ export default function Profile() {
           <div className="grid grid-cols-1 gap-4 sm:grid-cols-2" id = "profile">
             <ProfileInput
               className="sm:col-span-2"
-              label="Full Name"
+              label="First Name"
               value={profile?.firstName || ""}
               onChange={(value) => update({ firstName: value })}
             />
             <ProfileInput
               className="sm:col-span-2"
-              label="Full Name"
+              label="Last Name"
               value={profile?.lastName || ""}
               onChange={(value) => update({ lastName: value })}
             />
@@ -430,81 +356,6 @@ export default function Profile() {
           </div>
         )}
         */}
-
-        <ProfileSectionCard title="Your Profile Preferences">
-          <div className="space-y-6">
-            <ProfileInput
-              className="sm:col-span-2"
-              label="Estimated ATAR"
-              value={atar}
-              onChange={setAtar}
-            />
-
-            {/* HSC Subjects */}
-            <div className="space-y-2">
-              <label className="block text-sm font-medium text-black">
-                HSC Subjects
-              </label>
-              <div className="flex gap-2">
-                <input
-                  type="text"
-                  value={hscSubject}
-                  onChange={(e) => setHscSubject(e.target.value)}
-                  placeholder="e.g Mathematics Advanced"
-                  className="flex-1 px-3 py-2.5 border border-[#1A1818] rounded-lg bg-bg-soft text-sm text-[#5D5D5D] placeholder:text-[#5D5D5D] focus:outline-none focus:ring-2 focus:ring-primary-blue"
-                />
-                <button className="px-4 py-2 text-sm font-medium text-white bg-primary-blue rounded-lg hover:bg-blue-600 transition-colors whitespace-nowrap">
-                  Add
-                </button>
-              </div>
-            </div>
-
-            {/* Fields of Interest */}
-            <div className="space-y-2">
-              <label className="block text-sm font-medium text-black">
-                Fields of Interest
-              </label>
-              <div className="flex gap-2">
-                <input
-                  type="text"
-                  value={fieldOfInterest}
-                  onChange={(e) => setFieldOfInterest(e.target.value)}
-                  placeholder="e.g Engineering, Medicine"
-                  className="flex-1 px-3 py-2.5 border border-[#1A1818] rounded-lg bg-bg-soft text-sm text-[#5D5D5D] placeholder:text-[#5D5D5D] focus:outline-none focus:ring-2 focus:ring-primary-blue"
-                />
-                <button className="px-4 py-2 text-sm font-medium text-white bg-primary-blue rounded-lg hover:bg-blue-600 transition-colors whitespace-nowrap">
-                  Add
-                </button>
-              </div>
-            </div>
-
-            {/* Preferred Location */}
-            <div className="space-y-2">
-              <label className="block text-sm font-medium text-black">
-                Preferred Location
-              </label>
-              <div className="flex gap-2">
-                <input
-                  type="text"
-                  value={location}
-                  onChange={(e) => setLocation(e.target.value)}
-                  placeholder="e.g Sydney, Wollongong, Newcastle"
-                  className="flex-1 px-3 py-2.5 border border-[#1A1818] rounded-lg bg-bg-soft text-sm text-[#5D5D5D] placeholder:text-[#5D5D5D] focus:outline-none focus:ring-2 focus:ring-primary-blue"
-                />
-                <button className="px-4 py-2 text-sm font-medium text-white bg-primary-blue rounded-lg hover:bg-blue-600 transition-colors whitespace-nowrap">
-                  Add
-                </button>
-              </div>
-            </div>
-
-            {/* Save Button */}
-            <div className="flex justify-end pt-4">
-              <button className="px-4 py-2 text-sm font-medium text-white bg-primary-blue rounded-lg hover:bg-blue-600 transition-colors">
-                Save Changes
-              </button>
-            </div>
-          </div>
-        </ProfileSectionCard>
       </div>
     );
   }

@@ -189,7 +189,7 @@ export default function Home() {
 
   if(isSecStaff(profile) || isParent(profile) || isSecStaff(profile)){
   return (
-    <div className="min-h-screen bg-bg-soft">
+    <div className="min-h-screen bg-bg-soft flex flex-col">
       <Navigation />
 
       <Hero
@@ -202,14 +202,14 @@ export default function Home() {
       />
 
       <QuickActions cards={actionCards} />
-
+      <div className="flex-1"></div>
       <Footer />
     </div>
   );
   }
   else {
     return (
-      <div className="min-h-screen bg-bg-soft">
+      <div className="min-h-screen bg-bg-soft flex flex-col">
       <Navigation />
 
       <Hero
@@ -230,7 +230,7 @@ export default function Home() {
       />
 
       <QuickActions cards={actionCards} />
-
+      <div className="flex-1"></div>
       <Footer />
     </div>
     );

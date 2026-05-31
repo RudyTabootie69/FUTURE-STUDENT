@@ -62,8 +62,7 @@ const REQUIRED_SECONDARY_FIELDS: (keyof SecondaryRepFormData)[] = [
   "email",
   "phone",
   "role",
-  "schoolName",
-  "schoolAddress",
+  "schoolName"
 ];
 
 const REQUIRED_TERTIARY_FIELDS: (keyof TertiaryRepFormData)[] = [
@@ -392,11 +391,11 @@ export default function Onboarding() {
         "",
         "",
         secondaryForm.schoolName,
-        secondaryForm.schoolAddress,
-        secondaryForm.role,
+        "",
+        "",
       );
       rep.phone = secondaryForm.phone;
-      rep.nesaSchoolCode = secondaryForm.nesaSchoolCode || undefined;
+      rep.nesaSchoolCode = undefined;
       save(rep);
     } else if (isTertiary) {
       const errors = validateAllTertiary(tertiaryForm);
