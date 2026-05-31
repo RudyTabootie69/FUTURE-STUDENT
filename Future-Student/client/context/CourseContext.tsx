@@ -71,10 +71,6 @@ export function CourseProvider({ children }: { children: React.ReactNode }) {
         body: 
           JSON.stringify({"search": search, "fieldFilter": fieldFilter, "universityFilter": universityFilter, "atarMin": atarMin, "atarMax": atarMax, "sortBy": sortBy, "offset": 0}), 
       });
-      if (!response.ok) {
-          const res = await response.json();
-          throw new Error(res || "Request failed");
-      }
       const res = await response.json();
       if (!res.data) {
         throw new Error("Failed to fetch results");
@@ -103,16 +99,13 @@ export function CourseProvider({ children }: { children: React.ReactNode }) {
         body: 
           JSON.stringify({"search": search, "fieldFilter": fieldFilter, "universityFilter": universityFilter, "atarMin": atarMin, "atarMax": atarMax, "sortBy": sortBy, "offset": scroll*20}), 
       });
-      if (!response.ok) {
-          const res = await response.json();
-          throw new Error(res || "Request failed");
-      }
+
       const res = await response.json();
       if (!res.data) {
         throw new Error("Failed to fetch results");
       }
 
-      const data = await res.json();
+      const data = res.data;
       setCourses(prev => [...prev, ...data]);
     } catch (err) {
       setError(err.message);

@@ -11,7 +11,7 @@ import { useRef } from "react";
 export default function StudentFinder() {
   const navigate = useNavigate();
   const { students, setScroll, sortBy, setSortBy, scrollStudents} = useStudents();
-  const { add, has } = useStudentTracker();
+  const { add, has, remove } = useStudentTracker();
   const tableRef = useRef(null);
 
   useEffect(() => {
@@ -74,7 +74,7 @@ export default function StudentFinder() {
             </div>
 
             {/* Scrollable vertical list */}
-            <div className="h-[632px] overflow-x-auto overflow-y-auto">
+            <div ref={tableRef} className="h-[632px] overflow-x-auto overflow-y-auto" onScroll={handleScroll}>
               <table className="w-full">
                 <tbody className="divide-y divide-[#E9E8FC]">
                   {students.map((student, index) => (
@@ -120,20 +120,20 @@ export default function StudentFinder() {
                                 {student.entryYear}
                               </div>
                             </div>
-                            <div className="text-right">
+                            <div className="ml-auto">
                               {has(toString(student)) ? (
                                 <button
-                                  className="px-3 py-2 text-sm border border-gray-300 text-gray-400 rounded-md cursor-default"
-                                  disabled
+                                  onClick={(e) => {e.stopPropagation(), remove(toString(student))}}
+                                  className="px-3 py-2 text-sm border border-gray-300 text-gray-400 rounded-md cursor-default hover:border-deadline-red hover:text-deadline-red"               
                                 >
-                                  Added
+                                  Remove
                                 </button>
                               ) : (
                                 <button
                                   onClick={(e) => {e.stopPropagation(), add(student)}}
                                   className="px-3 py-2 text-sm border border-primary-blue text-primary-blue rounded-md hover:bg-blue-50"
                                 >
-                                  Track Student
+                                  Add to Wishlist
                                 </button>
                               )}
                             </div>

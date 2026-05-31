@@ -41,5 +41,5 @@ export class Course {
 }
 
 export function toString(c: Course): string {
-  return `${c.uniName}__${c.variantID}__${c.campus}__${c.startDate}`;
+  return `${c.uniName}__${c.courseID}__${c.variantID}__${c.campus}__${c.startDate}__${c.lastDate}__${c.atar}`;
 }

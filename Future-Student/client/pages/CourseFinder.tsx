@@ -14,7 +14,7 @@ import { useRef } from "react";
 export default function CourseFinder() {
   const navigate = useNavigate();
   const { courses, search, fieldFilter, universityFilter, atarMin, atarMax, sortBy, setSearch, scrollCourses, setScroll, setFieldFilter, setUniversityFilter, setAtarMin, setAtarMax, setSortBy} = useCourseFinder();
-  const { add, has } = useWishlist();
+  const { add, has, remove } = useWishlist();
   const tags = useTags();
   const coursetags = tags.courseTags;
   const tableRef = useRef(null);
@@ -36,72 +36,21 @@ export default function CourseFinder() {
         scrollCourses();
       }
   };
-  
-  const sem1 = { start: "26-FEB-2026", close: "31-JAN-2026" };
-  const sem2 = { start: "22-JUL-2026", close: "30-JUN-2026" };
-
-  // Date helpers for D-MMM-YYYY strings
-  const MONTHS: Record<string, number> = {
-    JAN: 0,
-    FEB: 1,
-    MAR: 2,
-    APR: 3,
-    MAY: 4,
-    JUN: 5,
-    JUL: 6,
-    AUG: 7,
-    SEP: 8,
-    OCT: 9,
-    NOV: 10,
-    DEC: 11,
-  };
-  function parseDMY(s: string): Date {
-    // expects like 26-FEB-2026
-    const [dd, mmm, yyyy] = s.split("-");
-    const d = parseInt(dd, 10);
-    const m = MONTHS[mmm as keyof typeof MONTHS] ?? 0;
-    const y = parseInt(yyyy, 10);
-    return new Date(y, m, d);
-  }
-  function fmtDMY(d: Date): string {
-    const inv: string[] = [
-      "JAN",
-      "FEB",
-      "MAR",
-      "APR",
-      "MAY",
-      "JUN",
-      "JUL",
-      "AUG",
-      "SEP",
-      "OCT",
-      "NOV",
-      "DEC",
-    ];
-    const dd = String(d.getDate()).padStart(2, "0");
-    const mmm = inv[d.getMonth()];
-    const yyyy = d.getFullYear();
-    return `${dd}-${mmm}-${yyyy}`;
-  }
-  function addDays(base: Date, days: number): Date {
-    const d = new Date(base);
-    d.setDate(d.getDate() + days);
-    return d;
-  }
 
   const universityNames = useMemo(() => universities.map((u) => u.name), []);
+  
+  /*
   const fieldOptions = useMemo(
     () => [...Array.from(new Set(coursetags.map((d) => d.title)))],
     [],
   );
-
+  */
 
   const goToCourse = (variantID: string) => {
     if(variantID){
       navigate("/course",{state: { variantID: variantID }});
     }
   }
-
 
   return (
     <div className="min-h-screen bg-bg-soft">
@@ -174,7 +123,7 @@ export default function CourseFinder() {
               </div>
             </div>
             */}      
-            
+
             {/* University */}
             <div className="space-y-2">
               <label className="block text-sm font-medium text-black">
@@ -257,7 +206,7 @@ export default function CourseFinder() {
             </div>
 
             {/* Scrollable vertical list */}
-            <div className="h-[632px] overflow-x-auto overflow-y-auto" onScroll={handleScroll}>
+            <div ref={tableRef} className="h-[632px] overflow-x-auto overflow-y-auto" onScroll={handleScroll}>
               <table className="w-full">
                 <tbody className="divide-y divide-[#E9E8FC]">
                   {courses.map((course, index) => (
@@ -287,7 +236,7 @@ export default function CourseFinder() {
                                 {course.variantID}
                               </div>
                             </div>
-                            
+                            {course.startDate &&
                             <div className="space-y-1 text-right">
                               <div className="font-normal text-[#27273F] text-base">
                                 Course Starts        
@@ -296,9 +245,10 @@ export default function CourseFinder() {
                                 {course.startDate}
                               </div>
                             </div>
-                            
-                          
+                            }
+                            {course.lastDate &&
                             <div className="space-y-1 text-right">
+                              
                               <div className="font-normal text-[#27273F] text-base">
                                 Final Closing
                               </div>
@@ -306,14 +256,14 @@ export default function CourseFinder() {
                                 {course.lastDate}
                               </div>
                             </div>
-                            
-                            <div className="text-right">
+                            }
+                            <div className="ml-auto">
                               {has(toString(course)) ? (
                                 <button
-                                  className="px-3 py-2 text-sm border border-gray-300 text-gray-400 rounded-md cursor-default"
-                                  disabled
+                                  onClick={(e) => {e.stopPropagation(), remove(toString(course))}}
+                                  className="px-3 py-2 text-sm border border-gray-300 text-gray-400 rounded-md cursor-default hover:border-deadline-red hover:text-deadline-red"               
                                 >
-                                  Added
+                                  Remove
                                 </button>
                               ) : (
                                 <button

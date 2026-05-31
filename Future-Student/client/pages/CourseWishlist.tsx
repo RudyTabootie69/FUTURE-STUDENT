@@ -1,9 +1,11 @@
+import { useState } from "react";
 import Navigation from "@/components/Navigation";
 import { useWishlist } from "@/context/WishlistContext";
 import { toString } from "@shared/types/course";
 import { useNavigate } from "react-router-dom";
 
 export default function Wishlist() {
+  const [confirmRemove, setConfirmRemove] = useState<string | null>(null);
   const navigate = useNavigate();
   const { wishlist, remove } = useWishlist();
 
@@ -52,20 +54,37 @@ export default function Wishlist() {
                               <div className="text-[#27273F]">{course.title}</div>
                               <div className="text-grey-400">{course.courseID}</div>
                             </div>
+                            {course.startDate &&
                             <div className="space-y-1 text-right">
                               <div className="text-[#27273F]">Course Starts</div>
                               <div className="text-grey-400">{course.startDate}</div>
                             </div>
+                            }
+                            {course.lastDate &&
                             <div className="space-y-1 text-right">
                               <div className="text-[#27273F]">Final Closing</div>
                               <div className="text-grey-400">{course.lastDate}</div>
                             </div>
+                            }
                             <div className="text-right">
                               <button
-                                onClick={(e) => {e.stopPropagation(), remove(toString(course))}}
-                                className="px-3 py-2 text-sm border border-primary-blue text-primary-blue rounded-md hover:bg-blue-50"
-                              >
-                                Remove
+                                  onClick={(e) => {
+                                    e.stopPropagation();
+
+                                    if (confirmRemove === toString(course)) {
+                                      remove(toString(course));
+                                      setConfirmRemove(null);
+                                    } else {
+                                      setConfirmRemove(toString(course));
+                                    }
+                                  }}
+                                  className={`px-3 py-2 text-sm border rounded-md ${
+                                    confirmRemove === toString(course)
+                                      ? "text-deadline-red border-deadline-red"
+                                      : "border-gray-300 text-gray-400 hover:border-deadline-red hover:text-deadline-red"
+                                  }`}
+                                >
+                                  {confirmRemove === toString(course) ? "Are you sure?" : "Remove"}
                               </button>
                             </div>
                           </div>
