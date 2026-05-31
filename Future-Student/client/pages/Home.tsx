@@ -8,11 +8,10 @@ import { ApplicationJourney } from "@/sections/ApplicationJourney";
 import { StatsGrid } from "@/sections/StatsGrid";
 import { QuickActions } from "@/sections/QuickActions";
 import { useNavigate } from "react-router-dom";
-import { actionCards } from "./data/home-data";
 import { getUpcomingDeadlines } from "@/lib/utils";
 import { useCourseFinder } from "@/context/CourseContext";
-import type { JourneyStep } from "@shared/types/types";
-import { isStudent } from "@shared/types/user";
+import type { ActionCard, JourneyStep } from "@shared/types/types";
+import { isParent, isSecStaff, isStudent } from "@shared/types/user";
 
 function getStepStatus(
   tasks: { completed: boolean }[],
@@ -34,12 +33,72 @@ export default function Home() {
     return getUpcomingDeadlines(wishlist);
   }, [wishlist]);
   
-  if(isStudent(profile)){
-    useEffect(() => {
+  useEffect(() => {
+    if(isStudent(profile)){
       setSearch("");
-    }, []);
-  }
+    }
+  }, []);
 
+  let actionCards: ActionCard[] 
+
+  if(isParent(profile)){
+    actionCards =[
+      {
+        title: "Student Finder",
+        description: "View and track student's progress",
+        path: "/student-finder",
+      },
+      {
+        title: "Important Dates",
+        description: "Never miss application deadlines and open\ndays",
+        path: "/calendar",
+      },
+    ]
+  }
+  else if(isSecStaff(profile)){
+      actionCards =[
+      {
+        title: "Student Finder",
+        description: "View all your student's progress",
+        path: "/student-finder",
+      },
+      {
+        title: "Student Tracker",
+        description: "See which students you've marked to track later",
+        path: "/student-tracker",
+      },
+      {
+        title: "Important Dates",
+        description: "Never miss application deadlines and open\ndays",
+        path: "/calendar",
+      },
+    ]
+  }
+  else{
+    actionCards =[
+      {
+        title: "Course Finder",
+        description: "Search thousands of courses and filter\nby your preferences",
+        path: "/course-finder",
+      },
+      {
+        title: "Check Eligibility",
+        description: "See which courses match your ATAR\nand prerequisites",
+        path: "/course-finder",
+      },
+      {
+        title: "My Wishlist",
+        description: "View and manage your saved courses\nand preferences",
+        path: "/wishlist",
+      },
+      {
+        title: "Important Dates",
+        description: "Never miss application deadlines and open\ndays",
+        path: "/calendar",
+      },
+    ]
+  }
+  
   const journeySteps: JourneyStep[] = useMemo(() => {
     const hasSavedEnoughCourses = wishlist.length >= 3;
 
@@ -128,8 +187,29 @@ export default function Home() {
     ];
   }, [wishlist.length]);
 
+  if(isSecStaff(profile) || isParent(profile) || isSecStaff(profile)){
   return (
     <div className="min-h-screen bg-bg-soft">
+      <Navigation />
+
+      <Hero
+        title={`Welcome, ${profile?.firstName || "Student"}!`}
+        description="Let’s continue planning your path to University. You’re doing great!"
+        cta={{
+          label: "Track your Students",
+          href: "/student-finder",
+        }}
+      />
+
+      <QuickActions cards={actionCards} />
+
+      <Footer />
+    </div>
+  );
+  }
+  else {
+    return (
+      <div className="min-h-screen bg-bg-soft">
       <Navigation />
 
       <Hero
@@ -153,5 +233,6 @@ export default function Home() {
 
       <Footer />
     </div>
-  );
+    );
+  }
 }

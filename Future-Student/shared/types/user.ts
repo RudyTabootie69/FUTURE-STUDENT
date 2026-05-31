@@ -85,6 +85,9 @@ export class Student extends User {
   }
 }
 
+export function studenttoString(s: Student): string {
+  return `${s.nesaNumber}__${s.id}__${s.firstName}__${s.lastName}`;
+}
 // ---------------------------------------------------------------------------
 // SecondaryRep — representative of a secondary (school) institution
 // ---------------------------------------------------------------------------

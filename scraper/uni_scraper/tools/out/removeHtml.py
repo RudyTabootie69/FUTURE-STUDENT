@@ -22,6 +22,8 @@ for line in data:
     line = line.replace("<li>", "")
     line = line.replace("</li>", "")
     line = line.replace("</li>", "")
+    line = line.replace("<em>", "")
+    line = line.replace("</em>", "")
     line = line.replace("color: rgb", "")
     line = line.replace("(255, 255, 255)", "")
     line = line.replace("(57, 64, 73)", "")

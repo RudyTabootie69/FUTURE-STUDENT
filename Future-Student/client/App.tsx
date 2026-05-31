@@ -13,7 +13,8 @@ import { OnboardingProfileProvider } from "@/context/OnboardingProfileContext";
 import { SavedEventProvider } from "@/context/SavedEventContext";
 import { EventProvider } from "@/context/EventContext";
 import { TagProvider } from "@/context/TagContext";
-import { StudentTrackerProvider } from "./context/StudentContext";
+import { StudentProvider } from "./context/StudentContext";
+import { StudentTrackerProvider } from "./context/StudentTrackerContext";
 import Calendar from "./pages/Calendar";
 import CourseFinder from "./pages/CourseFinder";
 import Profile from "./pages/Profile";
@@ -38,6 +39,7 @@ import ProtectedRoute from "./components/ProtectedRoute";
 import LogIn from "./pages/LogInPage";
 import StudentFinder from "./pages/StudentFinder";
 import { CourseProvider } from "./context/CourseContext";
+import StudentPage from "./pages/StudentPage";
 
 
 const queryClient = new QueryClient();
@@ -55,36 +57,39 @@ const App = () => (
                 <EventProvider>
                   <SavedEventProvider>
                     <WishlistProvider>
-                      <StudentTrackerProvider>
-                        <TagProvider>
-                          <Routes>
-                            <Route element={<ProtectedRoute />}>
-                              <Route path="/home" element={<Home />} />
-                              <Route path="/calendar" element={<Calendar />} />
-                              <Route path="/course-finder" element={<CourseFinder />} />
-                              <Route path="/wishlist" element={<Wishlist />} />
-                              <Route path="/profile" element={<Profile />} />
-                              <Route path="/course" element={<CoursePage />} />
-                              <Route path="/event" element={<EventPage />} />
-                              <Route path="/student-finder" element={<StudentFinder />} />
-                            </Route>
-                            <Route path="/" element={<LandingPage />} />
-                            <Route path="/registration" element={<Registration />} />
-                            <Route path="/login" element={<LogIn />} />
-                            <Route path="/onboarding" element={<Onboarding />} />
-                            <Route path="/onboarding/home" element={<OnboardingHome />} />
-                            <Route path="/onboarding/course-finder" element={<OnboardingCourseFinder />} />
-                            <Route path="/onboarding/calendar" element={<OnboardingCalendar />} />
-                            <Route path="/onboarding/wishlist" element={<OnboardingWishlist />} />
-                            <Route path="/onboarding/profile" element={<OnboardingProfile />} />
-                            <Route path="/about" element={<AboutUs />} />
-                            <Route path="/privacypolicy" element={<PrivacyPolicy />} />
-                            <Route path="/contact" element={<ContactUs />} />
-                          
-                            <Route path="*" element={<NotFound />} />
-                          </Routes>
-                        </TagProvider>
-                      </StudentTrackerProvider>
+                      <StudentProvider>
+                        <StudentTrackerProvider>
+                          <TagProvider>
+                            <Routes>
+                              <Route element={<ProtectedRoute />}>
+                                <Route path="/home" element={<Home />} />
+                                <Route path="/calendar" element={<Calendar />} />
+                                <Route path="/course-finder" element={<CourseFinder />} />
+                                <Route path="/wishlist" element={<Wishlist />} />
+                                <Route path="/profile" element={<Profile />} />
+                                <Route path="/course" element={<CoursePage />} />
+                                <Route path="/event" element={<EventPage />} />
+                                <Route path="/student-finder" element={<StudentFinder />} />
+                                <Route path="/student" element={<StudentPage />} />
+                              </Route>
+                              <Route path="/" element={<LandingPage />} />
+                              <Route path="/registration" element={<Registration />} />
+                              <Route path="/login" element={<LogIn />} />
+                              <Route path="/onboarding" element={<Onboarding />} />
+                              <Route path="/onboarding/home" element={<OnboardingHome />} />
+                              <Route path="/onboarding/course-finder" element={<OnboardingCourseFinder />} />
+                              <Route path="/onboarding/calendar" element={<OnboardingCalendar />} />
+                              <Route path="/onboarding/wishlist" element={<OnboardingWishlist />} />
+                              <Route path="/onboarding/profile" element={<OnboardingProfile />} />
+                              <Route path="/about" element={<AboutUs />} />
+                              <Route path="/privacypolicy" element={<PrivacyPolicy />} />
+                              <Route path="/contact" element={<ContactUs />} />
+                            
+                              <Route path="*" element={<NotFound />} />
+                            </Routes>
+                          </TagProvider>
+                        </StudentTrackerProvider>
+                      </StudentProvider>
                     </WishlistProvider>
                   </SavedEventProvider>  
                 </EventProvider>

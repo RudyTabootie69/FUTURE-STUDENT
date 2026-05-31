@@ -14,6 +14,7 @@ import { useRef } from "react";
 export default function CourseFinder() {
   const navigate = useNavigate();
   const { courses, search, fieldFilter, universityFilter, atarMin, atarMax, sortBy, setSearch, scrollCourses, setScroll, setFieldFilter, setUniversityFilter, setAtarMin, setAtarMax, setSortBy} = useCourseFinder();
+  const { add, has } = useWishlist();
   const tags = useTags();
   const coursetags = tags.courseTags;
   const tableRef = useRef(null);
@@ -94,12 +95,10 @@ export default function CourseFinder() {
     [],
   );
 
-  const { add, has } = useWishlist();
 
-
-  const goToCourse = (courseID: string) => {
-    if(courseID){
-      navigate("/course",{state: { course: courseID }});
+  const goToCourse = (variantID: string) => {
+    if(variantID){
+      navigate("/course",{state: { variantID: variantID }});
     }
   }
 
@@ -150,12 +149,12 @@ export default function CourseFinder() {
                 type="text"
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
-                placeholder="Filter by course, institution, or code"
+                placeholder="Filter by course or institution"
                 className="flex-1 bg-transparent text-sm text-primary-blue placeholder:text-primary-blue outline-none"
               />
             </div>
 
-            {/* Field of Study */}
+            {/* Field of Study
             <div className="space-y-2">
               <label className="block text-sm font-medium text-black">
                 Field of Study
@@ -174,7 +173,8 @@ export default function CourseFinder() {
                 <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-grey-400 pointer-events-none" />
               </div>
             </div>
-
+            */}      
+            
             {/* University */}
             <div className="space-y-2">
               <label className="block text-sm font-medium text-black">
@@ -198,7 +198,14 @@ export default function CourseFinder() {
             {/* ATAR Slider */}
             <div className="space-y-3">
               <label className="block text-base text-[#1E1E1E]">
-                ATAR Requirement: {atarMin.toFixed(2)} – {atarMax.toFixed(2)}
+                ATAR Range:{' '}
+                <span className="inline-block w-[5ch] text-right tabular-nums">
+                  {atarMin.toFixed(2)}
+                </span>
+                {' – '}
+                <span className="inline-block w-[5ch] text-right tabular-nums">
+                  {atarMax.toFixed(2)}
+                </span>
               </label>
               <div className="relative">
                 <input
@@ -257,7 +264,7 @@ export default function CourseFinder() {
                     <tr
                       key={toString(course) + index}
                       className="hover:bg-gray-50 transition-colors"
-                      onClick = {() => goToCourse(course.courseID)}
+                      onClick = {() => goToCourse(course.variantID)}
                     >
                       <td className="p-4">
                         <div className="flex items-center gap-4">
@@ -277,17 +284,20 @@ export default function CourseFinder() {
                                 {course.title}
                               </div>
                               <div className="text-grey-400 text-base">
-                                {course.courseID}
+                                {course.variantID}
                               </div>
                             </div>
+                            
                             <div className="space-y-1 text-right">
                               <div className="font-normal text-[#27273F] text-base">
-                                Course Starts
+                                Course Starts        
                               </div>
                               <div className="text-grey-400 text-base">
                                 {course.startDate}
                               </div>
                             </div>
+                            
+                          
                             <div className="space-y-1 text-right">
                               <div className="font-normal text-[#27273F] text-base">
                                 Final Closing
@@ -296,6 +306,7 @@ export default function CourseFinder() {
                                 {course.lastDate}
                               </div>
                             </div>
+                            
                             <div className="text-right">
                               {has(toString(course)) ? (
                                 <button
@@ -313,6 +324,7 @@ export default function CourseFinder() {
                                 </button>
                               )}
                             </div>
+                            
                           </div>
                         </div>
                       </td>

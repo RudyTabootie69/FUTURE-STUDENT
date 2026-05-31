@@ -1,52 +1,40 @@
-import { useMemo, useState } from "react";
+import { useMemo, useState, useEffect} from "react";
 import { Search, ChevronDown } from "lucide-react";
 import Navigation from "@/components/Navigation";
 import type { Student } from "@shared/types/user";
 import { toString } from "@shared/types/user";
-import { useStudentTracker } from "@/context/StudentContext";
+import { useStudentTracker } from "@/context/StudentTrackerContext";
 import { useNavigate } from "react-router-dom";
-import {useTags} from "@/context/TagContext"
+import { useStudents } from "@/context/StudentContext";
+import { useRef } from "react";
 
 export default function StudentFinder() {
   const navigate = useNavigate();
-  // Filters & sort
-  const [search, setSearch] = useState<string>("");
-  const [sortBy, setSortBy] = useState<"none" | "school" | "firstname" | "lastname" >("none");
-
-  const students = []
+  const { students, setScroll, sortBy, setSortBy, scrollStudents} = useStudents();
   const { add, has } = useStudentTracker();
+  const tableRef = useRef(null);
 
-
-  const filteredStudents = useMemo(() => {
-    const q = search.trim().toLowerCase();
-    let list = []
-
-    if (q) {
-      list = list.filter(
-        (c) =>
-          c.firstname.toLowerCase().includes(q) ||
-          c.lastname.toLowerCase().includes(q) ||
-          c.id.toLowerCase().includes(q),
-      );
-    }
-    
-    if (sortBy === "school")
-      list = [...list].sort((a, b) => a.schoolName.localeCompare(b.schoolName));
-    if (sortBy === "firstname")
-      list = [...list].sort((a, b) => a.firstName.localeCompare(b.firstName));
-    if (sortBy === "lastname")
-      list = [...list].sort((a, b) => a.lastName.localeCompare(b.lastName));
-    return list;
-  }, [
-    students,
-    search,
-  ]);
+  useEffect(() => {
+      if (tableRef.current) {
+        tableRef.current.scrollTop = 0;
+      }
+      setScroll(0);
+    }, []);
+  
+    const handleScroll = () => {
+        const el = tableRef.current;
+  
+        const nearBottom =
+          el.scrollTop + el.clientHeight >= el.scrollHeight - 50;
+  
+        if (nearBottom) {
+          scrollStudents();
+        }
+  };
   
 
-  const goToStudent = (student: Student) => {
-    if(student){
-      navigate("/student",{state: { student: student }});
-    }
+  const goToStudent = (studentid: string) => {
+    navigate("/student",{state: { studentID: studentid }});
   }
 
   return (
@@ -89,11 +77,11 @@ export default function StudentFinder() {
             <div className="h-[632px] overflow-x-auto overflow-y-auto">
               <table className="w-full">
                 <tbody className="divide-y divide-[#E9E8FC]">
-                  {filteredStudents.map((student, index) => (
+                  {students.map((student, index) => (
                     <tr
                       key={toString(student) + index}
                       className="hover:bg-gray-50 transition-colors"
-                      onClick = {() => goToStudent(student)}
+                      onClick = {() => goToStudent(student.id)}
                     >
                       <td className="p-4">
                         <div className="flex items-center gap-4">
@@ -104,7 +92,7 @@ export default function StudentFinder() {
                               <div className="font-normal text-[#27273F] text-base">
                                 {student.firstName}
                               </div>
-                              <div className="text-grey-400 text-base">
+                              <div className="font-normal text-[#27273F] text-base">
                                 {student.lastName}
                               </div>
                             </div>

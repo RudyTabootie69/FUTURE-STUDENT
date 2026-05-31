@@ -50,7 +50,6 @@ export function CourseProvider({ children }: { children: React.ReactNode }) {
 
     return () => clearTimeout(timeout);
   }, [
-    courses,
     search,
     fieldFilter,
     universityFilter,

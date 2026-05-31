@@ -4,8 +4,10 @@ export class Course {
   title: string;
   description?: string;
   uniName: string;
+  acronym: string;
   campus: string;
   courseID: string;
+  variantID: string;
   startDate: string | null;
   lastDate: string | null;
   applicationOpenDate?: string;
@@ -39,5 +41,5 @@ export class Course {
 }
 
 export function toString(c: Course): string {
-  return `${c.uniName}__${c.uacID}`;
+  return `${c.uniName}__${c.variantID}__${c.campus}__${c.startDate}`;
 }

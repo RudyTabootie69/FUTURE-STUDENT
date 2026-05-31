@@ -347,7 +347,7 @@ export function createServer() {
 
     server.post('/coursesearch', async (req, res) => {
         const {search, universityFilter, atarMin,atarMax, sortBy, offset} = req.body;
-        let sql = 'SELECT crow.uniName, campus, crow.courseID, startDate, lastDate FROM Course crow LEFT JOIN CourseVariant cvrow on crow.courseID = cvrow.courseID LEFT JOIN CourseOffering corow on corow.variantID = cvrow.variantID LEFT JOIN ModeOfAttendance moarow on moarow.variantID = moarow.variantID LEFT JOIN Duration drow on drow.variantID = cvrow.variantID LEFT JOIN Requirement rrow on rrow.variantID = cvrow.variantID WHERE (lowestAtar IS NULL OR (lowestAtar >= ? AND lowestAtar <= ?))';
+        let sql = 'SELECT crow.uniName, campus, cvrow.variantID, startDate, lastDate FROM Course crow LEFT JOIN CourseVariant cvrow on crow.courseID = cvrow.courseID LEFT JOIN CourseOffering corow on corow.variantID = cvrow.variantID LEFT JOIN ModeOfAttendance moarow on moarow.variantID = moarow.variantID LEFT JOIN Duration drow on drow.variantID = cvrow.variantID LEFT JOIN Requirement rrow on rrow.variantID = cvrow.variantID WHERE (lowestAtar IS NULL OR (lowestAtar >= ? AND lowestAtar <= ?))';
 
         const params = [atarMin, atarMax];
 
@@ -374,6 +374,54 @@ export function createServer() {
 
     });
 
+    // Get event by ID
+    server.post('/course/id', async (req, res) => {
+      try{
+        const {variantID} = req.body;
+        const [rows] = await conn.query('SELECT crow.uniName, crow.header as description, rrow.lowestAtar as atar, cvrow.campus, crow.courseID, startDate, lastDate FROM Course crow LEFT JOIN CourseVariant cvrow on crow.courseID = cvrow.courseID LEFT JOIN CourseOffering corow on corow.variantID = cvrow.variantID LEFT JOIN ModeOfAttendance moarow on moarow.variantID = moarow.variantID LEFT JOIN Duration drow on drow.variantID = cvrow.variantID LEFT JOIN Requirement rrow on rrow.variantID = cvrow.variantID WHERE cvrow.variantID = ?', [variantID]);
+        return res.json({data: rows[0]});
+      }catch(err){
+      return res.status(500).json({ error: err.message });
+      }
+    });
+
+
+    server.post('/studentsearch', async (req, res) => {
+        const {search, parentID, secID, sortBy, offset} = req.body;
+        let sql = 'SELECT sturow.stuID as id, sturow.school as schoolName, urow.firstName, urow.lastName, sturow.nesaNumber, sturow.entryYear from Student sturow LEFT JOIN User urow on urow.id = sturow.stuID';
+        const params = [];
+        if (parentID) {
+          sql += ' LEFT JOIN Parent prow on parrow.childID = sturow.stuID LEFT JOIN ParentUser purow on parrow.parID = purrow.parID WHERE purrow.parID = ?';
+          const lowersearch = `%${search.toLowerCase()}%`;
+          params.push(parentID);
+        }
+        if (secID) {
+          sql += ' LEFT JOIN School schrow on schrow.name = sturow.School LEFT JOIN SecondaryRep srrow on schrow.name = srrow.school WHERE srrow.secID = ?';
+          params.push(secID);
+        }
+
+        if (sortBy === "uni") {
+          sql += ' ORDER BY crow.uniName ASC';
+        } else if (sortBy === "course") {
+          sql += ' ORDER BY title ASC';
+        }
+        sql += ' LIMIT 20 OFFSET ?';
+        params.push(offset);
+        const [rows] = await conn.query(sql, params)
+        return res.json({data: rows});
+
+    });
+
+    // Get event by ID
+    server.post('/student/id', async (req, res) => {
+      try{
+        const {studentID} = req.body;
+        const [rows] = await conn.query('SELECT * from Student sturow LEFT JOIN User urow ON urow.id = sturow.stuID WHERE stuID = ?', [studentID]);
+        return res.json({data: rows[0]});
+      }catch(err){
+      return res.status(500).json({ error: err.message });
+      }
+    });
     return server;
 }
 

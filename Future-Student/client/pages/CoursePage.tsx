@@ -1,27 +1,51 @@
 import Navigation from "@/components/Navigation";
 import { Course } from "@shared/types/course";
+import { useEffect, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 
 type State = {
-  course: Course;
+  variantID: string;
 };
 
 export default function CoursePage() {
+  const [course, setCourse] = useState<Course>(Course.default);
   const navigate = useNavigate();
   const location = useLocation();
+  
   const state = location.state as State | null;
-  const testing = true;
-  let course: Course;
+  const testing = false;
+  useEffect(() => {
+      if (!state.variantID) {
+        navigate("/course-finder");
+      }
+      try{
+        const fetchCourse = async () => {
+          const response = await fetch("/backend/course/id", {
+              method: "POST",
+              headers: {
+                'Content-Type': 'application/json'
+              },
+              body: 
+                JSON.stringify({"variantID": state.variantID}), 
+            });
+            const res = await response.json();
+            if (!res.data) {
+              throw new Error("Failed to fetch results");
+            }
 
-  if(testing){
-    course = Course.default
-  }else{  
-    if (!state.course) {
-      navigate("*");
-    }
+            const data = res.data;
+            console.log(data);
+            setCourse(data)
+        }
+        fetchCourse()
+      } catch (err) {
+        console.log(err.message);
+        navigate("/course-finder")
+      }
     
-    course = state.course
-  }
+  }, []);
+  
+  
 
   return (
     <div className="min-h-screen bg-bg-soft">
@@ -31,8 +55,8 @@ export default function CoursePage() {
         <div>
           <h1 className="text-white text-3xl font-bold mb-2">{course.title}</h1>
           <p className="text-white text-sm">
-            {course.university}
-            {course.location ? ` • ${course.location}` : ""}
+            {course.uniName}
+            {course.campus ? ` • ${course.campus}` : ""}
           </p>
         </div>
       </div>
@@ -44,24 +68,24 @@ export default function CoursePage() {
             <div>
               <p className="text-sm text-gray-500 mb-1">University</p>
               <p className="text-lg font-medium text-[#27273F]">
-                {course.university}
+                {course.uniName}
               </p>
             </div>
 
-            {course.code && (
+            {course.courseID && (
               <div>
                 <p className="text-sm text-gray-500 mb-1">Course Code</p>
                 <p className="text-lg font-medium text-[#27273F]">
-                  {course.code}
+                  {course.courseID}
                 </p>
               </div>
             )}
 
-            {course.location && (
+            {course.campus && (
               <div>
                 <p className="text-sm text-gray-500 mb-1">Location</p>
                 <p className="text-lg font-medium text-[#27273F]">
-                  {course.location}
+                  {course.campus}
                 </p>
               </div>
             )}
@@ -84,11 +108,11 @@ export default function CoursePage() {
               </div>
             )}
 
-            {course.closingDate && (
+            {course.lastDate && (
               <div>
                 <p className="text-sm text-gray-500 mb-1">Closing Date</p>
                 <p className="text-lg font-medium text-[#27273F]">
-                  {course.closingDate}
+                  {course.lastDate}
                 </p>
               </div>
             )}

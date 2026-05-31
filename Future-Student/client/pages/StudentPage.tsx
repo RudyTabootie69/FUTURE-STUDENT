@@ -1,28 +1,49 @@
 import Navigation from "@/components/Navigation";
 import { Student } from "@shared/types/user";
-import { useWishlist } from "@/context/WishlistContext";
+import { useEffect, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 
 type State = {
-  student: Student;
+  studentID: string;
 };
 
 export default function StudentPage() {
-  const location = useLocation();
+  const [student, setStudent] = useState<Student>(Student.default);
   const navigate = useNavigate();
+  const location = useLocation();
+  
   const state = location.state as State | null;
-  const testing = true;
-  let student: Student;
+  const testing = false;
+  useEffect(() => {
+      if (!state.studentID) {
+        navigate("/student-finder");
+      }
+      try{
+        const fetchCourse = async () => {
+          const response = await fetch("/backend/student/id", {
+              method: "POST",
+              headers: {
+                'Content-Type': 'application/json'
+              },
+              body: 
+                JSON.stringify({"studentID": state.studentID}), 
+            });
+            const res = await response.json();
+            if (!res.data) {
+              throw new Error("Failed to fetch results");
+            }
 
-  if(testing){
-    student = Student.default
-  }else{  
-    if (!state.student) {
-      navigate("*");
-    }
+            const data = res.data;
+            console.log(data);
+            setStudent(data)
+        }
+        fetchCourse()
+      } catch (err) {
+        console.log(err.message);
+        navigate("/student-finder")
+      }
     
-    student = state.student
-  }
+  }, []);
 
   return (
     <div className="min-h-screen bg-bg-soft">
@@ -40,7 +61,7 @@ export default function StudentPage() {
       <div className="max-w-[1440px] mx-auto px-6 lg:px-10 py-8">
         <div className="bg-white border border-[#E9E8FC] rounded-2xl p-6 shadow-sm">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            
+            {(student.email || student.phone) &&
             <div>
               <p className="text-sm text-gray-500 mb-1">Contact Details</p>
               <p className="text-lg font-medium text-[#27273F]">
@@ -48,7 +69,7 @@ export default function StudentPage() {
                 {student.phone ? ` • ${student.phone}` : ""}
               </p>
             </div>
-
+            }
             {student.id && (
               <div>
                 <p className="text-sm text-gray-500 mb-1">Future Student ID</p>
