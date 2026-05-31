@@ -1,9 +1,17 @@
 import Navigation from "@/components/Navigation";
 import { useWishlist } from "@/context/WishlistContext";
 import { toString } from "@shared/types/course";
+import { useNavigate } from "react-router-dom";
 
 export default function Wishlist() {
+  const navigate = useNavigate();
   const { wishlist, remove } = useWishlist();
+
+  const goToCourse = (variantID: string) => {
+    if(variantID){
+      navigate("/course",{state: { variantID: variantID }});
+    }
+  }
 
   return (
     <div className="min-h-screen bg-bg-soft">
@@ -27,7 +35,11 @@ export default function Wishlist() {
               <table className="w-full">
                 <tbody className="divide-y divide-[#E9E8FC]">
                   {wishlist.map((course) => (
-                    <tr key={toString(course)} className="hover:bg-gray-50 transition-colors">
+                    <tr 
+                    key={toString(course)} 
+                    className="hover:bg-gray-50 transition-colors"
+                    onClick = {() => goToCourse(course.variantID)}
+                    >
                       <td className="p-4">
                         <div className="flex items-center gap-4">
                           <div className="w-12 h-12 rounded-full bg-primary-blue flex-shrink-0" />
@@ -50,7 +62,7 @@ export default function Wishlist() {
                             </div>
                             <div className="text-right">
                               <button
-                                onClick={() => remove(toString(course))}
+                                onClick={(e) => {e.stopPropagation(), remove(toString(course))}}
                                 className="px-3 py-2 text-sm border border-primary-blue text-primary-blue rounded-md hover:bg-blue-50"
                               >
                                 Remove

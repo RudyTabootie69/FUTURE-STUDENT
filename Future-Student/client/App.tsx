@@ -20,7 +20,7 @@ import CourseFinder from "./pages/CourseFinder";
 import Profile from "./pages/Profile";
 import LandingPage from "./pages/LandingPage";
 import Placeholder from "./pages/Placeholder";
-import Wishlist from "./pages/Wishlist";
+import Wishlist from "./pages/CourseWishlist";
 import NotFound from "./pages/NotFound";
 import Home from "./pages/Home";
 import Onboarding from "./pages/Onboarding";
